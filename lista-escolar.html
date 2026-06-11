@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista Escolar — Sartec Papelaria</title>
+  <meta name="description" content="Envie a foto ou PDF da sua lista escolar. Marque o que já tem em casa e receba o orçamento organizado pelo WhatsApp. Sartec Papelaria em São José dos Campos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+  <div id="header-mount"></div>
+
+  <div class="banner-implantacao">
+    <div class="container">
+      <span class="banner-implantacao-ico">⚙</span>
+      <span><strong>Novo site em implantação.</strong> Estamos atualizando a experiência digital da Sartec.</span>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <section style="background: #1E3A8A; color: #FFFFFF">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 56px 20px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start">
+      <span style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #FFFFFF; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; border-radius: 100px">Ferramenta de lista escolar</span>
+      <h1 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(32px, 4vw, 48px); line-height: 1.1; margin: 0; letter-spacing: -0.01em; max-width: 620px">Envie sua lista, marque o que já tem.</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #DBE4F8; max-width: 560px">Foto ou PDF da lista, os itens organizados para você conferir, e um pedido pronto para o WhatsApp — sem digitar nada.</p>
+    </div>
+  </section>
+
+  <section class="lista-tool">
+    <div class="container">
+
+      <!-- ESTADO 1: UPLOAD -->
+      <div class="estado ativo" id="estado-upload">
+        <div style="text-align:center; max-width: 720px; margin: 0 auto 32px;">
+          <span class="kicker">Lista Escolar</span>
+          <h2>Envie sua lista escolar</h2>
+          <p class="sub">
+            Tire uma foto da lista impressa ou envie o PDF que a escola mandou.
+            Veja os itens organizados, marque o que já tem em casa e envie pelo WhatsApp — nossa equipe confirma disponibilidade e preços com você.
+          </p>
+          <p style="font-size:.83rem; color:var(--texto-suave); margin-top:-8px;">
+            A ferramenta está em evolução. As imagens são ilustrativas e as identificações estão sendo aprimoradas.
+          </p>
+        </div>
+
+        <div class="form-card" style="max-width: 640px;">
+          <form id="form-upload">
+            <div class="form-group">
+              <label for="nome">Seu nome</label>
+              <input type="text" id="nome" name="nome" required placeholder="Ex: Maria Silva" />
+            </div>
+
+            <div class="form-group">
+              <label for="whatsapp">WhatsApp pra contato</label>
+              <input type="tel" id="whatsapp" name="whatsapp" required placeholder="(12) 99999-9999" />
+              <div class="hint">Vamos te chamar nesse número quando tiver o orçamento.</div>
+            </div>
+
+            <div class="form-group">
+              <label>Arquivo da lista</label>
+              <div class="upload-area" id="upload-area">
+                <div class="icon">📋</div>
+                <div class="label" id="upload-label">Clique ou arraste sua lista aqui</div>
+                <div class="hint">PDF, JPG ou PNG • até 10MB</div>
+                <input type="file" id="arquivo" accept=".pdf,.jpg,.jpeg,.png" style="display:none" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+              Identificar itens da lista
+            </button>
+
+            <div class="dica-box">
+              <strong>💡 Dica:</strong> Tire a foto com boa iluminação e enquadre toda a lista.
+              Se a escola mandou PDF, esse é o melhor formato.
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ESTADO 2: LOADING -->
+      <div class="estado" id="estado-loading">
+        <div class="loading-box">
+          <div class="loading-spinner"></div>
+          <div class="loading-msg">Lendo sua lista...</div>
+          <div class="loading-hint" id="loading-hint">Identificando os itens um por um.</div>
+        </div>
+      </div>
+
+      <!-- ESTADO 3: RESULTADO -->
+      <div class="estado" id="estado-resultado">
+        <div style="text-align:center; max-width: 720px; margin: 0 auto 32px;">
+          <span class="kicker">✓ Itens para revisar</span>
+          <h2>Confirme o que você quer comprar</h2>
+          <p class="sub">
+            Confira os itens abaixo. Marque <strong>"Já tenho"</strong> nos que você não precisa
+            e ajuste a quantidade do que falta. Nossa equipe confirma disponibilidade e preços pelo WhatsApp.
+          </p>
+          <p style="font-size:.8rem; color:var(--texto-suave); margin-top:-8px;">
+            As imagens são ilustrativas. As identificações e quantidades são sugestões — nossa equipe revisa com você.
+          </p>
+        </div>
+
+        <div class="resultado-header">
+          <div class="info">
+            <strong id="counter-quero">0 itens</strong> na sua lista •
+            <span id="counter-tem">0 já tenho</span>
+          </div>
+          <button id="btn-marcar-todos-tem" class="toggle-incluir nao" style="cursor:pointer">
+            Marcar todos como "Já tenho"
+          </button>
+        </div>
+
+        <div class="itens-grid" id="itens-grid">
+          <!-- Cards renderizados via JS -->
+        </div>
+
+        <div class="acoes-finais">
+          <div class="resumo">
+            Sua lista final: <strong id="resumo-total">0 itens</strong>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button id="btn-recomecar" class="btn btn-ghost">
+              ← Recomeçar
+            </button>
+            <a id="btn-enviar" class="btn btn-wpp btn-lg" target="_blank" rel="noopener">
+              Enviar pelo WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- O QUE ACONTECE DEPOIS -->
+  <section style="background: var(--cinza-fundo); border-top: 1px solid #E2E8F0">
+    <div class="container" style="padding-top: 64px; padding-bottom: 64px">
+      <div style="text-align: center; max-width: 560px; margin: 0 auto 40px">
+        <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 30px; margin: 0 0 10px; letter-spacing: -0.01em">O que acontece depois do envio</h2>
+        <p style="margin: 0; font-size: 17px; color: #475569; line-height: 1.5">A equipe da Sartec entra em ação assim que a mensagem chega.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1180px; margin: 0 auto">
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 36px; height: 36px; border-radius: 10px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center">1</span>
+          <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px">Recebemos sua lista</strong>
+          <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">A mensagem chega organizada no nosso WhatsApp. A equipe vê tudo de uma vez.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 36px; height: 36px; border-radius: 10px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center">2</span>
+          <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px">Verificamos o estoque</strong>
+          <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Item por item, conferindo marcas, quantidades e modelos disponíveis.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 36px; height: 36px; border-radius: 10px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center">3</span>
+          <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px">Enviamos o orçamento</strong>
+          <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Você recebe um resumo claro com tudo que pediu, valores e prazo para retirada ou entrega.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 36px; height: 36px; border-radius: 10px; background: #DC2626; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center">4</span>
+          <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px">Você confirma e combina</strong>
+          <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Aprova o orçamento e decide: retirada na loja ou entrega. A gente separa tudo para você.</p>
+        </div>
+      </div>
+
+      <div style="background: linear-gradient(135deg, #1E3A8A 0%, #2347AF 100%); border-radius: 16px; padding: 36px; text-align: center; margin-top: 48px; max-width: 1180px; margin-left: auto; margin-right: auto">
+        <h3 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 22px; color: white; margin: 0 0 8px">Escola parceira? Diga na mensagem.</h3>
+        <p style="color: rgba(255,255,255,0.85); max-width: 600px; margin: 0 auto 20px; font-size: 16px; line-height: 1.5">Informe o nome da escola ao enviar a lista e garanta as condições especiais para alunos de escolas parceiras.</p>
+        <a href="escolas.html" class="btn" style="background: white; color: #1E3A8A; font-weight: 700; display: inline-block; padding: 13px 26px; border-radius: 12px; text-decoration: none; font-size: 15.5px">Ver escolas parceiras</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-mount"></div>
+
+  <script src="assets/app.js"></script>
+  <script src="assets/lista.js"></script>
+  <script>SartecInit({ active: 'lista', fab: 'principal' });</script>
+</body>
+</html>

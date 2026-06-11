@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Produtos — Sartec Papelaria</title>
+  <meta name="description" content="Vitrine de produtos da Sartec Papelaria: materiais escolares, cadernos, escritório, arte e informática em São José dos Campos. Consulte disponibilidade pelo WhatsApp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    html { scroll-behavior: smooth; }
+    .cat-btn {
+      font-family: 'Source Sans 3', sans-serif;
+      cursor: pointer;
+      font-size: 14.5px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 100px;
+      border: 1px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #475569;
+      transition: background .12s, color .12s, border-color .12s;
+    }
+    .cat-btn.ativo { background: #1E3A8A; color: #FFFFFF; border-color: #1E3A8A; }
+    .produto-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }
+    .produto-card[hidden] { display: none; }
+    .wpp-btn:hover { background: #1FB858 !important; }
+    .perguntar-btn:hover { background: #16306F !important; }
+  </style>
+</head>
+<body>
+
+  <div id="header-mount"></div>
+
+  <div class="banner-implantacao">
+    <div class="container">
+      <span class="banner-implantacao-ico">⚙</span>
+      <span><strong>Novo site em implantação.</strong> Estamos atualizando a experiência digital da Sartec.</span>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- Hero -->
+    <section style="background: #1E3A8A; color: #FFFFFF">
+      <div style="max-width: 1180px; margin: 0 auto; padding: 56px 20px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start">
+        <span style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #FFFFFF; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; border-radius: 100px">Vitrine em atualização</span>
+        <h1 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(32px, 4vw, 46px); line-height: 1.1; margin: 0; letter-spacing: -0.01em; max-width: 640px">Produtos para escola, casa e escritório.</h1>
+        <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #DBE4F8; max-width: 560px">Estamos atualizando nossa vitrine online aos poucos. Enquanto isso, fale com a equipe para consultar disponibilidade, modelos e valores.</p>
+      </div>
+    </section>
+
+    <!-- Vitrine -->
+    <section style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0">
+      <div style="max-width: 1180px; margin: 0 auto; padding: 48px 20px 72px; display: flex; flex-direction: column; gap: 28px">
+
+        <!-- Categorias -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap" id="cat-bar">
+          <button class="cat-btn ativo" data-cat="Todos" onclick="filtrar(this)">Todos</button>
+          <button class="cat-btn" data-cat="Escolar" onclick="filtrar(this)">Escolar</button>
+          <button class="cat-btn" data-cat="Cadernos e agendas" onclick="filtrar(this)">Cadernos e agendas</button>
+          <button class="cat-btn" data-cat="Escritório" onclick="filtrar(this)">Escritório</button>
+          <button class="cat-btn" data-cat="Escrita" onclick="filtrar(this)">Escrita</button>
+          <button class="cat-btn" data-cat="Arte" onclick="filtrar(this)">Arte</button>
+          <button class="cat-btn" data-cat="Informática" onclick="filtrar(this)">Informática</button>
+        </div>
+
+        <!-- Grid de produtos -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px" id="produtos-grid">
+
+          <div class="produto-card" data-cat="Escolar">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escolar</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Mochila escolar reforçada</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Mochila%20escolar%20refor%C3%A7ada" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Escolar">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escolar</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Estojo duplo com zíper</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Estojo%20duplo%20com%20z%C3%ADper" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Escolar">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escolar</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Tesoura sem ponta</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Tesoura%20sem%20ponta" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Cadernos e agendas">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Cadernos e agendas</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Caderno universitário 10 matérias</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Caderno%20universit%C3%A1rio%2010%20mat%C3%A9rias" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Cadernos e agendas">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Cadernos e agendas</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Agenda 2026</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Agenda%202026" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Cadernos e agendas">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Cadernos e agendas</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Caderno brochura 96 folhas</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Caderno%20brochura%2096%20folhas" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Escritório">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escritório</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Papel sulfite A4 500 folhas</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Papel%20sulfite%20A4%20500%20folhas" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Escritório">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escritório</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Grampeador de mesa</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Grampeador%20de%20mesa" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Escritório">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escritório</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Calculadora científica</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Calculadora%20cient%C3%ADfica" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Escrita">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escrita</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Caneta esferográfica azul (caixa 50)</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Caneta%20esferogr%C3%A1fica%20azul%20%28caixa%2050%29" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Escrita">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escrita</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Kit marca-texto tons pastel</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Kit%20marca-texto%20tons%20pastel" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Escrita">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Escrita</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Lápis grafite nº 2 (cartela 12)</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20L%C3%A1pis%20grafite%20n%C2%BA%202%20%28cartela%2012%29" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Arte">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Arte</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Tinta guache 6 cores</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Tinta%20guache%206%20cores" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Arte">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Arte</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Bloco de papel A4 para desenho</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Bloco%20de%20papel%20A4%20para%20desenho" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Informática">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Informática</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Pen drive 32GB</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Pen%20drive%2032GB" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="produto-card" data-cat="Informática">
+            <div style="height: 140px; background: repeating-linear-gradient(135deg, #F8FAFC 0px, #F8FAFC 14px, #EFF3FB 14px, #EFF3FB 28px); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #E2E8F0"><span style="font-family: monospace; font-size: 12px; color: #94A3B8; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 5px 12px; border-radius: 100px">imagem em breve</span></div>
+            <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A">Informática</span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; flex: 1">Mouse USB</strong>
+              <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vi%20a%20vitrine%20do%20site%20e%20quero%20consultar%20disponibilidade%2C%20modelos%20e%20valor%20de%3A%20Mouse%20USB" target="_blank" rel="noopener" style="margin-top: 6px; text-align: center; background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 11px 16px; border-radius: 12px" class="wpp-btn">Consultar no WhatsApp</a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Não encontrou -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; padding: 36px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 21px">Não encontrou o que procura?</strong>
+            <span style="font-size: 16px; color: #475569; line-height: 1.5">A loja tem muito mais do que a vitrine mostra. Fala com a gente que a equipe encontra para você.</span>
+          </div>
+          <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20N%C3%A3o%20encontrei%20um%20produto%20na%20vitrine%20do%20site%20e%20queria%20consultar%20a%20equipe." target="_blank" rel="noopener" style="background: #1E3A8A; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 16px; padding: 15px 26px; border-radius: 14px; flex-shrink: 0" class="perguntar-btn">Perguntar no WhatsApp</a>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <div id="footer-mount"></div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    SartecInit({ active: 'produtos', fab: 'principal' });
+
+    function filtrar(btn) {
+      var cat = btn.getAttribute('data-cat');
+      document.querySelectorAll('#cat-bar .cat-btn').forEach(function(b) {
+        b.classList.toggle('ativo', b === btn);
+      });
+      document.querySelectorAll('#produtos-grid .produto-card').forEach(function(card) {
+        var match = cat === 'Todos' || card.getAttribute('data-cat') === cat;
+        card.hidden = !match;
+      });
+    }
+  </script>
+</body>
+</html>
