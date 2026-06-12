@@ -356,7 +356,7 @@ section { padding: 64px 0; }
 
 /* Por que escolher */
 .why {
-  background: linear-gradient(135deg, var(--azul) 0%, var(--vermelho) 100%);
+  background: linear-gradient(135deg, #C41E1E 0%, #DC2626 65%, #C92020 100%);
   color: white;
   text-align: center;
   position: relative;
@@ -1325,6 +1325,21 @@ section { padding: 64px 0; }
   background: linear-gradient(135deg, #1B3A8A 0%, #2049B0 55%, #1D3F9E 100%);
   border-top: none !important;
   border-bottom: none !important;
+  position: relative;
+}
+.como-funciona-azul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 56px solid transparent;
+  border-right: 56px solid transparent;
+  border-top: 34px solid #FFFFFF;
+  z-index: 2;
+  pointer-events: none;
 }
 .como-funciona-azul h2 { color: #FFFFFF; }
 .como-funciona-azul .step {
@@ -1475,7 +1490,7 @@ section { padding: 64px 0; }
 .loja-fw {
   position: relative;
   overflow: hidden;
-  min-height: 520px;
+  min-height: 640px;
   display: flex;
   align-items: flex-start;
 }
@@ -1490,7 +1505,7 @@ section { padding: 64px 0; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center center;
   display: block;
 }
 .loja-fw-content {
@@ -1503,13 +1518,13 @@ section { padding: 64px 0; }
 }
 .loja-fw-card {
   max-width: 440px;
-  background: rgba(8, 18, 46, 0.52);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.70);
   border-radius: 16px;
   padding: 30px 32px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 6px 28px rgba(15, 23, 42, 0.10);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1520,13 +1535,13 @@ section { padding: 64px 0; }
   font-size: 1.35rem;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  color: #FFFFFF;
+  color: #0F172A;
   margin: 0;
 }
 .loja-fw-card p {
   font-size: 0.93rem;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.82);
+  color: #475569;
   margin: 0 0 8px;
 }
 .loja-fw-btns {
@@ -1553,11 +1568,9 @@ section { padding: 64px 0; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  color: #FFFFFF;
+  background: transparent;
+  border: 1.5px solid rgba(15, 23, 42, 0.22);
+  color: #0F172A;
   text-decoration: none;
   font-weight: 600;
   font-size: 13px;
@@ -1565,10 +1578,10 @@ section { padding: 64px 0; }
   border-radius: 11px;
   transition: background .15s;
 }
-.loja-btn-map:hover { background: rgba(255, 255, 255, 0.26); color: #FFFFFF; }
+.loja-btn-map:hover { background: rgba(15, 23, 42, 0.07); color: #0F172A; }
 
 @media (max-width: 640px) {
-  .loja-fw { min-height: 600px; }
+  .loja-fw { min-height: 420px; }
   .loja-fw-content { padding: 20px 16px; }
   .loja-fw-card {
     max-width: 100%;
