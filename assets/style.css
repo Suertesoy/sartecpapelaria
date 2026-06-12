@@ -512,8 +512,9 @@ section { padding: 64px 0; }
 
 /* ======================== FOOTER ======================== */
 .site-footer {
-  background: linear-gradient(135deg, var(--azul) 0%, var(--vermelho) 100%);
-  color: white;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  color: #0F172A;
   padding: 56px 0 24px;
   margin-top: 80px;
 }
@@ -523,30 +524,52 @@ section { padding: 64px 0; }
   gap: 40px;
   margin-bottom: 40px;
 }
-.footer-brand img { height: 50px; background: white; padding: 6px; border-radius: 8px; margin-bottom: 14px; }
-.footer-brand p { color: rgba(255,255,255,0.85); font-size: .92rem; }
+.footer-brand img { height: 44px; margin-bottom: 14px; }
+.footer-brand p { color: #475569; font-size: .92rem; line-height: 1.6; }
 .footer-col h4 {
-  font-size: .85rem;
-  letter-spacing: .12em;
+  font-family: 'Archivo', sans-serif;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .10em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 16px;
+  color: #94A3B8;
+  margin-bottom: 14px;
 }
 .footer-col a, .footer-col p {
-  color: white;
+  color: #475569;
   display: block;
   font-size: .95rem;
   margin-bottom: 10px;
   text-decoration: none;
 }
-.footer-col a:hover { color: rgba(255,255,255,0.75); }
+.footer-col a:hover { color: #1E3A8A; }
+.footer-wpp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #25D366;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  font-size: .88rem;
+  padding: 9px 16px;
+  border-radius: 100px;
+  text-decoration: none;
+  margin-top: 4px;
+}
+.footer-wpp-btn:hover { background: #1FB858; color: #FFFFFF !important; }
 .footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.18);
+  border-top: 1px solid #E2E8F0;
   padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
   text-align: center;
   font-size: .85rem;
-  color: rgba(255,255,255,0.7);
+  color: #94A3B8;
 }
+.footer-digital-link { color: #1E3A8A; text-decoration: none; font-weight: 600; }
+.footer-digital-link:hover { text-decoration: underline; }
 
 @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 540px) { .footer-grid { grid-template-columns: 1fr; gap: 28px; } }

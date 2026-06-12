@@ -130,7 +130,8 @@ function renderFooter() {
             <p>Papelaria, informática, cópias e impressão. Atendimento personalizado e tudo organizado pra você.</p>
           </div>
           <div class="footer-col">
-            <h4>Serviços</h4>
+            <h4>Navegação</h4>
+            <a href="index.html">Início</a>
             <a href="produtos.html">Produtos</a>
             <a href="lista-escolar.html">Lista Escolar</a>
             <a href="copias.html">Cópias e Impressão</a>
@@ -142,17 +143,18 @@ function renderFooter() {
             <p>${SARTEC.TELEFONE_DISPLAY}</p>
             <p>${SARTEC.EMAIL}</p>
             <p>CNPJ: ${SARTEC.CNPJ}</p>
+            <a href="https://wa.me/${SARTEC.WPP_PRINCIPAL}?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20falar%20com%20a%20equipe." target="_blank" rel="noopener" class="footer-wpp-btn">WhatsApp</a>
           </div>
           <div class="footer-col">
             <h4>Visite a loja</h4>
             <p>${SARTEC.ENDERECO}</p>
             <p>CEP: ${SARTEC.CEP}</p>
-            <p style="font-size:.85rem;opacity:.85">${SARTEC.HORARIO}</p>
+            <p>${SARTEC.HORARIO}</p>
           </div>
         </div>
         <div class="footer-bottom">
-          © 2026 Sartec Papelaria e Informática. Todos os direitos reservados.
-          <div class="footer-digital">Tecnologia de atendimento desenvolvida por <a href="#" target="_blank" rel="noopener" class="footer-digital-link"><!-- TODO: substituir pela URL final da Sartec Digital -->Sartec Digital</a>.</div>
+          <span>© 2026 Sartec Papelaria e Informática. Todos os direitos reservados.</span>
+          <span>Este site faz parte da nova experiência digital da Sartec. Experiência digital implementada pela Sartec Digital. <a href="#" target="_blank" rel="noopener" class="footer-digital-link"><!-- TODO: substituir pela URL final da Sartec Digital -->Conhecer a Sartec Digital →</a></span>
         </div>
       </div>
     </footer>
