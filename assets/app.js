@@ -94,12 +94,13 @@ function renderDeliveryFaixa() {
 
   const wpp = 'https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20fazer%20um%20pedido.';
 
+  const msg = 'Entrega grátis acima de R$ 100,00 em São José dos Campos';
   const items = [
-    { ico: '🚚', texto: 'Entrega grátis em São José dos Campos para compras acima de R$ 100' },
-    { ico: '📦', texto: 'Entrega grátis acima de R$ 100' },
-    { ico: '📍', texto: 'São José dos Campos' },
-    { ico: '💬', texto: 'Compre pelo WhatsApp' },
-    { ico: '🚚', texto: 'A Sartec entrega pra você' },
+    { ico: '🚚', texto: msg },
+    { ico: '🚚', texto: msg },
+    { ico: '🚚', texto: msg },
+    { ico: '🚚', texto: msg },
+    { ico: '🚚', texto: msg },
   ];
 
   const pills = items.map(i => `
@@ -128,12 +129,10 @@ function renderEscolasFaixa() {
   if (!mount) return;
 
   const items = [
-    { ico: '🏫', texto: 'Sua escola pode ser parceira da Sartec' },
-    { ico: '📋', texto: 'Listas escolares organizadas pelo WhatsApp' },
-    { ico: '✨', texto: 'Condições especiais para famílias' },
-    { ico: '📍', texto: 'Parceria para escolas de São José dos Campos' },
-    { ico: '💬', texto: 'Facilite a volta às aulas da sua escola' },
-    { ico: '→',  texto: 'Fale com a Sartec e conheça as condições' },
+    { ico: '🏫', texto: 'Seja uma escola parceira' },
+    { ico: '✨', texto: 'Veja condições e benefícios' },
+    { ico: '🏫', texto: 'Sua escola pode ser parceira' },
+    { ico: '📋', texto: 'Entenda como indicar a Sartec' },
   ];
 
   const pills = items.map(i => `
