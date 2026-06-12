@@ -394,7 +394,12 @@ section { padding: 64px 0; }
 @media (max-width: 900px) { .why-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 540px) { .why-grid { grid-template-columns: 1fr; } }
 
-/* Banner escolas (faixa — marquee infinito) */
+/* Banner parceria escolas (faixa — marquee infinito) */
+.escolas-faixa-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
 .escolas-faixa {
   background: linear-gradient(90deg, var(--azul) 0%, var(--vermelho) 100%);
   padding: 16px 0;
@@ -422,25 +427,18 @@ section { padding: 64px 0; }
   font-weight: 500;
   font-size: .92rem;
   flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
 }
 .escola-pill .badge {
   width: 32px; height: 32px;
-  background: white;
-  color: var(--azul);
+  background: rgba(255,255,255,0.18);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: .85rem;
+  font-size: 1rem;
   flex-shrink: 0;
-}
-.escola-pill .desc {
-  background: rgba(255,255,255,0.18);
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: .78rem;
-  font-weight: 700;
 }
 
 /* ======================== FORMULÁRIOS ======================== */

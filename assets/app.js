@@ -86,34 +86,36 @@ function toggleMenu() {
 }
 
 /* =========================================================
-   FAIXA DE ESCOLAS (MARQUEE)
+   FAIXA DE PARCERIA COM ESCOLAS (MARQUEE)
    ========================================================= */
 function renderEscolasFaixa() {
   const mount = document.getElementById('escolas-faixa-mount');
   if (!mount) return;
 
-  const escolas = [
-    { badge: 'SM', nome: 'Colégio Santa Maria', desc: '20% OFF' },
-    { badge: 'DB', nome: 'Escola Dom Bosco', desc: '20% OFF' },
-    { badge: 'CO', nome: 'Colégio Objetivo', desc: '20% OFF' },
-    { badge: 'SP', nome: 'Instituto São Paulo', desc: '20% OFF' },
-    { badge: '★', nome: 'Parceria exclusiva para alunos', desc: 'Saiba mais →' },
+  const items = [
+    { ico: '🏫', texto: 'Sua escola pode ser parceira da Sartec' },
+    { ico: '📋', texto: 'Listas escolares organizadas pelo WhatsApp' },
+    { ico: '✨', texto: 'Condições especiais para famílias' },
+    { ico: '📍', texto: 'Parceria para escolas de São José dos Campos' },
+    { ico: '💬', texto: 'Facilite a volta às aulas da sua escola' },
+    { ico: '→',  texto: 'Fale com a Sartec e conheça as condições' },
   ];
 
-  const pills = escolas.map(e => `
-    <div class="escola-pill">
-      <div class="badge">${e.badge}</div>
-      <span>${e.nome}</span>
-      <span class="desc">${e.desc}</span>
-    </div>
+  const pills = items.map(i => `
+    <a href="escolas.html" class="escola-pill" tabindex="-1" aria-hidden="true">
+      <span class="badge">${i.ico}</span>
+      <span>${i.texto}</span>
+    </a>
   `).join('');
 
   mount.innerHTML = `
-    <div class="escolas-faixa">
-      <div class="faixa-track">
-        ${pills}${pills}
+    <a href="escolas.html" class="escolas-faixa-link" aria-label="Saiba mais sobre parceria com escolas">
+      <div class="escolas-faixa">
+        <div class="faixa-track">
+          ${pills}${pills}
+        </div>
       </div>
-    </div>
+    </a>
   `;
 }
 
