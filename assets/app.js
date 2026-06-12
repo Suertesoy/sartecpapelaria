@@ -143,18 +143,19 @@ function renderFooter() {
             <p>${SARTEC.TELEFONE_DISPLAY}</p>
             <p>${SARTEC.EMAIL}</p>
             <p>CNPJ: ${SARTEC.CNPJ}</p>
-            <a href="https://wa.me/${SARTEC.WPP_PRINCIPAL}?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20falar%20com%20a%20equipe." target="_blank" rel="noopener" class="footer-wpp-btn">WhatsApp</a>
           </div>
           <div class="footer-col">
             <h4>Visite a loja</h4>
             <p>${SARTEC.ENDERECO}</p>
             <p>CEP: ${SARTEC.CEP}</p>
             <p>${SARTEC.HORARIO}</p>
+            <a href="https://www.google.com/maps/search/?api=1&query=Av.%20Andr%C3%B4meda%2C%201805%20-%20Jardim%20Sat%C3%A9lite%2C%20S%C3%A3o%20Jos%C3%A9%20dos%20Campos%20SP" target="_blank" rel="noopener" class="footer-map-link">Ver no Google Maps →</a>
+            <a href="https://waze.com/ul?q=Av.%20Andr%C3%B4meda%2C%201805%20-%20Jardim%20Sat%C3%A9lite%2C%20S%C3%A3o%20Jos%C3%A9%20dos%20Campos%20SP&navigate=yes" target="_blank" rel="noopener" class="footer-map-link">Ver no Waze →</a>
           </div>
         </div>
         <div class="footer-bottom">
           <span>© 2026 Sartec Papelaria e Informática. Todos os direitos reservados.</span>
-          <span>Este site faz parte da nova experiência digital da Sartec. Experiência digital implementada pela Sartec Digital. <a href="#" target="_blank" rel="noopener" class="footer-digital-link"><!-- TODO: substituir pela URL final da Sartec Digital -->Conhecer a Sartec Digital →</a></span>
+          <span>Este site faz parte da nova experiência digital da Sartec. Implementado pela <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="footer-digital-link">Sartec Digital →</a></span>
         </div>
       </div>
     </footer>

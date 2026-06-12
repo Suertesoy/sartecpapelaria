@@ -524,7 +524,7 @@ section { padding: 64px 0; }
   gap: 40px;
   margin-bottom: 40px;
 }
-.footer-brand img { height: 44px; margin-bottom: 14px; }
+.footer-brand img { height: 56px; margin-bottom: 14px; }
 .footer-brand p { color: #475569; font-size: .92rem; line-height: 1.6; }
 .footer-col h4 {
   font-family: 'Archivo', sans-serif;
@@ -1272,19 +1272,6 @@ section { padding: 64px 0; }
   margin-bottom: 10px;
 }
 
-/* Footer digital credit */
-.footer-digital {
-  font-size: .78rem;
-  color: rgba(255,255,255,0.45);
-  margin-top: 6px;
-}
-.footer-digital-link {
-  color: rgba(255,255,255,0.6);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(255,255,255,0.3);
-  transition: color .15s, border-color .15s;
-}
-.footer-digital-link:hover { color: rgba(255,255,255,0.88); border-bottom-color: rgba(255,255,255,0.65); }
 
 /* ======================== BANNER DE IMPLANTAÇÃO ======================== */
 .banner-implantacao {

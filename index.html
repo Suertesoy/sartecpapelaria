@@ -11,9 +11,24 @@
   <link rel="stylesheet" href="assets/style.css" />
   <style>
     html { scroll-behavior: smooth; }
-    .hub-card:hover { border-color: #1E3A8A !important; box-shadow: 0 4px 14px rgba(30,58,138,0.12) !important; }
-    .wpp-btn-green:hover { background: #1FB858 !important; }
-    .btn-azul-hero:hover { background: #EFF3FB !important; }
+    /* Hero demo card hover */
+    .hero-demo-card { transition: box-shadow .25s, transform .25s; }
+    .hero-demo-card:hover { box-shadow: 0 28px 72px rgba(30,58,138,0.20), 0 6px 20px rgba(0,0,0,0.08) !important; transform: translateY(-2px); }
+    /* Service cards como links */
+    a.service-card { color: var(--texto); }
+    a.service-card:hover { color: var(--azul); }
+    a.service-card h3 { color: var(--texto); }
+    a.service-card:hover h3 { color: var(--azul); }
+    /* CTA final */
+    .cta-final-wpp:hover { background: #1FB858 !important; }
+    .cta-final-lista:hover { background: #F1F5F9 !important; }
+    /* Sartec Digital button */
+    .sartec-digital-btn:hover { background: rgba(255,255,255,0.22) !important; }
+    .wpp-demo-btn:hover { background: #1FB858 !important; }
+    /* hero CTA secundário */
+    .hero-cta-outline:hover { background: rgba(30,58,138,0.07) !important; }
+    /* Why section padding override */
+    .why { padding: 72px 0; }
   </style>
 </head>
 <body>
@@ -29,22 +44,29 @@
 
   <main>
 
-    <!-- HERO -->
-    <section style="background: #1E3A8A; color: #FFFFFF; overflow: hidden">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 68px 20px 76px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 48px; align-items: center">
+    <!-- HERO — fundo claro com accents gradiente -->
+    <section style="background: #F0F4FD; overflow: hidden; position: relative;">
+      <!-- linha gradiente no topo -->
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #1E3A8A 0%, #DC2626 100%);"></div>
+      <!-- accents radial sutis -->
+      <div style="position: absolute; inset: 0; background: radial-gradient(50% 60% at 90% 10%, rgba(220,38,38,0.07), transparent 60%), radial-gradient(50% 70% at 5% 40%, rgba(30,58,138,0.09), transparent 55%); pointer-events: none;"></div>
+
+      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px 80px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 52px; align-items: center; position: relative;">
+        <!-- Texto -->
         <div style="display: flex; flex-direction: column; gap: 22px; max-width: 560px">
-          <span style="align-self: flex-start; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #FFFFFF; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; border-radius: 100px">Volta às aulas sem fila</span>
-          <h1 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(34px, 4.5vw, 52px); line-height: 1.08; margin: 0; letter-spacing: -0.01em">Envie sua lista escolar e a gente cuida do resto.</h1>
-          <p style="margin: 0; font-size: 19px; line-height: 1.55; color: #DBE4F8; max-width: 480px">Mande a foto ou o PDF da lista, marque o que você já tem em casa e receba o orçamento organizado pelo WhatsApp. Simples assim.</p>
+          <span style="align-self: flex-start; background: #1E3A8A; color: #FFFFFF; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; border-radius: 100px">Volta às aulas sem fila</span>
+          <h1 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(34px, 4.5vw, 52px); line-height: 1.08; margin: 0; letter-spacing: -0.01em; color: #0F172A">Envie sua lista escolar e a gente cuida do resto.</h1>
+          <p style="margin: 0; font-size: 19px; line-height: 1.55; color: #475569; max-width: 480px">Mande a foto ou o PDF da lista, marque o que você já tem em casa e receba o orçamento organizado pelo WhatsApp. Simples assim.</p>
           <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 6px">
-            <a href="lista-escolar.html" style="background: #FFFFFF; color: #1E3A8A; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.18)" class="btn-azul-hero">Enviar minha lista</a>
-            <a href="#como-funciona" style="background: transparent; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.45); text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px">Ver como funciona</a>
+            <a href="lista-escolar.html" style="background: #DC2626; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px; box-shadow: 0 4px 14px rgba(220,38,38,0.28)">Enviar minha lista</a>
+            <a href="#como-funciona" class="hero-cta-outline" style="background: transparent; color: #1E3A8A; border: 1.5px solid rgba(30,58,138,0.5); text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px">Ver como funciona</a>
           </div>
-          <p style="margin: 4px 0 0; font-size: 14px; color: #B7C4E8">Sem cadastro e sem pagamento no site. A equipe confirma tudo com você antes do orçamento.</p>
+          <p style="margin: 4px 0 0; font-size: 14px; color: #94A3B8">Sem cadastro e sem pagamento no site. A equipe confirma tudo com você antes do orçamento.</p>
         </div>
 
+        <!-- Demo card -->
         <div style="display: flex; justify-content: center">
-          <div style="background: #FFFFFF; color: #0F172A; border-radius: 18px; box-shadow: 0 24px 60px rgba(2,8,30,0.35); width: 100%; max-width: 400px; overflow: hidden">
+          <div class="hero-demo-card" style="background: #FFFFFF; color: #0F172A; border-radius: 18px; box-shadow: 0 20px 56px rgba(30,58,138,0.14), 0 4px 16px rgba(0,0,0,0.06); width: 100%; max-width: 400px; overflow: hidden; border-top: 3px solid #1E3A8A;">
             <div style="padding: 16px 20px; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; gap: 12px">
               <div style="display: flex; flex-direction: column; gap: 2px">
                 <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 16px">Lista escolar — 3º ano</strong>
@@ -67,12 +89,16 @@
               </div>
             </div>
             <div style="padding: 16px 20px 20px">
-              <a href="lista-escolar.html" style="display: block; background: #25D366; color: #FFFFFF; text-align: center; text-decoration: none; font-weight: 700; font-size: 15px; padding: 14px; border-radius: 14px" class="wpp-btn-green">Enviar pedido no WhatsApp</a>
+              <a href="lista-escolar.html" class="wpp-demo-btn" style="display: block; background: #25D366; color: #FFFFFF; text-align: center; text-decoration: none; font-weight: 700; font-size: 15px; padding: 14px; border-radius: 14px">Enviar pedido no WhatsApp</a>
             </div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- FAIXA ROTATIVA DE ESCOLAS -->
+    <!-- TODO: substituir nomes/badges pelas escolas parceiras reais quando confirmadas -->
+    <div id="escolas-faixa-mount"></div>
 
     <!-- COMO FUNCIONA -->
     <section id="como-funciona" style="background: #FFFFFF">
@@ -81,129 +107,147 @@
           <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 34px; margin: 0; letter-spacing: -0.01em">Como funciona</h2>
           <p style="margin: 0; font-size: 18px; color: #475569; line-height: 1.5">Três passos e a lista sai da sua frente.</p>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px">
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px">
-            <span style="width: 40px; height: 40px; border-radius: 12px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center">1</span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">Envie a lista</strong>
-            <p style="margin: 0; font-size: 16px; color: #475569; line-height: 1.5">Foto ou PDF, direto do celular. Não precisa digitar nada.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <h3>Envie a lista</h3>
+            <p>Foto ou PDF, direto do celular. Não precisa digitar nada.</p>
           </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px">
-            <span style="width: 40px; height: 40px; border-radius: 12px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center">2</span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">Marque o que já tem</strong>
-            <p style="margin: 0; font-size: 16px; color: #475569; line-height: 1.5">Você ajusta quantidades e manda só o que realmente precisa.</p>
+          <div class="step">
+            <div class="step-num">2</div>
+            <h3>Marque o que já tem</h3>
+            <p>Você ajusta quantidades e manda só o que realmente precisa.</p>
           </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px">
-            <span style="width: 40px; height: 40px; border-radius: 12px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center">3</span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">Receba pelo WhatsApp</strong>
-            <p style="margin: 0; font-size: 16px; color: #475569; line-height: 1.5">A equipe confere item por item e fecha o orçamento com você.</p>
+          <div class="step">
+            <div class="step-num">3</div>
+            <h3>Receba pelo WhatsApp</h3>
+            <p>A equipe confere item por item e fecha o orçamento com você.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- HUB — O que você procura hoje? -->
+    <!-- O QUE OFERECEMOS -->
     <section style="background: #F8FAFC; border-top: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0">
       <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px">
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; max-width: 600px">
-          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 34px; margin: 0; letter-spacing: -0.01em">O que você procura hoje?</h2>
-          <p style="margin: 0; font-size: 18px; color: #475569; line-height: 1.5">Cada assunto tem a própria página, com o caminho certo no WhatsApp.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 44px; max-width: 640px">
+          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 34px; margin: 0; letter-spacing: -0.01em">O que oferecemos</h2>
+          <p style="margin: 0; font-size: 18px; color: #475569; line-height: 1.5">Tudo que sua família ou empresa precisa, com atendimento pelo WhatsApp.</p>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px">
-          <a href="lista-escolar.html" class="hub-card" style="text-decoration: none; color: #0F172A; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(15,23,42,0.05); transition: border-color .15s, box-shadow .15s">
-            <span style="width: 44px; height: 44px; border-radius: 12px; background: #EFF3FB; display: flex; align-items: center; justify-content: center"><span style="width: 16px; height: 16px; background: #1E3A8A; transform: rotate(45deg); border-radius: 3px; display: block"></span></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Lista Escolar</strong>
-            <p style="margin: 0; font-size: 14.5px; color: #475569; line-height: 1.5; flex: 1">Envie a foto da lista e receba o orçamento organizado.</p>
-            <span style="color: #1E3A8A; font-weight: 700; font-size: 14.5px">Enviar lista →</span>
+        <div class="services">
+
+          <a href="lista-escolar.html" class="service-card">
+            <div class="service-icon azul">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+            </div>
+            <h3>Lista Escolar</h3>
+            <p>Foto ou PDF da lista, itens organizados e orçamento direto no WhatsApp.</p>
+            <span class="arrow">Enviar lista →</span>
           </a>
-          <a href="produtos.html" class="hub-card" style="text-decoration: none; color: #0F172A; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(15,23,42,0.05); transition: border-color .15s, box-shadow .15s">
-            <span style="width: 44px; height: 44px; border-radius: 12px; background: #EFF3FB; display: flex; align-items: center; justify-content: center"><span style="width: 16px; height: 16px; background: #3B82F6; transform: rotate(45deg); border-radius: 3px; display: block"></span></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Produtos</strong>
-            <p style="margin: 0; font-size: 14.5px; color: #475569; line-height: 1.5; flex: 1">Vitrine em atualização. Consulte modelos e valores.</p>
-            <span style="color: #1E3A8A; font-weight: 700; font-size: 14.5px">Ver produtos →</span>
+
+          <a href="copias.html" class="service-card">
+            <div class="service-icon vermelho">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            </div>
+            <h3>Cópias e Impressão</h3>
+            <p>Envie o arquivo pelo WhatsApp exclusivo do setor. Orçamento com prazo na hora.</p>
+            <span class="arrow">Pedir cópias →</span>
           </a>
-          <a href="empresas.html" class="hub-card" style="text-decoration: none; color: #0F172A; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(15,23,42,0.05); transition: border-color .15s, box-shadow .15s">
-            <span style="width: 44px; height: 44px; border-radius: 12px; background: #FEF2F2; display: flex; align-items: center; justify-content: center"><span style="width: 16px; height: 16px; background: #B91C1C; transform: rotate(45deg); border-radius: 3px; display: block"></span></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Empresas</strong>
-            <p style="margin: 0; font-size: 14.5px; color: #475569; line-height: 1.5; flex: 1">Boleto a 28 dias, desconto por volume e entrega.</p>
-            <span style="color: #1E3A8A; font-weight: 700; font-size: 14.5px">Para empresas →</span>
+
+          <a href="produtos.html" class="service-card">
+            <div class="service-icon azul">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            </div>
+            <h3>Produtos</h3>
+            <p>Vitrine em atualização. Consulte modelos, marcas e valores com a equipe.</p>
+            <span class="arrow">Ver produtos →</span>
           </a>
-          <a href="escolas.html" class="hub-card" style="text-decoration: none; color: #0F172A; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(15,23,42,0.05); transition: border-color .15s, box-shadow .15s">
-            <span style="width: 44px; height: 44px; border-radius: 12px; background: #EFF3FB; display: flex; align-items: center; justify-content: center"><span style="width: 16px; height: 16px; background: #1E3A8A; transform: rotate(45deg); border-radius: 3px; display: block"></span></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Escolas Parceiras</strong>
-            <p style="margin: 0; font-size: 14.5px; color: #475569; line-height: 1.5; flex: 1">Condições especiais para famílias de escolas parceiras.</p>
-            <span style="color: #1E3A8A; font-weight: 700; font-size: 14.5px">Ver parcerias →</span>
+
+          <a href="empresas.html" class="service-card">
+            <div class="service-icon vermelho">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            </div>
+            <h3>Empresas</h3>
+            <p>Boleto faturado a 28 dias, desconto por volume e entrega para empresas cadastradas.</p>
+            <span class="arrow">Faturar empresa →</span>
           </a>
-          <a href="copias.html" class="hub-card" style="text-decoration: none; color: #0F172A; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(15,23,42,0.05); transition: border-color .15s, box-shadow .15s">
-            <span style="width: 44px; height: 44px; border-radius: 12px; background: #FEF2F2; display: flex; align-items: center; justify-content: center"><span style="width: 16px; height: 16px; background: #DC2626; transform: rotate(45deg); border-radius: 3px; display: block"></span></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Cópias e Impressão</strong>
-            <p style="margin: 0; font-size: 14.5px; color: #475569; line-height: 1.5; flex: 1">Setor próprio, com WhatsApp exclusivo para arquivos.</p>
-            <span style="color: #1E3A8A; font-weight: 700; font-size: 14.5px">Pedir cópias →</span>
-          </a>
+
         </div>
       </div>
     </section>
 
-    <!-- POR QUE A SARTEC -->
-    <section style="background: #FFFFFF">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px">
-        <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 34px; margin: 0 0 40px; letter-spacing: -0.01em">Por que escolher a Sartec?</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px">
-          <div style="display: flex; flex-direction: column; gap: 8px; padding: 4px">
-            <span style="width: 12px; height: 12px; background: #DC2626; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 8px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">Atendimento humano</strong>
-            <p style="margin: 0; font-size: 16px; color: #475569; line-height: 1.5">Gente de verdade respondendo no WhatsApp, do orçamento à entrega.</p>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 8px; padding: 4px">
-            <span style="width: 12px; height: 12px; background: #1E3A8A; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 8px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">Tradição local</strong>
-            <p style="margin: 0; font-size: 16px; color: #475569; line-height: 1.5">Papelaria de bairro, com anos de balcão e clientes que voltam sempre.</p>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 8px; padding: 4px">
-            <span style="width: 12px; height: 12px; background: #3B82F6; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 8px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">Pedidos organizados</strong>
-            <p style="margin: 0; font-size: 16px; color: #475569; line-height: 1.5">Sua lista vira um pedido claro, conferido item por item.</p>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 8px; padding: 4px">
-            <span style="width: 12px; height: 12px; background: #B91C1C; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 8px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">Famílias e empresas</strong>
-            <p style="margin: 0; font-size: 16px; color: #475569; line-height: 1.5">Da lista escolar ao escritório, com condições para cada caso.</p>
-          </div>
+    <!-- POR QUE A SARTEC — gradiente azul→vermelho -->
+    <section class="why">
+      <div class="container">
+        <div class="section-header">
+          <h2>Por que escolher a Sartec?</h2>
+          <p>Papelaria local com tradição, atendimento humano e pedidos organizados para sua família ou empresa.</p>
         </div>
-      </div>
-    </section>
-
-    <!-- SARTEC DIGITAL -->
-    <section style="background: linear-gradient(135deg, #0B1226 0%, #14224E 100%); color: #FFFFFF">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 48px; align-items: center">
-        <div style="display: flex; flex-direction: column; gap: 18px">
-          <span style="align-self: flex-start; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #7FA3F2; border: 1px solid rgba(127,163,242,0.4); padding: 6px 13px; border-radius: 100px">Sartec Digital</span>
-          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(26px, 3vw, 34px); margin: 0; line-height: 1.15; letter-spacing: -0.01em; color: #FFFFFF">Este site faz parte da nova experiência digital da Sartec.</h2>
-          <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #AAB8DC; max-width: 520px">A solução foi implementada pela Sartec Digital, nossa frente de automação, atendimento inteligente e organização de processos para pequenos negócios.</p>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 480px; justify-self: center; width: 100%">
-          <div style="background: #FFFFFF; color: #0F172A; border-radius: 14px; padding: 24px 20px; display: flex; flex-direction: column; gap: 8px">
-            <span style="width: 14px; height: 14px; background: #DC2626; transform: rotate(45deg); border-radius: 3px; display: block; margin-bottom: 6px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 16px">Sartec Papelaria</strong>
-            <span style="font-size: 13.5px; color: #475569; line-height: 1.5">Balcão, lista escolar, cópias e atendimento pelo WhatsApp.</span>
+        <div class="why-grid">
+          <div class="why-item">
+            <div class="num">30+</div>
+            <div class="label">Anos atendendo a região</div>
           </div>
-          <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(127,163,242,0.35); color: #FFFFFF; border-radius: 14px; padding: 24px 20px; display: flex; flex-direction: column; gap: 8px">
-            <span style="width: 14px; height: 14px; background: #3B82F6; transform: rotate(45deg); border-radius: 3px; display: block; margin-bottom: 6px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 16px">Sartec Digital</strong>
-            <span style="font-size: 13.5px; color: #AAB8DC; line-height: 1.5">Automação, CRM e atendimento inteligente. Duas frentes, uma Sartec.</span>
+          <div class="why-item">
+            <div class="num">5 mil+</div>
+            <div class="label">Famílias atendidas em volta às aulas</div>
+          </div>
+          <div class="why-item">
+            <div class="num">28 dias</div>
+            <div class="label">Boleto para empresas cadastradas</div>
+          </div>
+          <div class="why-item">
+            <div class="num" style="font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em">Equipe<br>Sartec</div>
+            <div class="label">Pedidos conferidos antes do orçamento</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- CTA FINAL -->
-    <section style="background: #FFFFFF">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px">
-        <div style="background: #EFF3FB; border: 1px solid #DBE4F8; border-radius: 18px; padding: 56px 32px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
-          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(28px, 3.5vw, 38px); margin: 0; color: #1E3A8A; letter-spacing: -0.01em">Pronto para tirar a lista da frente?</h2>
-          <p style="margin: 0; font-size: 18px; color: #475569; max-width: 460px; line-height: 1.5">Envie sua lista agora ou chame a equipe no WhatsApp. A gente organiza o pedido com você.</p>
-          <div style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 8px">
-            <a href="lista-escolar.html" style="background: #DC2626; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px">Enviar minha lista</a>
-            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20falar%20com%20a%20equipe." target="_blank" rel="noopener" style="background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px" class="wpp-btn-green">Falar no WhatsApp</a>
+    <!-- SARTEC DIGITAL — visual escuro/glassy próprio -->
+    <section style="background: linear-gradient(135deg, #0B1226 0%, #14224E 100%); color: #FFFFFF; position: relative; overflow: hidden;">
+      <!-- luzes de fundo -->
+      <div style="position: absolute; inset: 0; background: radial-gradient(50% 60% at 75% 30%, rgba(30,58,138,0.4), transparent 55%), radial-gradient(40% 50% at 15% 75%, rgba(220,38,38,0.15), transparent 60%); pointer-events: none;"></div>
+
+      <div style="max-width: 1180px; margin: 0 auto; padding: 80px 20px; position: relative;">
+        <!-- glassy container -->
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(127,163,242,0.22); border-radius: 24px; padding: 52px 40px; backdrop-filter: blur(12px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <span style="align-self: flex-start; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #7FA3F2; border: 1px solid rgba(127,163,242,0.4); padding: 6px 13px; border-radius: 100px">Sartec Digital</span>
+            <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(26px, 3vw, 34px); margin: 0; line-height: 1.15; letter-spacing: -0.01em; color: #FFFFFF">Este site faz parte da nova experiência digital da Sartec.</h2>
+            <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #AAB8DC; max-width: 520px">A solução foi implementada pela Sartec Digital, nossa frente de automação, atendimento inteligente e organização de processos para pequenos negócios.</p>
+            <div style="margin-top: 4px;">
+              <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="sartec-digital-btn" style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.12); border: 1px solid rgba(127,163,242,0.45); color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 15px; padding: 14px 24px; border-radius: 14px;">
+                Conhecer a Sartec Digital →
+              </a>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 480px; justify-self: center; width: 100%;">
+            <div style="background: #FFFFFF; color: #0F172A; border-radius: 14px; padding: 24px 20px; display: flex; flex-direction: column; gap: 8px;">
+              <span style="width: 14px; height: 14px; background: #DC2626; transform: rotate(45deg); border-radius: 3px; display: block; margin-bottom: 6px"></span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 16px">Sartec Papelaria</strong>
+              <span style="font-size: 13.5px; color: #475569; line-height: 1.5">Balcão, lista escolar, cópias e atendimento pelo WhatsApp.</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(127,163,242,0.35); color: #FFFFFF; border-radius: 14px; padding: 24px 20px; display: flex; flex-direction: column; gap: 8px;">
+              <span style="width: 14px; height: 14px; background: #3B82F6; transform: rotate(45deg); border-radius: 3px; display: block; margin-bottom: 6px"></span>
+              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 16px">Sartec Digital</strong>
+              <span style="font-size: 13.5px; color: #AAB8DC; line-height: 1.5">Automação, CRM e atendimento inteligente. Duas frentes, uma Sartec.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA FINAL — foco no WhatsApp -->
+    <section style="background: #FFFFFF;">
+      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px;">
+        <div style="background: linear-gradient(135deg, #1E3A8A 0%, #1A4FA0 100%); border-radius: 20px; padding: 56px 40px; display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; position: relative; overflow: hidden;">
+          <div style="position: absolute; inset: 0; background: radial-gradient(50% 70% at 85% 20%, rgba(220,38,38,0.18), transparent 55%); pointer-events: none;"></div>
+          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(28px, 3.5vw, 38px); margin: 0; color: #FFFFFF; letter-spacing: -0.01em; position: relative;">Fale com a Sartec pelo WhatsApp</h2>
+          <p style="margin: 0; font-size: 18px; color: #C5D2F0; max-width: 520px; line-height: 1.5; position: relative;">Tire dúvidas, envie sua lista, consulte produtos ou peça atendimento para empresas. A equipe te direciona pelo melhor caminho.</p>
+          <div style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 8px; position: relative;">
+            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec." target="_blank" rel="noopener" class="cta-final-wpp" style="background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.18)">Falar no WhatsApp</a>
+            <a href="lista-escolar.html" class="cta-final-lista" style="background: #FFFFFF; color: #1E3A8A; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px">Enviar lista escolar</a>
           </div>
         </div>
       </div>
