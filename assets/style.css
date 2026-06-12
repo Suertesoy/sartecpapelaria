@@ -1462,7 +1462,7 @@ section { padding: 64px 0; }
 }
 .hero-btn-lista:hover { background: rgba(30, 58, 138, 0.07); }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .hero-fw {
     display: block;
     overflow: hidden;
@@ -1486,7 +1486,7 @@ section { padding: 64px 0; }
     position: relative;
     z-index: 2;
     min-height: 0;
-    padding: 40px 20px 32px;
+    padding: 32px 16px 24px;
     background: transparent;
   }
   .hero-fw-card {
@@ -1496,8 +1496,17 @@ section { padding: 64px 0; }
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.65);
     border-radius: 16px;
-    padding: 28px 22px;
+    padding: 20px 18px;
     box-shadow: 0 4px 20px rgba(15, 23, 42, 0.10);
+    gap: 14px;
+  }
+  .hero-fw-card h1 {
+    font-size: clamp(19px, 5vw, 24px);
+  }
+  .hero-fw-btns .hero-btn-wpp,
+  .hero-fw-btns .hero-btn-lista {
+    font-size: 14px;
+    padding: 11px 18px;
   }
 }
 
