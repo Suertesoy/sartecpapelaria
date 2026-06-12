@@ -1309,6 +1309,255 @@ section { padding: 64px 0; }
   text-decoration: underline;
 }
 
+/* ======================== HERO FULL WIDTH ======================== */
+.hero-fw {
+  position: relative;
+  overflow: hidden;
+  background: #F8FAFC;
+}
+.hero-fw::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--azul) 0%, var(--vermelho) 100%);
+  z-index: 3;
+}
+.hero-fw-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero-fw-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  display: block;
+}
+.hero-fw-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 72px 24px 80px;
+  min-height: 540px;
+  display: flex;
+  align-items: center;
+}
+.hero-fw-card {
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 18px;
+  padding: 40px;
+  box-shadow: 0 6px 32px rgba(15, 23, 42, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.hero-fw-badge {
+  align-self: flex-start;
+  background: var(--azul);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+}
+.hero-fw-card h1 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: clamp(26px, 3.5vw, 42px);
+  line-height: 1.12;
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: #0F172A;
+}
+.hero-fw-card p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #475569;
+}
+.hero-fw-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hero-btn-wpp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 24px;
+  border-radius: 13px;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.28);
+  transition: background .15s;
+}
+.hero-btn-wpp:hover { background: #1FB858; color: #FFFFFF; }
+.hero-btn-lista {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: var(--azul);
+  border: 1.5px solid rgba(30, 58, 138, 0.45);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 24px;
+  border-radius: 13px;
+  transition: background .15s;
+}
+.hero-btn-lista:hover { background: rgba(30, 58, 138, 0.07); }
+
+@media (max-width: 768px) {
+  .hero-fw { display: flex; flex-direction: column; overflow: visible; }
+  .hero-fw-bg {
+    position: relative;
+    inset: auto;
+    height: 230px;
+    overflow: hidden;
+    flex-shrink: 0;
+    z-index: 0;
+  }
+  .hero-fw-bg img { object-position: center 25%; }
+  .hero-fw-content {
+    position: relative;
+    min-height: 0;
+    padding: 28px 20px 36px;
+    background: #F8FAFC;
+  }
+  .hero-fw-card {
+    max-width: 100%;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+
+/* ======================== VISITE A SARTEC FULL WIDTH ======================== */
+.loja-fw {
+  position: relative;
+  overflow: hidden;
+  min-height: 520px;
+  display: flex;
+  align-items: flex-start;
+}
+.loja-fw-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  line-height: 0;
+}
+.loja-fw-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+.loja-fw-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 44px 24px 56px;
+}
+.loja-fw-card {
+  max-width: 440px;
+  background: rgba(8, 18, 46, 0.52);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 30px 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.loja-fw-card h2 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  margin: 0;
+}
+.loja-fw-card p {
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0 0 8px;
+}
+.loja-fw-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.loja-btn-wpp {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--verde-wpp);
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: 11px;
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.30);
+  transition: background .15s;
+}
+.loja-btn-wpp:hover { background: var(--verde-wpp-escuro); color: #FFFFFF; }
+.loja-btn-map {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: 11px;
+  transition: background .15s;
+}
+.loja-btn-map:hover { background: rgba(255, 255, 255, 0.26); color: #FFFFFF; }
+
+@media (max-width: 640px) {
+  .loja-fw { min-height: 600px; }
+  .loja-fw-content { padding: 20px 16px; }
+  .loja-fw-card {
+    max-width: 100%;
+    padding: 22px 18px;
+    border-radius: 14px;
+  }
+  .loja-fw-card h2 { font-size: 1.1rem; }
+  .loja-fw-card p  { font-size: 0.88rem; }
+  .loja-btn-wpp { font-size: 13px; padding: 9px 14px; }
+  .loja-btn-map { font-size: 12px; padding: 9px 12px; }
+}
+
 /* =========================================================
    PAGE TRANSITIONS (page-transition)
    ========================================================= */
