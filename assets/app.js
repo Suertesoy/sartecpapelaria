@@ -125,10 +125,13 @@ function renderEscolasFaixa() {
 function renderFooter() {
   const html = `
     <footer class="site-footer">
-      <div class="container">
+      <div class="footer-accent-bar"></div>
+      <div class="container footer-container">
         <div class="footer-grid">
           <div class="footer-brand">
-            <img src="assets/logo-sartec.png" alt="Sartec Papelaria" />
+            <div class="footer-logo-seal">
+              <img src="assets/logo-sartec.png" alt="Sartec Papelaria" />
+            </div>
             <p>Papelaria, informática, cópias e impressão. Atendimento personalizado e tudo organizado pra você.</p>
           </div>
           <div class="footer-col">
@@ -155,7 +158,9 @@ function renderFooter() {
             <a href="https://waze.com/ul?q=Av.%20Andr%C3%B4meda%2C%201805%20-%20Jardim%20Sat%C3%A9lite%2C%20S%C3%A3o%20Jos%C3%A9%20dos%20Campos%20SP&navigate=yes" target="_blank" rel="noopener" class="footer-map-link">Ver no Waze →</a>
           </div>
         </div>
-        <div class="footer-bottom">
+      </div>
+      <div class="footer-bottom">
+        <div class="container footer-bottom-inner">
           <span>© 2026 Sartec Papelaria e Informática. Todos os direitos reservados.</span>
           <span>Este site faz parte da nova experiência digital da Sartec. Implementado pela <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="footer-digital-link">Sartec Digital →</a></span>
         </div>
