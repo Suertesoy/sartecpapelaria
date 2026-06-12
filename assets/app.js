@@ -86,6 +86,41 @@ function toggleMenu() {
 }
 
 /* =========================================================
+   FAIXA ENTREGA GRÁTIS (MARQUEE — home, após hero)
+   ========================================================= */
+function renderDeliveryFaixa() {
+  const mount = document.getElementById('delivery-faixa-mount');
+  if (!mount) return;
+
+  const wpp = 'https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20fazer%20um%20pedido.';
+
+  const items = [
+    { ico: '🚚', texto: 'Entrega grátis em São José dos Campos para compras acima de R$ 100' },
+    { ico: '📦', texto: 'Entrega grátis acima de R$ 100' },
+    { ico: '📍', texto: 'São José dos Campos' },
+    { ico: '💬', texto: 'Compre pelo WhatsApp' },
+    { ico: '🚚', texto: 'A Sartec entrega pra você' },
+  ];
+
+  const pills = items.map(i => `
+    <a href="${wpp}" target="_blank" rel="noopener" class="escola-pill" tabindex="-1" aria-hidden="true">
+      <span class="badge">${i.ico}</span>
+      <span>${i.texto}</span>
+    </a>
+  `).join('');
+
+  mount.innerHTML = `
+    <a href="${wpp}" target="_blank" rel="noopener" class="escolas-faixa-link" aria-label="Entrega grátis em São José dos Campos para compras acima de R$ 100">
+      <div class="escolas-faixa">
+        <div class="faixa-track">
+          ${pills}${pills}
+        </div>
+      </div>
+    </a>
+  `;
+}
+
+/* =========================================================
    FAIXA DE PARCERIA COM ESCOLAS (MARQUEE)
    ========================================================= */
 function renderEscolasFaixa() {
@@ -238,6 +273,7 @@ function initPageTransitions() {
 window.SartecInit = function ({ active, fab }) {
   document.addEventListener('DOMContentLoaded', () => {
     renderHeader(active);
+    renderDeliveryFaixa();
     renderEscolasFaixa();
     renderFooter();
     renderFab(fab || 'principal');
