@@ -157,9 +157,21 @@ p  { margin: 0 0 1em; color: var(--texto-suave); }
   .menu-toggle { display: inline-flex; padding: 6px; } /* tap target maior */
   .btn-wpp-header { display: none; } /* botão WPP do header some no mobile — FAB já cobre */
 }
+@media (max-width: 640px) {
+  :root { --header-h: 72px; }
+  .brand img { height: 50px; }
+  .menu-toggle {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
 @media (max-width: 480px) {
-  .brand-text span { display: none; } /* esconde "Papelaria & Informática" em telas pequenas */
-  .site-header .container { padding: 0 12px; } /* menos padding lateral → hamburger mais no canto */
+  .brand-text span { display: none; }
+  .site-header .container { padding: 0 8px; }
 }
 
 /* ======================== BOTÕES ======================== */
@@ -576,7 +588,19 @@ section { padding: 64px 0; }
 .footer-digital-link:hover { color: #FFFFFF; text-decoration: underline; }
 
 @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 540px) { .footer-grid { grid-template-columns: 1fr; gap: 28px; } }
+@media (max-width: 540px) {
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  .footer-brand { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .footer-logo-seal {
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 14px;
+    line-height: inherit;
+  }
+  .footer-brand img { height: auto; width: clamp(130px, 45%, 170px); }
+  .footer-brand p { max-width: 280px; }
+}
 
 /* ======================== BOTÃO FLUTUANTE ======================== */
 .fab-wpp {
@@ -1287,15 +1311,19 @@ section { padding: 64px 0; }
 }
 .banner-implantacao .container {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 8px;
-  flex-wrap: wrap;
-  text-align: center;
+  text-align: left;
 }
 .banner-implantacao-ico {
   flex-shrink: 0;
-  margin-top: 1px;
+  line-height: 1;
+}
+@media (max-width: 640px) {
+  .banner-implantacao { padding: 8px 0; font-size: .79rem; }
+  .banner-implantacao .container { align-items: flex-start; justify-content: flex-start; }
+  .banner-implantacao-ico { margin-top: 2px; }
 }
 
 /* Link "O que é este item?" nos cards da lista */
