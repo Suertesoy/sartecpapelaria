@@ -22,8 +22,11 @@
     /* CTA final */
     .cta-final-wpp:hover { background: #1FB858 !important; }
     .cta-final-lista:hover { background: #F1F5F9 !important; }
-    /* Sartec Digital button */
-    .sartec-digital-btn:hover { background: rgba(255,255,255,0.22) !important; }
+    /* Sartec Digital card/badge */
+    .sartec-digital-card { transition: box-shadow .25s, transform .25s; }
+    .sartec-digital-card:hover { box-shadow: 0 24px 60px rgba(14,26,74,0.28), 0 4px 14px rgba(0,0,0,0.10) !important; transform: translateY(-2px); }
+    .sartec-digital-btn { transition: background .2s; }
+    .sartec-digital-btn:hover { background: rgba(255,255,255,0.20) !important; }
     .wpp-demo-btn:hover { background: #1FB858 !important; }
     /* hero CTA secundário */
     .hero-cta-outline:hover { background: rgba(30,58,138,0.07) !important; }
@@ -204,43 +207,9 @@
       </div>
     </section>
 
-    <!-- SARTEC DIGITAL — visual escuro/glassy próprio -->
-    <section style="background: linear-gradient(135deg, #0B1226 0%, #14224E 100%); color: #FFFFFF; position: relative; overflow: hidden;">
-      <!-- luzes de fundo -->
-      <div style="position: absolute; inset: 0; background: radial-gradient(50% 60% at 75% 30%, rgba(30,58,138,0.4), transparent 55%), radial-gradient(40% 50% at 15% 75%, rgba(220,38,38,0.15), transparent 60%); pointer-events: none;"></div>
-
-      <div style="max-width: 1180px; margin: 0 auto; padding: 80px 20px; position: relative;">
-        <!-- glassy container -->
-        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(127,163,242,0.22); border-radius: 24px; padding: 52px 40px; backdrop-filter: blur(12px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: center;">
-          <div style="display: flex; flex-direction: column; gap: 20px;">
-            <span style="align-self: flex-start; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #7FA3F2; border: 1px solid rgba(127,163,242,0.4); padding: 6px 13px; border-radius: 100px">Sartec Digital</span>
-            <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(26px, 3vw, 34px); margin: 0; line-height: 1.15; letter-spacing: -0.01em; color: #FFFFFF">Este site faz parte da nova experiência digital da Sartec.</h2>
-            <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #AAB8DC; max-width: 520px">A solução foi implementada pela Sartec Digital, nossa frente de automação, atendimento inteligente e organização de processos para pequenos negócios.</p>
-            <div style="margin-top: 4px;">
-              <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="sartec-digital-btn" style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.12); border: 1px solid rgba(127,163,242,0.45); color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 15px; padding: 14px 24px; border-radius: 14px;">
-                Conhecer a Sartec Digital →
-              </a>
-            </div>
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 480px; justify-self: center; width: 100%;">
-            <div style="background: #FFFFFF; color: #0F172A; border-radius: 14px; padding: 24px 20px; display: flex; flex-direction: column; gap: 8px;">
-              <span style="width: 14px; height: 14px; background: #DC2626; transform: rotate(45deg); border-radius: 3px; display: block; margin-bottom: 6px"></span>
-              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 16px">Sartec Papelaria</strong>
-              <span style="font-size: 13.5px; color: #475569; line-height: 1.5">Balcão, lista escolar, cópias e atendimento pelo WhatsApp.</span>
-            </div>
-            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(127,163,242,0.35); color: #FFFFFF; border-radius: 14px; padding: 24px 20px; display: flex; flex-direction: column; gap: 8px;">
-              <span style="width: 14px; height: 14px; background: #3B82F6; transform: rotate(45deg); border-radius: 3px; display: block; margin-bottom: 6px"></span>
-              <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 16px">Sartec Digital</strong>
-              <span style="font-size: 13.5px; color: #AAB8DC; line-height: 1.5">Automação, CRM e atendimento inteligente. Duas frentes, uma Sartec.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- CTA FINAL — foco no WhatsApp -->
     <section style="background: #FFFFFF;">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px;">
+      <div style="max-width: 1180px; margin: 0 auto; padding: 88px 20px 72px;">
         <div style="background: linear-gradient(135deg, #1E3A8A 0%, #1A4FA0 100%); border-radius: 20px; padding: 56px 40px; display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; position: relative; overflow: hidden;">
           <div style="position: absolute; inset: 0; background: radial-gradient(50% 70% at 85% 20%, rgba(220,38,38,0.18), transparent 55%); pointer-events: none;"></div>
           <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(28px, 3.5vw, 38px); margin: 0; color: #FFFFFF; letter-spacing: -0.01em; position: relative;">Fale com a Sartec pelo WhatsApp</h2>
@@ -248,6 +217,37 @@
           <div style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 8px; position: relative;">
             <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec." target="_blank" rel="noopener" class="cta-final-wpp" style="background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.18)">Falar no WhatsApp</a>
             <a href="lista-escolar.html" class="cta-final-lista" style="background: #FFFFFF; color: #1E3A8A; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px">Enviar lista escolar</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASSINATURA SARTEC DIGITAL — card flutuante -->
+    <section style="background: #FFFFFF;">
+      <div style="max-width: 640px; margin: 0 auto; padding: 0 20px 72px;">
+        <div class="sartec-digital-card" style="background: linear-gradient(140deg, #0D1F4A 0%, #0F2660 55%, #141E3C 100%); border: 1px solid rgba(127,163,242,0.26); border-radius: 20px; box-shadow: 0 16px 48px rgba(14,26,74,0.20), 0 2px 10px rgba(0,0,0,0.07); padding: 32px 36px; position: relative; overflow: hidden;">
+          <!-- accent luminoso top-right -->
+          <div style="position: absolute; top: -50px; right: -40px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(59,130,246,0.16), transparent 65%); pointer-events: none;"></div>
+          <!-- accent vermelho bottom-left -->
+          <div style="position: absolute; bottom: -40px; left: -30px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(220,38,38,0.08), transparent 65%); pointer-events: none;"></div>
+
+          <div style="position: relative; display: flex; flex-direction: column; gap: 14px;">
+            <!-- badge label -->
+            <div style="display: flex; align-items: center; gap: 9px;">
+              <span style="width: 9px; height: 9px; background: #3B82F6; transform: rotate(45deg); border-radius: 2px; display: inline-block; flex-shrink: 0;"></span>
+              <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #7FA3F2;">Sartec Digital</span>
+            </div>
+            <!-- texto -->
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.65; color: #AAB8DC;">
+              Este site faz parte da nova experiência digital da Sartec. A solução foi implementada pela <strong style="color: rgba(255,255,255,0.88); font-weight: 600;">Sartec Digital</strong>, nossa frente de automação, atendimento inteligente e organização de processos para pequenos negócios.
+            </p>
+            <!-- botão -->
+            <div style="margin-top: 6px;">
+              <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="sartec-digital-btn" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.10); border: 1px solid rgba(127,163,242,0.40); color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 14px; padding: 11px 20px; border-radius: 12px;">
+                Conhecer a Sartec Digital
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </a>
+            </div>
           </div>
         </div>
       </div>
