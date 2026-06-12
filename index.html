@@ -82,7 +82,7 @@
          ===================================================== -->
     <section style="background: #FFFFFF; padding: 0;">
       <div style="max-width: 1180px; margin: 0 auto; padding: 80px 20px;">
-        <div class="hero-home-grid">
+        <div class="lista-grid">
 
           <!-- Copy esquerda -->
           <div style="display: flex; flex-direction: column; gap: 20px; max-width: 520px;">
@@ -91,7 +91,6 @@
             <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #475569;">Envie a foto ou o PDF, marque o que já tem em casa e receba o orçamento pelo WhatsApp. Nossa equipe confere tudo antes de fechar.</p>
             <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px;">
               <a href="lista-escolar.html" style="background: #DC2626; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 16px; padding: 14px 24px; border-radius: 13px; box-shadow: 0 4px 14px rgba(220,38,38,0.25);">Enviar minha lista</a>
-              <a href="#como-funciona" style="background: transparent; color: #1E3A8A; border: 1.5px solid rgba(30,58,138,0.4); text-decoration: none; font-weight: 700; font-size: 16px; padding: 14px 24px; border-radius: 13px;">Ver como funciona</a>
             </div>
             <p style="margin: 4px 0 0; font-size: 13.5px; color: #94A3B8;">Sem cadastro e sem pagamento no site. A equipe confirma tudo com você antes do orçamento.</p>
           </div>
@@ -133,11 +132,11 @@
     <!-- =====================================================
          4. COMO FUNCIONA
          ===================================================== -->
-    <section id="como-funciona" style="background: #F8FAFC; border-top: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; padding: 72px 0;">
+    <section id="como-funciona" class="como-funciona-azul" style="padding: 72px 0;">
       <div style="max-width: 1180px; margin: 0 auto; padding: 0 20px;">
         <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; max-width: 560px;">
           <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 32px; margin: 0; letter-spacing: -0.01em;">Como funciona</h2>
-          <p style="margin: 0; font-size: 18px; color: #475569; line-height: 1.5;">Três passos e a lista sai da sua frente.</p>
+          <p style="margin: 0; font-size: 18px; color: rgba(255,255,255,0.80); line-height: 1.5;">Três passos e a lista sai da sua frente.</p>
         </div>
         <div class="steps">
           <div class="step">
@@ -241,7 +240,35 @@
     </section>
 
     <!-- =====================================================
-         7. VISITE A SARTEC — FULL WIDTH
+         7. FAIXA SARTEC DIGITAL
+         ===================================================== -->
+    <section style="background: #FFFFFF; padding: 64px 20px;">
+      <div style="max-width: 1180px; margin: 0 auto;">
+        <div class="sartec-digital-faixa" style="background: linear-gradient(135deg, #0D1F4A 0%, #0F2660 55%, #141E3C 100%); border: 1px solid rgba(127,163,242,0.22); border-radius: 18px; box-shadow: 0 12px 40px rgba(14,26,74,0.18), 0 2px 8px rgba(0,0,0,0.06); padding: 28px 40px; position: relative; overflow: hidden;">
+          <div style="position: absolute; top: -60px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(59,130,246,0.15), transparent 65%); pointer-events: none;"></div>
+          <div style="position: absolute; bottom: -50px; left: -20px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(220,38,38,0.08), transparent 65%); pointer-events: none;"></div>
+
+          <div class="sartec-digital-faixa-row" style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; position: relative;">
+            <div style="flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 9px;">
+                <span style="width: 9px; height: 9px; background: #3B82F6; transform: rotate(45deg); border-radius: 2px; display: inline-block; flex-shrink: 0;"></span>
+                <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #7FA3F2;">Sartec Digital</span>
+              </div>
+              <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #AAB8DC; max-width: 560px;">
+                Este site faz parte da nova experiência digital da Sartec. A solução foi implementada pela <strong style="color: rgba(255,255,255,0.88); font-weight: 600;">Sartec Digital</strong>, nossa frente de automação, atendimento inteligente e organização de processos para pequenos negócios.
+              </p>
+            </div>
+            <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="sartec-digital-faixa-btn" style="flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.10); border: 1px solid rgba(127,163,242,0.40); color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 14px; padding: 12px 22px; border-radius: 12px; white-space: nowrap;">
+              Conhecer a Sartec Digital
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         8. VISITE A SARTEC — FULL WIDTH
          Desktop: assets/images/fachada-loja-desktop.png
          Mobile:  assets/images/fachada-loja-mobile.png
          ===================================================== -->
@@ -266,34 +293,6 @@
             <a href="https://waze.com/ul?q=Av.%20Andr%C3%B4meda%2C%201805%20-%20Jardim%20Sat%C3%A9lite%2C%20S%C3%A3o%20Jos%C3%A9%20dos%20Campos%20SP&navigate=yes" target="_blank" rel="noopener" class="loja-btn-map">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
               Waze
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =====================================================
-         9. FAIXA SARTEC DIGITAL — strip horizontal elegante
-         ===================================================== -->
-    <section style="background: #FFFFFF; padding: 0 20px 64px;">
-      <div style="max-width: 1180px; margin: 0 auto;">
-        <div class="sartec-digital-faixa" style="background: linear-gradient(135deg, #0D1F4A 0%, #0F2660 55%, #141E3C 100%); border: 1px solid rgba(127,163,242,0.22); border-radius: 18px; box-shadow: 0 12px 40px rgba(14,26,74,0.18), 0 2px 8px rgba(0,0,0,0.06); padding: 28px 40px; position: relative; overflow: hidden;">
-          <div style="position: absolute; top: -60px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(59,130,246,0.15), transparent 65%); pointer-events: none;"></div>
-          <div style="position: absolute; bottom: -50px; left: -20px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(220,38,38,0.08), transparent 65%); pointer-events: none;"></div>
-
-          <div class="sartec-digital-faixa-row" style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; position: relative;">
-            <div style="flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 8px;">
-              <div style="display: flex; align-items: center; gap: 9px;">
-                <span style="width: 9px; height: 9px; background: #3B82F6; transform: rotate(45deg); border-radius: 2px; display: inline-block; flex-shrink: 0;"></span>
-                <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #7FA3F2;">Sartec Digital</span>
-              </div>
-              <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #AAB8DC; max-width: 560px;">
-                Este site faz parte da nova experiência digital da Sartec. A solução foi implementada pela <strong style="color: rgba(255,255,255,0.88); font-weight: 600;">Sartec Digital</strong>, nossa frente de automação, atendimento inteligente e organização de processos para pequenos negócios.
-              </p>
-            </div>
-            <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="sartec-digital-faixa-btn" style="flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.10); border: 1px solid rgba(127,163,242,0.40); color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 14px; padding: 12px 22px; border-radius: 12px; white-space: nowrap;">
-              Conhecer a Sartec Digital
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
           </div>
         </div>

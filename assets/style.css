@@ -1309,6 +1309,29 @@ section { padding: 64px 0; }
   text-decoration: underline;
 }
 
+/* ======================== LISTA ESCOLAR GRID ======================== */
+.lista-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 52px;
+  align-items: center;
+}
+@media (max-width: 860px) {
+  .lista-grid { grid-template-columns: 1fr; gap: 36px; }
+}
+
+/* ======================== COMO FUNCIONA — GRADIENTE AZUL ======================== */
+.como-funciona-azul {
+  background: linear-gradient(135deg, #1B3A8A 0%, #2049B0 55%, #1D3F9E 100%);
+  border-top: none !important;
+  border-bottom: none !important;
+}
+.como-funciona-azul h2 { color: #FFFFFF; }
+.como-funciona-azul .step {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 /* ======================== HERO FULL WIDTH ======================== */
 .hero-fw {
   position: relative;
@@ -1467,7 +1490,7 @@ section { padding: 64px 0; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center top;
   display: block;
 }
 .loja-fw-content {
