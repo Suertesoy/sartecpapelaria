@@ -1683,6 +1683,40 @@ section { padding: 64px 0; }
 }
 
 /* =========================================================
+   SARTEC DIGITAL CARD — glass + circuit effects
+   ========================================================= */
+.sartec-digital-faixa::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg,   transparent, transparent 39px, rgba(168,85,247,0.10) 39px, rgba(168,85,247,0.10) 40px),
+    repeating-linear-gradient(90deg,  transparent, transparent 39px, rgba(99,102,241,0.08) 39px, rgba(99,102,241,0.08) 40px);
+  background-size: 40px 40px;
+  opacity: 0.9;
+  transition: opacity .28s ease, background-position .6s ease;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.sartec-digital-faixa::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(118deg, rgba(255,255,255,0.07) 0%, transparent 55%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+.sartec-digital-faixa-row { position: relative; z-index: 2; }
+.sartec-digital-faixa:hover::before {
+  opacity: 1;
+  background-position: 4px 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sartec-digital-faixa { transition: box-shadow .25s !important; transform: none !important; }
+  .sartec-digital-faixa::before { transition: none !important; }
+}
+
+/* =========================================================
    PAGE TRANSITIONS
    Nota: body NÃO usa transform para não criar stacking context
    que quebraria position: fixed do FAB.
