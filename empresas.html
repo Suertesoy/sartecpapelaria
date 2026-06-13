@@ -43,36 +43,22 @@
 
   <main>
 
-    <!-- Hero -->
-    <section style="background: #1E3A8A; color: #FFFFFF">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 64px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 44px; align-items: center">
-        <div style="display: flex; flex-direction: column; gap: 18px; max-width: 560px">
-          <span style="align-self: flex-start; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #FFFFFF; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; border-radius: 100px">Atendimento para empresas</span>
-          <h1 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(32px, 4vw, 48px); line-height: 1.1; margin: 0; letter-spacing: -0.01em">Material de escritório com boleto faturado a 28 dias.</h1>
-          <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #DBE4F8; max-width: 500px">Cadastre sua empresa e compre com desconto por volume, pedido recorrente e entrega — sem burocracia e com atendimento dedicado.</p>
-          <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 4px">
-            <a href="#cadastro" style="background: #FFFFFF; color: #1E3A8A; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.18)" class="hero-cad">Cadastrar minha empresa</a>
-            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Quero%20falar%20sobre%20compras%20para%20minha%20empresa." target="_blank" rel="noopener" style="background: #25D366; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px" class="hero-wpp">Falar no WhatsApp</a>
-          </div>
-        </div>
-        <div style="display: flex; justify-content: center">
-          <div style="background: #FFFFFF; color: #0F172A; border-radius: 18px; box-shadow: 0 24px 60px rgba(2,8,30,0.35); width: 100%; max-width: 380px; padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 16px">
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 17px">Como sua empresa compra na Sartec</strong>
-            <div style="display: flex; flex-direction: column; gap: 12px">
-              <div style="display: flex; gap: 12px; align-items: flex-start">
-                <span style="width: 26px; height: 26px; border-radius: 8px; background: #EFF3FB; color: #1E3A8A; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">1</span>
-                <span style="font-size: 15px; color: #475569; line-height: 1.5">Cadastro simples pelo formulário ou WhatsApp</span>
-              </div>
-              <div style="display: flex; gap: 12px; align-items: flex-start">
-                <span style="width: 26px; height: 26px; border-radius: 8px; background: #EFF3FB; color: #1E3A8A; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">2</span>
-                <span style="font-size: 15px; color: #475569; line-height: 1.5">Pedido com desconto por volume</span>
-              </div>
-              <div style="display: flex; gap: 12px; align-items: flex-start">
-                <span style="width: 26px; height: 26px; border-radius: 8px; background: #EFF3FB; color: #1E3A8A; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">3</span>
-                <span style="font-size: 15px; color: #475569; line-height: 1.5">Entrega na empresa e boleto a 28 dias</span>
-              </div>
-            </div>
-            <span style="font-size: 12.5px; color: #94A3B8; border-top: 1px solid #E2E8F0; padding-top: 12px">Boleto faturado disponível para empresas cadastradas e aprovadas.</span>
+    <!-- Hero — Empresas -->
+    <section class="internal-hero hero-empresas">
+      <div class="internal-hero-media">
+        <picture>
+          <source srcset="assets/hero-empresas-mobile.png" media="(max-width: 640px)" />
+          <img src="assets/hero-empresas-desktop.png" alt="Sartec Papelaria — atendimento para empresas com boleto faturado" />
+        </picture>
+      </div>
+      <div class="internal-hero-content">
+        <div class="internal-hero-card">
+          <span class="internal-hero-badge">Atendimento para empresas</span>
+          <h1>Material de escritório com boleto faturado a 28 dias.</h1>
+          <p>Desconto por volume, pedido recorrente e entrega — sem burocracia e com atendimento dedicado.</p>
+          <div class="internal-hero-btns">
+            <a href="#cadastro" class="internal-hero-btn-wpp" style="background: var(--azul);">Cadastrar minha empresa</a>
+            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Quero%20falar%20sobre%20compras%20para%20minha%20empresa." target="_blank" rel="noopener" class="internal-hero-btn-sec">Falar no WhatsApp</a>
           </div>
         </div>
       </div>

@@ -1717,6 +1717,189 @@ section { padding: 64px 0; }
 }
 
 /* =========================================================
+   INTERNAL HERO — base reutilizável para páginas internas
+   Mesmo conceito do .hero-fw da Home:
+   imagem ocupa largura total + conteúdo sobre área livre
+   ========================================================= */
+
+.internal-hero {
+  position: relative;
+  overflow: hidden;
+  background: #1E3A8A;
+  /* min-height definido por modificador ou default */
+  min-height: 520px;
+  display: flex;
+  align-items: stretch;
+}
+
+/* Gradiente de implantação no topo (mesma barra que a Home) */
+.internal-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--azul) 0%, var(--vermelho) 100%);
+  z-index: 3;
+}
+
+/* Camada da imagem de fundo */
+.internal-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  line-height: 0;
+}
+.internal-hero-media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.internal-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  display: block;
+}
+
+/* Container do conteúdo (z-index acima da imagem) */
+.internal-hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 72px 24px 80px;
+  display: flex;
+  align-items: center;
+}
+
+/* Card glassmorphism sobre a imagem */
+.internal-hero-card {
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.70);
+  border-radius: 18px;
+  padding: 40px;
+  box-shadow: 0 6px 32px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Badge / kicker dentro do card */
+.internal-hero-badge {
+  align-self: flex-start;
+  background: var(--azul);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+}
+.internal-hero-badge.vermelho { background: var(--vermelho); }
+
+/* Título */
+.internal-hero-card h1 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: clamp(24px, 3.2vw, 40px);
+  line-height: 1.12;
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: #0F172A;
+}
+
+/* Descrição */
+.internal-hero-card p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #475569;
+}
+
+/* CTAs */
+.internal-hero-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.internal-hero-btn-wpp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 13px 22px;
+  border-radius: 13px;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.28);
+  transition: background .15s;
+}
+.internal-hero-btn-wpp:hover { background: #1FB858; color: #FFFFFF; }
+.internal-hero-btn-sec {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: var(--azul);
+  border: 1.5px solid rgba(30, 58, 138, 0.45);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 13px 22px;
+  border-radius: 13px;
+  transition: background .15s;
+}
+.internal-hero-btn-sec:hover { background: rgba(30, 58, 138, 0.07); color: var(--azul); }
+
+/* ---- Modificadores de imagem por página ---- */
+/* (usados como fallback se picture não carregar ou como bg-image) */
+.hero-produtos    .internal-hero-media img { object-position: right center; }
+.hero-lista-escolar .internal-hero-media img { object-position: right center; }
+.hero-escolas     .internal-hero-media img { object-position: right center; }
+.hero-empresas    .internal-hero-media img { object-position: right center; }
+.hero-copias      .internal-hero-media img { object-position: right center; }
+
+/* ---- Responsividade mobile ---- */
+@media (max-width: 640px) {
+  .internal-hero {
+    min-height: 640px;
+  }
+  .internal-hero-media img {
+    object-position: center bottom;
+  }
+  .internal-hero-content {
+    padding: 32px 16px 28px;
+    align-items: flex-start;
+  }
+  .internal-hero-card {
+    max-width: 100%;
+    padding: 22px 18px;
+    border-radius: 16px;
+    gap: 14px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .internal-hero-card h1 {
+    font-size: clamp(20px, 5.5vw, 26px);
+  }
+  .internal-hero-card p {
+    font-size: 14.5px;
+  }
+  .internal-hero-btn-wpp,
+  .internal-hero-btn-sec {
+    font-size: 14px;
+    padding: 11px 18px;
+  }
+}
+
+/* =========================================================
    PAGE TRANSITIONS
    Nota: body NÃO usa transform para não criar stacking context
    que quebraria position: fixed do FAB.
