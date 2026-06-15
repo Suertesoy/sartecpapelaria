@@ -5,22 +5,24 @@
    ====================================================== */
 
 const ITENS_MOCK = [
-  { id: 'cad_universitario', nome: 'Caderno universitário 96 folhas', icon: '📓', qty: 4, obs: 'Capa dura', categoria: 'cadernos', confianca: 'alta' },
-  { id: 'lapis_grafite', nome: 'Lápis grafite nº 2', icon: '✏️', qty: 6, obs: '', categoria: 'lápis', confianca: 'alta' },
-  { id: 'borracha_branca', nome: 'Borracha branca', icon: '🧽', qty: 2, obs: 'Sem capa', categoria: 'borrachas', confianca: 'alta' },
-  { id: 'apontador', nome: 'Apontador com depósito', icon: '🔻', qty: 1, obs: '', categoria: 'apontadores', confianca: 'alta' },
-  { id: 'caneta_azul', nome: 'Caneta esferográfica azul', icon: '🖊️', qty: 4, obs: '', categoria: 'canetas', confianca: 'alta' },
-  { id: 'caneta_preta', nome: 'Caneta esferográfica preta', icon: '🖋️', qty: 2, obs: '', categoria: 'canetas', confianca: 'alta' },
-  { id: 'lapis_cor', nome: 'Caixa de lápis de cor', icon: '🎨', qty: 1, obs: '24 cores', categoria: 'artes', confianca: 'alta' },
-  { id: 'canetinha', nome: 'Caixa de canetinha hidrocor', icon: '🖌️', qty: 1, obs: '12 cores', categoria: 'artes', confianca: 'alta' },
-  { id: 'tesoura', nome: 'Tesoura sem ponta', icon: '✂️', qty: 1, obs: '', categoria: 'tesouras', confianca: 'alta' },
-  { id: 'cola_bastao', nome: 'Cola bastão', icon: '🩹', qty: 2, obs: '', categoria: 'colas', confianca: 'alta' },
+  { id: 'cad_universitario', nome: 'Caderno universitário 96 folhas', qty: 4, obs: 'Capa dura', unidade: 'un', categoria: 'cadernos', confianca: 'alta' },
+  { id: 'lapis_grafite', nome: 'Lápis grafite nº 2', qty: 6, obs: '', unidade: 'un', categoria: 'lápis', confianca: 'alta' },
+  { id: 'borracha_branca', nome: 'Borracha branca', qty: 2, obs: 'Sem capa', unidade: 'un', categoria: 'borrachas', confianca: 'alta' },
+  { id: 'apontador', nome: 'Apontador com depósito', qty: 1, obs: '', unidade: 'un', categoria: 'apontadores', confianca: 'alta' },
+  { id: 'caneta_azul', nome: 'Caneta esferográfica azul', qty: 4, obs: '', unidade: 'un', categoria: 'canetas', confianca: 'alta' },
+  { id: 'lapis_cor', nome: 'Caixa de lápis de cor', qty: 1, obs: '24 cores', unidade: 'caixa', categoria: 'artes', confianca: 'alta' },
+  { id: 'canetinha', nome: 'Caixa de canetinha hidrocor', qty: 1, obs: '12 cores', unidade: 'caixa', categoria: 'artes', confianca: 'alta' },
+  { id: 'tesoura', nome: 'Tesoura sem ponta', qty: 1, obs: '', unidade: 'un', categoria: 'tesouras', confianca: 'alta' },
+  { id: 'cola_bastao', nome: 'Cola bastão', qty: 2, obs: '', unidade: 'un', categoria: 'colas', confianca: 'alta' },
+  { id: 'papel_sulfite', nome: 'Resma de papel sulfite A4', qty: 1, obs: '500 folhas, 75g', unidade: 'pacote', categoria: 'papéis', confianca: 'alta' },
 ];
+
+const META_MOCK = { escola: 'Escola Exemplo', anoSerie: '3º ano', segmento: 'Ensino Fundamental I', anoLetivo: '2026' };
 
 const LOADING_MSGS = [
   'Enviando lista para análise...',
   'A IA está lendo os itens...',
-  'Identificando materiais escolares...',
+  'Identificando materiais para orçamento...',
   'Organizando os itens para você revisar...',
 ];
 
@@ -30,6 +32,7 @@ let estado = {
   nome: '',
   whatsapp: '',
   itens: [],
+  metadados: { escola: '', anoSerie: '', segmento: '', anoLetivo: '' },
 };
 
 // =============== UTILITÁRIOS ===============
@@ -52,6 +55,10 @@ function formatarTelefone(valor) {
     });
   }
   return limpo.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+}
+
+function esc(str) {
+  return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // =============== UPLOAD ===============
@@ -127,14 +134,15 @@ async function iniciarAnalise(arquivo) {
     clearInterval(interval);
 
     if (dados.ok && dados.itens?.length) {
+      estado.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
       estado.itens = dados.itens.map(it => ({ ...it, incluso: true }));
       renderizarResultado();
       trocarEstado('estado-resultado');
       return;
     }
 
-    // API respondeu mas sem itens — fallback localhost ou erro ao usuário
     if (isLocal) {
+      estado.metadados = META_MOCK;
       estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true }));
       renderizarResultado();
       trocarEstado('estado-resultado');
@@ -148,6 +156,7 @@ async function iniciarAnalise(arquivo) {
     console.error('[lista] Erro na análise:', err);
 
     if (isLocal) {
+      estado.metadados = META_MOCK;
       estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true }));
       renderizarResultado();
       trocarEstado('estado-resultado');
@@ -168,15 +177,41 @@ const btnEnviar = document.getElementById('btn-enviar');
 const btnMarcarTodosTem = document.getElementById('btn-marcar-todos-tem');
 const btnRecomecar = document.getElementById('btn-recomecar');
 
+function renderizarMetadados() {
+  const bloco = document.getElementById('bloco-metadados');
+  if (!bloco) return;
+  const m = estado.metadados;
+  bloco.innerHTML = `
+    <div class="meta-lista">
+      <p class="meta-lista-titulo">Dados identificados na lista</p>
+      <div class="meta-lista-campos">
+        <label>Escola<input id="meta-escola" value="${esc(m.escola)}" placeholder="Não identificado" /></label>
+        <label>Ano / Série<input id="meta-anoSerie" value="${esc(m.anoSerie)}" placeholder="Não identificado" /></label>
+        <label>Segmento<input id="meta-segmento" value="${esc(m.segmento)}" placeholder="Não identificado" /></label>
+        <label>Ano letivo<input id="meta-anoLetivo" value="${esc(m.anoLetivo)}" placeholder="Não identificado" /></label>
+      </div>
+      <p class="meta-lista-dica">Confira se os dados estão corretos. Eles ajudam a equipe da Sartec a localizar a lista certa e confirmar o orçamento.</p>
+    </div>
+  `;
+  ['escola', 'anoSerie', 'segmento', 'anoLetivo'].forEach(campo => {
+    document.getElementById(`meta-${campo}`).addEventListener('input', (e) => {
+      estado.metadados[campo] = e.target.value;
+      atualizarLinkEnviar();
+    });
+  });
+}
+
 function renderizarResultado() {
+  renderizarMetadados();
+
   grid.innerHTML = estado.itens.map(it => {
-    const icone = it.icon || '📦';
     const busca = encodeURIComponent('material escolar ' + it.nome + (it.obs ? ' ' + it.obs : ''));
     return `
     <div class="item-card ${it.incluso ? '' : 'excluido'}" data-id="${it.id}">
-      <div class="item-img">${icone}</div>
-      <h4>${it.nome}</h4>
-      <div class="obs">${it.obs || '&nbsp;'}</div>
+      <div class="item-info">
+        <h4>${it.nome}</h4>
+        ${it.obs ? `<div class="obs">${it.obs}</div>` : ''}
+      </div>
       <a href="https://www.google.com/search?tbm=isch&q=${busca}" target="_blank" rel="noopener" class="item-img-buscar">O que é este item?</a>
       <div class="item-controls">
         <div class="qty-control">
@@ -247,14 +282,22 @@ function atualizarLinkEnviar() {
   btnEnviar.style.pointerEvents = '';
 
   const excluidos = estado.itens.filter(x => !x.incluso);
+  const m = estado.metadados;
+
+  const dadosLista = [
+    `Escola: ${m.escola || 'Não informado'}`,
+    `Ano/Série: ${m.anoSerie || 'Não informado'}`,
+    m.segmento   ? `Segmento: ${m.segmento}`    : null,
+    m.anoLetivo  ? `Ano letivo: ${m.anoLetivo}`  : null,
+  ].filter(Boolean).join('\n');
 
   const linhasQuero = inclusos
-    .map(x => `✅ ${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`)
+    .map(x => `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`)
     .join('\n');
 
   const linhasTem = excluidos.length > 0
-    ? excluidos.map(x => `☑️ ${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`).join('\n')
-    : '_Nenhum item marcado como já tenho._';
+    ? excluidos.map(x => `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`).join('\n')
+    : 'Nenhum item marcado como já tenho.';
 
   const mensagem =
 `Olá, Sartec! Sou *${estado.nome}*.
@@ -262,6 +305,9 @@ function atualizarLinkEnviar() {
 [SITE_LISTA_ESCOLAR]
 
 *Lista escolar organizada pelo site*
+
+*Dados da lista:*
+${dadosLista}
 
 *WhatsApp informado no site:*
 ${estado.whatsapp}
@@ -272,7 +318,7 @@ ${linhasQuero}
 *Itens que já tenho em casa:*
 ${linhasTem}
 
-Aguardo o orçamento e a confirmação de disponibilidade.
+Aguardo o orçamento e a confirmação de disponibilidade, marcas/modelos e valores.
 
 — Enviado pela ferramenta de lista escolar do site da Sartec`;
 

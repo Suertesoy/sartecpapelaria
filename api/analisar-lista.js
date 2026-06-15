@@ -8,26 +8,58 @@ const TIPOS_ACEITOS = ['image/jpeg', 'image/png', 'application/pdf'];
 const LIMITE_BYTES = 4 * 1024 * 1024;
 const MODELO = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 
-const PROMPT_SISTEMA = `Você é um assistente especializado em leitura de listas escolares brasileiras.
+const PROMPT_SISTEMA = `Você é um assistente especializado em leitura de listas escolares brasileiras para papelaria.
 
-Analise a imagem ou documento recebido e extraia todos os itens de material escolar, papelaria, escritório ou artes mencionados.
+Sua tarefa é analisar a lista recebida e retornar dois blocos:
+1. Metadados da lista (escola, ano/série, segmento, ano letivo)
+2. Apenas os itens que a família provavelmente quer comprar ou pedir orçamento para a papelaria
 
-Regras:
-- Extraia apenas itens compráveis: materiais escolares, papelaria, escritório, artes.
-- Ignore completamente: nome da escola, turma, ano, série, cabeçalhos, datas, comunicados, observações gerais, instruções para pais, assinaturas, textos de rodapé.
-- Para cada item, identifique a quantidade. Se não estiver explícita, use 1.
-- Preserve detalhes relevantes em "obs": número de folhas, capa dura ou brochura, cores, tamanho, gramatura, marca exigida, formato, quantidade por embalagem, obrigatório ou opcional.
+━━━ METADADOS ━━━
+Extraia do documento:
+- escola: nome da escola, se aparecer
+- anoSerie: ano e série (ex: "3º ano", "1ª série", "4º ano EF1")
+- segmento: nível de ensino (ex: "Educação Infantil", "Ensino Fundamental I", "Ensino Médio")
+- anoLetivo: ano letivo (ex: "2025", "2026")
+Se não encontrar, deixe string vazia.
+
+━━━ ITENS — O QUE INCLUIR ━━━
+Inclua qualquer item que a família provavelmente compraria ou pediria orçamento:
+- Materiais escolares clássicos: cadernos, lápis, canetas, borrachas, apontadores, réguas, esquadros, compassos, pastas, fichários, mochilas, estojos
+- Artes e criatividade: tintas, pincéis, canetinhas, lápis de cor, massinha, EVA, papéis coloridos, tesouras, cola, fita adesiva
+- Materiais de higiene solicitados para compra: papel higiênico, lenço de papel, copo descartável, sabonete, escova de dente, pasta dental, detergente
+- Livros solicitados para compra pela família (preservar editora, ISBN e autor em obs)
+- Qualquer outro item que a lista indique que a família deve adquirir
+
+━━━ ITENS — O QUE IGNORAR COMPLETAMENTE ━━━
+Não retorne nada que seja:
+- Cabeçalho, título, nome da escola como item, comunicado, data, telefone, e-mail, assinatura
+- Instrução geral aos pais: orientações de entrega, etiquetagem, reaproveitamento, normas da escola
+- Itens claramente adquiridos ou fornecidos pela escola: frases como "adquirido na escola", "fornecido pela escola", "será encaminhado pela escola", "conforme circular específica", "valor conforme circular"
+- Kits de conteúdo digital ou apostilas comprados diretamente na escola (ex: "Material Geekie One", "Kit de Timbrados", "Material Gráfico" quando o texto diz que é adquirido na escola)
+- Uniformes, camisetas, aventais usados, de reaproveitamento ou de terceiro: "camiseta usada do ano anterior", "avental — quem tiver do ano passado pode enviar", "contato para uniforme: (12) XXXX"
+- Orientações de reaproveitamento de materiais do ano anterior
+- Qualquer trecho que seja claramente uma instrução, não um item a comprar
+
+━━━ REGRAS DE EXTRAÇÃO ━━━
 - Não invente itens. Não invente marcas.
-- Se estiver incerto sobre um item, inclua-o com confianca "baixa" e explique a dúvida em "obs".
-- Não inclua vestuário, alimentos, eletrônicos ou itens não escolares.
-- Retorne apenas JSON válido, sem markdown, sem texto antes ou depois do JSON.
+- Preserve em obs: número de folhas, capa dura/brochura, cor, tamanho, gramatura, marca exigida, formato, quantidade por embalagem, obrigatório/opcional
+- Quando não houver quantidade clara, use 1
+- Se um item puder ser comprado mas houver dúvida, inclua com confianca "baixa"
+- Retorne apenas JSON válido, sem markdown, sem texto antes ou depois
 
-Schema de resposta obrigatório:
+━━━ SCHEMA OBRIGATÓRIO ━━━
 {
+  "metadados": {
+    "escola": "",
+    "anoSerie": "",
+    "segmento": "",
+    "anoLetivo": ""
+  },
   "itens": [
     {
       "nome": "string",
       "qty": 1,
+      "unidade": "un|caixa|conjunto|pacote|rolo|outro",
       "obs": "string",
       "categoria": "string",
       "confianca": "alta|media|baixa"
@@ -35,6 +67,8 @@ Schema de resposta obrigatório:
   ],
   "avisos": ["string"]
 }`;
+
+const UNIDADES_VALIDAS = ['un', 'caixa', 'conjunto', 'pacote', 'rolo', 'outro'];
 
 function gerarId(nome) {
   return nome
@@ -46,16 +80,29 @@ function gerarId(nome) {
     .slice(0, 60);
 }
 
+function normalizarMetadados(meta) {
+  if (!meta || typeof meta !== 'object') {
+    return { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
+  }
+  return {
+    escola:    typeof meta.escola    === 'string' ? meta.escola.trim()    : '',
+    anoSerie:  typeof meta.anoSerie  === 'string' ? meta.anoSerie.trim()  : '',
+    segmento:  typeof meta.segmento  === 'string' ? meta.segmento.trim()  : '',
+    anoLetivo: typeof meta.anoLetivo === 'string' ? meta.anoLetivo.trim() : '',
+  };
+}
+
 function normalizarItens(itens) {
   if (!Array.isArray(itens)) return [];
   return itens
     .filter(it => it && typeof it.nome === 'string' && it.nome.trim())
     .slice(0, 80)
     .map(it => ({
-      id: gerarId(it.nome.trim()),
-      nome: it.nome.trim(),
-      qty: Math.min(Math.max(Math.round(Number(it.qty) || 1), 1), 99),
-      obs: typeof it.obs === 'string' ? it.obs.trim() : '',
+      id:        gerarId(it.nome.trim()),
+      nome:      it.nome.trim(),
+      qty:       Math.min(Math.max(Math.round(Number(it.qty) || 1), 1), 99),
+      unidade:   UNIDADES_VALIDAS.includes(it.unidade) ? it.unidade : 'un',
+      obs:       typeof it.obs      === 'string' ? it.obs.trim()      : '',
       categoria: typeof it.categoria === 'string' ? it.categoria.trim() : 'geral',
       confianca: ['alta', 'media', 'baixa'].includes(it.confianca) ? it.confianca : 'media',
     }));
@@ -87,24 +134,19 @@ export default async function handler(req, res) {
   if (!arquivo) {
     return res.status(400).json({ ok: false, error: 'Nenhum arquivo enviado. Envie o campo "arquivo".' });
   }
-
   if (!TIPOS_ACEITOS.includes(arquivo.mimetype)) {
     return res.status(400).json({ ok: false, error: 'Tipo de arquivo não aceito. Envie JPG, PNG ou PDF.' });
   }
-
   if (arquivo.size > LIMITE_BYTES) {
     return res.status(400).json({ ok: false, error: 'Arquivo muito grande. Máximo permitido: 4MB.' });
   }
 
-  // Ler arquivo como base64
   const base64 = readFileSync(arquivo.filepath).toString('base64');
 
-  // Montar bloco de conteúdo para Anthropic (imagem ou documento PDF)
   const blocoArquivo = arquivo.mimetype === 'application/pdf'
     ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
     : { type: 'image', source: { type: 'base64', media_type: arquivo.mimetype, data: base64 } };
 
-  // Chamar Anthropic
   let respostaTexto;
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -117,7 +159,7 @@ export default async function handler(req, res) {
           role: 'user',
           content: [
             blocoArquivo,
-            { type: 'text', text: 'Extraia todos os itens de material escolar desta lista.' },
+            { type: 'text', text: 'Analise esta lista escolar e retorne os metadados e os itens para orçamento conforme o schema.' },
           ],
         },
       ],
@@ -128,7 +170,6 @@ export default async function handler(req, res) {
     return res.status(502).json({ ok: false, error: 'Erro ao processar com IA. Tente novamente em instantes.' });
   }
 
-  // Parsear JSON da resposta da IA
   let dados;
   try {
     const match = respostaTexto.match(/\{[\s\S]*\}/);
@@ -138,15 +179,19 @@ export default async function handler(req, res) {
     return res.status(502).json({ ok: false, error: 'A IA retornou um formato inesperado. Tente novamente.' });
   }
 
+  const metadados = normalizarMetadados(dados.metadados);
   const itens = normalizarItens(dados.itens);
-  const avisos = Array.isArray(dados.avisos) ? dados.avisos.filter(a => typeof a === 'string') : [];
+  const avisos = Array.isArray(dados.avisos)
+    ? dados.avisos.filter(a => typeof a === 'string').slice(0, 5)
+    : [];
 
   if (itens.length === 0) {
     return res.status(200).json({
       ok: false,
-      error: 'Não consegui identificar itens na lista. Tente enviar uma foto mais nítida ou um PDF.',
+      metadados,
+      error: 'Não consegui identificar itens para orçamento nesta lista. Tente enviar uma foto mais nítida ou um PDF.',
     });
   }
 
-  return res.status(200).json({ ok: true, itens, avisos });
+  return res.status(200).json({ ok: true, metadados, itens, avisos });
 }
