@@ -1,46 +1,35 @@
 /* ======================================================
-   SARTEC — Ferramenta de lista escolar (SIMULAÇÃO)
-   Não chama IA real ainda. Tudo client-side com mock.
+   SARTEC — Ferramenta de lista escolar
+   Chama /api/analisar-lista para leitura real com IA.
+   ITENS_MOCK é usado apenas em localhost como fallback.
    ====================================================== */
 
-// Lista mockada — simula o que a IA Vision retornaria.
-// Cada item: nome canônico, emoji ilustrativo, qty padrão, observação.
 const ITENS_MOCK = [
-  { id: 'cad_universitario', nome: 'Caderno universitário 96 folhas', icon: '📓', qty: 4, obs: 'Capa dura' },
-  { id: 'lapis_grafite', nome: 'Lápis grafite nº 2', icon: '✏️', qty: 6, obs: '' },
-  { id: 'borracha_branca', nome: 'Borracha branca', icon: '🧽', qty: 2, obs: 'Sem capa' },
-  { id: 'apontador', nome: 'Apontador com depósito', icon: '🔻', qty: 1, obs: '' },
-  { id: 'caneta_azul', nome: 'Caneta esferográfica azul', icon: '🖊️', qty: 4, obs: '' },
-  { id: 'caneta_preta', nome: 'Caneta esferográfica preta', icon: '🖋️', qty: 2, obs: '' },
-  { id: 'caneta_vermelha', nome: 'Caneta esferográfica vermelha', icon: '🖍️', qty: 1, obs: '' },
-  { id: 'lapis_cor', nome: 'Caixa de lápis de cor', icon: '🎨', qty: 1, obs: '24 cores' },
-  { id: 'canetinha', nome: 'Caixa de canetinha hidrocor', icon: '🖌️', qty: 1, obs: '12 cores' },
-  { id: 'estojo', nome: 'Estojo escolar', icon: '👜', qty: 1, obs: '' },
-  { id: 'regua', nome: 'Régua transparente 30cm', icon: '📏', qty: 1, obs: '' },
-  { id: 'esquadro_45', nome: 'Esquadro 45°', icon: '📐', qty: 1, obs: '' },
-  { id: 'esquadro_60', nome: 'Esquadro 60°', icon: '📐', qty: 1, obs: '' },
-  { id: 'tesoura', nome: 'Tesoura sem ponta', icon: '✂️', qty: 1, obs: '' },
-  { id: 'cola_bastao', nome: 'Cola bastão', icon: '🩹', qty: 2, obs: '' },
-  { id: 'pasta_polionda', nome: 'Pasta polionda', icon: '📁', qty: 2, obs: '40mm' },
-  { id: 'tinta_guache', nome: 'Tinta guache', icon: '🎨', qty: 1, obs: '6 cores' },
-  { id: 'pincel', nome: 'Pincel chato nº 8', icon: '🖌️', qty: 1, obs: '' },
-  { id: 'massinha', nome: 'Massinha de modelar', icon: '🧱', qty: 1, obs: '' },
-  { id: 'eva', nome: 'Folha de EVA', icon: '🟦', qty: 5, obs: 'Cores variadas' }
+  { id: 'cad_universitario', nome: 'Caderno universitário 96 folhas', icon: '📓', qty: 4, obs: 'Capa dura', categoria: 'cadernos', confianca: 'alta' },
+  { id: 'lapis_grafite', nome: 'Lápis grafite nº 2', icon: '✏️', qty: 6, obs: '', categoria: 'lápis', confianca: 'alta' },
+  { id: 'borracha_branca', nome: 'Borracha branca', icon: '🧽', qty: 2, obs: 'Sem capa', categoria: 'borrachas', confianca: 'alta' },
+  { id: 'apontador', nome: 'Apontador com depósito', icon: '🔻', qty: 1, obs: '', categoria: 'apontadores', confianca: 'alta' },
+  { id: 'caneta_azul', nome: 'Caneta esferográfica azul', icon: '🖊️', qty: 4, obs: '', categoria: 'canetas', confianca: 'alta' },
+  { id: 'caneta_preta', nome: 'Caneta esferográfica preta', icon: '🖋️', qty: 2, obs: '', categoria: 'canetas', confianca: 'alta' },
+  { id: 'lapis_cor', nome: 'Caixa de lápis de cor', icon: '🎨', qty: 1, obs: '24 cores', categoria: 'artes', confianca: 'alta' },
+  { id: 'canetinha', nome: 'Caixa de canetinha hidrocor', icon: '🖌️', qty: 1, obs: '12 cores', categoria: 'artes', confianca: 'alta' },
+  { id: 'tesoura', nome: 'Tesoura sem ponta', icon: '✂️', qty: 1, obs: '', categoria: 'tesouras', confianca: 'alta' },
+  { id: 'cola_bastao', nome: 'Cola bastão', icon: '🩹', qty: 2, obs: '', categoria: 'colas', confianca: 'alta' },
 ];
 
-// Mensagens rotativas durante o "loading" (simula processamento)
 const LOADING_MSGS = [
-  'Preparando os itens da lista...',
+  'Enviando lista para análise...',
+  'A IA está lendo os itens...',
+  'Identificando materiais escolares...',
   'Organizando os itens para você revisar...',
-  'Buscando ilustrações para cada item...',
-  'Quase lá, organizando tudo...'
 ];
 
-// Estado da aplicação
+const LIMITE_BYTES = 4 * 1024 * 1024;
+
 let estado = {
   nome: '',
   whatsapp: '',
-  itens: [], // cópia mutável dos itens
+  itens: [],
 };
 
 // =============== UTILITÁRIOS ===============
@@ -95,7 +84,7 @@ function onArquivoEscolhido() {
   uploadLabel.textContent = `✓ ${f.name}`;
 }
 
-formUpload.addEventListener('submit', (e) => {
+formUpload.addEventListener('submit', async (e) => {
   e.preventDefault();
   const nome = document.getElementById('nome').value.trim();
   const whatsapp = inputWhatsapp.value.trim();
@@ -103,15 +92,19 @@ formUpload.addEventListener('submit', (e) => {
 
   if (!nome || !whatsapp) { alert('Preencha nome e WhatsApp.'); return; }
   if (!arquivo) { alert('Anexe a foto ou PDF da lista.'); return; }
+  if (arquivo.size > LIMITE_BYTES) {
+    alert('O arquivo é maior que 4MB. Reduza o tamanho e tente novamente.');
+    return;
+  }
 
   estado.nome = nome;
   estado.whatsapp = whatsapp;
 
-  iniciarSimulacao();
+  await iniciarAnalise(arquivo);
 });
 
-// =============== LOADING SIMULADO ===============
-function iniciarSimulacao() {
+// =============== ANÁLISE COM IA ===============
+async function iniciarAnalise(arquivo) {
   trocarEstado('estado-loading');
 
   const hint = document.getElementById('loading-hint');
@@ -122,13 +115,48 @@ function iniciarSimulacao() {
     hint.textContent = LOADING_MSGS[i];
   }, 700);
 
-  // 2.8s simulando análise
-  setTimeout(() => {
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+  try {
+    const formData = new FormData();
+    formData.append('arquivo', arquivo);
+
+    const resposta = await fetch('/api/analisar-lista', { method: 'POST', body: formData });
+    const dados = await resposta.json();
+
     clearInterval(interval);
-    estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true }));
-    renderizarResultado();
-    trocarEstado('estado-resultado');
-  }, 2800);
+
+    if (dados.ok && dados.itens?.length) {
+      estado.itens = dados.itens.map(it => ({ ...it, incluso: true }));
+      renderizarResultado();
+      trocarEstado('estado-resultado');
+      return;
+    }
+
+    // API respondeu mas sem itens — fallback localhost ou erro ao usuário
+    if (isLocal) {
+      estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true }));
+      renderizarResultado();
+      trocarEstado('estado-resultado');
+      return;
+    }
+
+    trocarEstado('estado-upload');
+    alert(dados.error || 'Não consegui identificar itens na lista. Tente enviar uma foto mais nítida ou um PDF.');
+  } catch (err) {
+    clearInterval(interval);
+    console.error('[lista] Erro na análise:', err);
+
+    if (isLocal) {
+      estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true }));
+      renderizarResultado();
+      trocarEstado('estado-resultado');
+      return;
+    }
+
+    trocarEstado('estado-upload');
+    alert('Erro de conexão. Verifique sua internet e tente novamente.');
+  }
 }
 
 // =============== RESULTADO ===============
@@ -141,12 +169,15 @@ const btnMarcarTodosTem = document.getElementById('btn-marcar-todos-tem');
 const btnRecomecar = document.getElementById('btn-recomecar');
 
 function renderizarResultado() {
-  grid.innerHTML = estado.itens.map(it => `
+  grid.innerHTML = estado.itens.map(it => {
+    const icone = it.icon || '📦';
+    const busca = encodeURIComponent('material escolar ' + it.nome + (it.obs ? ' ' + it.obs : ''));
+    return `
     <div class="item-card ${it.incluso ? '' : 'excluido'}" data-id="${it.id}">
-      <div class="item-img">${it.icon}</div>
+      <div class="item-img">${icone}</div>
       <h4>${it.nome}</h4>
       <div class="obs">${it.obs || '&nbsp;'}</div>
-      <a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(it.nome)}" target="_blank" rel="noopener" class="item-img-buscar">O que é este item?</a>
+      <a href="https://www.google.com/search?tbm=isch&q=${busca}" target="_blank" rel="noopener" class="item-img-buscar">O que é este item?</a>
       <div class="item-controls">
         <div class="qty-control">
           <button class="qty-btn" data-acao="menos" aria-label="Diminuir">−</button>
@@ -157,10 +188,9 @@ function renderizarResultado() {
           ${it.incluso ? '✓ Quero' : '✗ Já tenho'}
         </button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
-  // Eventos de cada card
   grid.querySelectorAll('.item-card').forEach(card => {
     const id = card.dataset.id;
     const item = estado.itens.find(x => x.id === id);
@@ -184,7 +214,6 @@ function renderizarResultado() {
 }
 
 function atualizarUI() {
-  // Atualiza visualmente cada card sem recriar (mantém scroll)
   grid.querySelectorAll('.item-card').forEach(card => {
     const id = card.dataset.id;
     const item = estado.itens.find(x => x.id === id);
@@ -217,17 +246,35 @@ function atualizarLinkEnviar() {
   btnEnviar.style.opacity = '';
   btnEnviar.style.pointerEvents = '';
 
-  const linhas = inclusos.map(x => `✅ ${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`).join('\n');
+  const excluidos = estado.itens.filter(x => !x.incluso);
+
+  const linhasQuero = inclusos
+    .map(x => `✅ ${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`)
+    .join('\n');
+
+  const linhasTem = excluidos.length > 0
+    ? excluidos.map(x => `☑️ ${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`).join('\n')
+    : '_Nenhum item marcado como já tenho._';
+
   const mensagem =
 `Olá, Sartec! Sou *${estado.nome}*.
 
-Montei minha lista escolar pelo site:
+[SITE_LISTA_ESCOLAR]
 
-${linhas}
+*Lista escolar organizada pelo site*
 
-Aguardo o orçamento. Obrigado!
+*WhatsApp informado no site:*
+${estado.whatsapp}
 
-— Enviado pela ferramenta do site`;
+*Itens que quero comprar:*
+${linhasQuero}
+
+*Itens que já tenho em casa:*
+${linhasTem}
+
+Aguardo o orçamento e a confirmação de disponibilidade.
+
+— Enviado pela ferramenta de lista escolar do site da Sartec`;
 
   btnEnviar.href = montarWpp(SARTEC.WPP_PRINCIPAL, mensagem);
 }

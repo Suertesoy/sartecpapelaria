@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "check": "node --check api/health.js"
+    "check": "node --check api/health.js && node --check api/analisar-lista.js && node --check assets/lista.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "formidable": "^3.5.2"
   }
 }
