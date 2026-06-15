@@ -40,12 +40,19 @@ Não retorne nada que seja:
 - Orientações de reaproveitamento de materiais do ano anterior
 - Qualquer trecho que seja claramente uma instrução, não um item a comprar
 
+━━━ MARCA SUGERIDA ━━━
+- Preencha marcaSugerida APENAS quando a lista mencionar explicitamente uma marca sugerida ou recomendada para aquele item.
+- Não invente marca. Não infira marca.
+- Se não houver marca mencionada para o item, retorne string vazia em marcaSugerida.
+- Se a marca estiver no texto do item, separe: coloque a marca em marcaSugerida e mantenha em obs apenas características como cor, tamanho, número de folhas, gramatura, formato, quantidade por embalagem.
+- Trate a marca como sugestão da escola, nunca como obrigação.
+
 ━━━ REGRAS DE EXTRAÇÃO ━━━
-- Não invente itens. Não invente marcas.
-- Preserve em obs: número de folhas, capa dura/brochura, cor, tamanho, gramatura, marca exigida, formato, quantidade por embalagem, obrigatório/opcional
-- Quando não houver quantidade clara, use 1
-- Se um item puder ser comprado mas houver dúvida, inclua com confianca "baixa"
-- Retorne apenas JSON válido, sem markdown, sem texto antes ou depois
+- Não invente itens.
+- Preserve em obs: número de folhas, capa dura/brochura, cor, tamanho, gramatura, formato, quantidade por embalagem, obrigatório/opcional (exceto marca, que vai em marcaSugerida).
+- Quando não houver quantidade clara, use 1.
+- Se um item puder ser comprado mas houver dúvida, inclua com confianca "baixa".
+- Retorne apenas JSON válido, sem markdown, sem texto antes ou depois.
 
 ━━━ SCHEMA OBRIGATÓRIO ━━━
 {
@@ -62,6 +69,7 @@ Não retorne nada que seja:
       "unidade": "un|caixa|conjunto|pacote|rolo|outro",
       "obs": "string",
       "categoria": "string",
+      "marcaSugerida": "string",
       "confianca": "alta|media|baixa"
     }
   ],
@@ -98,13 +106,14 @@ function normalizarItens(itens) {
     .filter(it => it && typeof it.nome === 'string' && it.nome.trim())
     .slice(0, 80)
     .map(it => ({
-      id:        gerarId(it.nome.trim()),
-      nome:      it.nome.trim(),
-      qty:       Math.min(Math.max(Math.round(Number(it.qty) || 1), 1), 99),
-      unidade:   UNIDADES_VALIDAS.includes(it.unidade) ? it.unidade : 'un',
-      obs:       typeof it.obs      === 'string' ? it.obs.trim()      : '',
-      categoria: typeof it.categoria === 'string' ? it.categoria.trim() : 'geral',
-      confianca: ['alta', 'media', 'baixa'].includes(it.confianca) ? it.confianca : 'media',
+      id:            gerarId(it.nome.trim()),
+      nome:          it.nome.trim(),
+      qty:           Math.min(Math.max(Math.round(Number(it.qty) || 1), 1), 99),
+      unidade:       UNIDADES_VALIDAS.includes(it.unidade) ? it.unidade : 'un',
+      obs:           typeof it.obs           === 'string' ? it.obs.trim()           : '',
+      categoria:     typeof it.categoria     === 'string' ? it.categoria.trim()     : 'geral',
+      marcaSugerida: typeof it.marcaSugerida === 'string' ? it.marcaSugerida.trim() : '',
+      confianca:     ['alta', 'media', 'baixa'].includes(it.confianca) ? it.confianca : 'media',
     }));
 }
 

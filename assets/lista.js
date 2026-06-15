@@ -5,19 +5,26 @@
    ====================================================== */
 
 const ITENS_MOCK = [
-  { id: 'cad_universitario', nome: 'Caderno universitário 96 folhas', qty: 4, obs: 'Capa dura', unidade: 'un', categoria: 'cadernos', confianca: 'alta' },
-  { id: 'lapis_grafite', nome: 'Lápis grafite nº 2', qty: 6, obs: '', unidade: 'un', categoria: 'lápis', confianca: 'alta' },
-  { id: 'borracha_branca', nome: 'Borracha branca', qty: 2, obs: 'Sem capa', unidade: 'un', categoria: 'borrachas', confianca: 'alta' },
-  { id: 'apontador', nome: 'Apontador com depósito', qty: 1, obs: '', unidade: 'un', categoria: 'apontadores', confianca: 'alta' },
-  { id: 'caneta_azul', nome: 'Caneta esferográfica azul', qty: 4, obs: '', unidade: 'un', categoria: 'canetas', confianca: 'alta' },
-  { id: 'lapis_cor', nome: 'Caixa de lápis de cor', qty: 1, obs: '24 cores', unidade: 'caixa', categoria: 'artes', confianca: 'alta' },
-  { id: 'canetinha', nome: 'Caixa de canetinha hidrocor', qty: 1, obs: '12 cores', unidade: 'caixa', categoria: 'artes', confianca: 'alta' },
-  { id: 'tesoura', nome: 'Tesoura sem ponta', qty: 1, obs: '', unidade: 'un', categoria: 'tesouras', confianca: 'alta' },
-  { id: 'cola_bastao', nome: 'Cola bastão', qty: 2, obs: '', unidade: 'un', categoria: 'colas', confianca: 'alta' },
-  { id: 'papel_sulfite', nome: 'Resma de papel sulfite A4', qty: 1, obs: '500 folhas, 75g', unidade: 'pacote', categoria: 'papéis', confianca: 'alta' },
+  { id: 'cad_universitario', nome: 'Caderno universitário 96 folhas', qty: 4, obs: 'Capa dura', unidade: 'un', categoria: 'cadernos', marcaSugerida: 'Tilibra', confianca: 'alta' },
+  { id: 'lapis_grafite', nome: 'Lápis grafite nº 2', qty: 6, obs: '', unidade: 'un', categoria: 'lápis', marcaSugerida: 'Faber-Castell', confianca: 'alta' },
+  { id: 'borracha_branca', nome: 'Borracha branca', qty: 2, obs: 'Sem capa', unidade: 'un', categoria: 'borrachas', marcaSugerida: '', confianca: 'alta' },
+  { id: 'apontador', nome: 'Apontador com depósito', qty: 1, obs: '', unidade: 'un', categoria: 'apontadores', marcaSugerida: '', confianca: 'alta' },
+  { id: 'caneta_azul', nome: 'Caneta esferográfica azul', qty: 4, obs: '', unidade: 'un', categoria: 'canetas', marcaSugerida: 'BIC', confianca: 'alta' },
+  { id: 'lapis_cor', nome: 'Caixa de lápis de cor', qty: 1, obs: '24 cores', unidade: 'caixa', categoria: 'artes', marcaSugerida: 'Faber-Castell', confianca: 'alta' },
+  { id: 'canetinha', nome: 'Caixa de canetinha hidrocor', qty: 1, obs: '12 cores', unidade: 'caixa', categoria: 'artes', marcaSugerida: '', confianca: 'alta' },
+  { id: 'tesoura', nome: 'Tesoura sem ponta', qty: 1, obs: '', unidade: 'un', categoria: 'tesouras', marcaSugerida: '', confianca: 'alta' },
+  { id: 'cola_bastao', nome: 'Cola bastão', qty: 2, obs: '', unidade: 'un', categoria: 'colas', marcaSugerida: 'UHU', confianca: 'alta' },
+  { id: 'papel_sulfite', nome: 'Resma de papel sulfite A4', qty: 1, obs: '500 folhas, 75g', unidade: 'pacote', categoria: 'papéis', marcaSugerida: '', confianca: 'alta' },
 ];
 
 const META_MOCK = { escola: 'Escola Exemplo', anoSerie: '3º ano', segmento: 'Ensino Fundamental I', anoLetivo: '2026' };
+
+const PREFERENCIAS_GERAL = [
+  { id: 'economico',  label: 'Mais econômico',            desc: 'Priorizar as opções mais em conta disponíveis.' },
+  { id: 'custo_ben', label: 'Melhor custo-benefício',     desc: 'Buscar equilíbrio entre qualidade e preço.' },
+  { id: 'escola',    label: 'Seguir sugestões da escola', desc: 'Quando a lista sugerir marca, tentar seguir a sugestão.' },
+  { id: 'qualidade', label: 'Marcas de maior qualidade',  desc: 'Priorizar marcas melhores, mesmo que custem mais.' },
+];
 
 const LOADING_MSGS = [
   'Enviando lista para análise...',
@@ -33,6 +40,7 @@ let estado = {
   whatsapp: '',
   itens: [],
   metadados: { escola: '', anoSerie: '', segmento: '', anoLetivo: '' },
+  preferenciaGeral: 'economico',
 };
 
 // =============== UTILITÁRIOS ===============
@@ -135,7 +143,7 @@ async function iniciarAnalise(arquivo) {
 
     if (dados.ok && dados.itens?.length) {
       estado.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
-      estado.itens = dados.itens.map(it => ({ ...it, incluso: true }));
+      estado.itens = dados.itens.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
       trocarEstado('estado-resultado');
       return;
@@ -143,7 +151,7 @@ async function iniciarAnalise(arquivo) {
 
     if (isLocal) {
       estado.metadados = META_MOCK;
-      estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true }));
+      estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
       trocarEstado('estado-resultado');
       return;
@@ -157,7 +165,7 @@ async function iniciarAnalise(arquivo) {
 
     if (isLocal) {
       estado.metadados = META_MOCK;
-      estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true }));
+      estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
       trocarEstado('estado-resultado');
       return;
@@ -176,6 +184,33 @@ const resumoTotal = document.getElementById('resumo-total');
 const btnEnviar = document.getElementById('btn-enviar');
 const btnMarcarTodosTem = document.getElementById('btn-marcar-todos-tem');
 const btnRecomecar = document.getElementById('btn-recomecar');
+
+function renderizarPreferenciaGeral() {
+  const bloco = document.getElementById('bloco-preferencia');
+  if (!bloco) return;
+  bloco.innerHTML = `
+    <div class="preferencia-orcamento">
+      <p class="preferencia-titulo">Preferência para o orçamento</p>
+      <p class="preferencia-desc">Escolha como a equipe deve priorizar marcas e opções ao montar seu orçamento. A disponibilidade, marcas/modelos e valores são confirmados pelo WhatsApp.</p>
+      <div class="preferencia-options">
+        ${PREFERENCIAS_GERAL.map(p => `
+        <button class="preferencia-option${estado.preferenciaGeral === p.id ? ' ativo' : ''}" type="button" data-pref="${p.id}">
+          <strong>${esc(p.label)}</strong>
+          <span>${esc(p.desc)}</span>
+        </button>`).join('')}
+      </div>
+    </div>
+  `;
+  bloco.querySelectorAll('.preferencia-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      estado.preferenciaGeral = btn.dataset.pref;
+      bloco.querySelectorAll('.preferencia-option').forEach(b => {
+        b.classList.toggle('ativo', b === btn);
+      });
+      atualizarLinkEnviar();
+    });
+  });
+}
 
 function renderizarMetadados() {
   const bloco = document.getElementById('bloco-metadados');
@@ -203,14 +238,28 @@ function renderizarMetadados() {
 
 function renderizarResultado() {
   renderizarMetadados();
+  renderizarPreferenciaGeral();
 
   grid.innerHTML = estado.itens.map(it => {
     const busca = encodeURIComponent('material escolar ' + it.nome + (it.obs ? ' ' + it.obs : ''));
+    const marcaLabel = it.marcaSugerida ? it.marcaSugerida : 'não informada';
+    const temPref = (it.preferenciaCliente || '').trim() !== '';
     return `
     <div class="item-card ${it.incluso ? '' : 'excluido'}" data-id="${it.id}">
       <div class="item-info">
-        <h4>${it.nome}</h4>
-        ${it.obs ? `<div class="obs">${it.obs}</div>` : ''}
+        <h4>${esc(it.nome)}</h4>
+        ${it.obs ? `<div class="obs">${esc(it.obs)}</div>` : ''}
+      </div>
+      <p class="marca-sugerida">Sugestão da escola: <strong>${esc(marcaLabel)}</strong></p>
+      <button class="marca-preferencia-toggle" type="button">${temPref ? 'Editar marca/preferência' : '+ adicionar marca/preferência'}</button>
+      <div class="marca-preferencia-wrap" style="display:${temPref ? 'block' : 'none'}">
+        <input
+          class="marca-preferencia-input"
+          type="text"
+          value="${esc(it.preferenciaCliente || '')}"
+          placeholder="Ex: Faber-Castell, Tilibra, mais barato, qualquer marca"
+          aria-label="Marca ou preferência para ${esc(it.nome)}"
+        />
       </div>
       <a href="https://www.google.com/search?tbm=isch&q=${busca}" target="_blank" rel="noopener" class="item-img-buscar">O que é este item?</a>
       <div class="item-controls">
@@ -241,6 +290,24 @@ function renderizarResultado() {
         else item.qty = Math.max(1, item.qty - 1);
         atualizarUI();
       });
+    });
+
+    const toggle = card.querySelector('.marca-preferencia-toggle');
+    const wrap   = card.querySelector('.marca-preferencia-wrap');
+    const input  = card.querySelector('.marca-preferencia-input');
+
+    toggle.addEventListener('click', () => {
+      const aberto = wrap.style.display !== 'none';
+      wrap.style.display = aberto ? 'none' : 'block';
+      if (!aberto) setTimeout(() => input.focus(), 0);
+    });
+
+    input.addEventListener('input', () => {
+      item.preferenciaCliente = input.value;
+      toggle.textContent = input.value.trim()
+        ? 'Editar marca/preferência'
+        : '+ adicionar marca/preferência';
+      atualizarLinkEnviar();
     });
   });
 
@@ -283,20 +350,35 @@ function atualizarLinkEnviar() {
 
   const excluidos = estado.itens.filter(x => !x.incluso);
   const m = estado.metadados;
+  const pref = PREFERENCIAS_GERAL.find(p => p.id === estado.preferenciaGeral) || PREFERENCIAS_GERAL[0];
 
   const dadosLista = [
     `Escola: ${m.escola || 'Não informado'}`,
     `Ano/Série: ${m.anoSerie || 'Não informado'}`,
-    m.segmento   ? `Segmento: ${m.segmento}`    : null,
-    m.anoLetivo  ? `Ano letivo: ${m.anoLetivo}`  : null,
+    m.segmento  ? `Segmento: ${m.segmento}`  : null,
+    m.anoLetivo ? `Ano letivo: ${m.anoLetivo}` : null,
   ].filter(Boolean).join('\n');
 
-  const linhasQuero = inclusos
-    .map(x => `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`)
-    .join('\n');
+  function linhaItem(x) {
+    const base = `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`;
+    const sugestao = x.marcaSugerida
+      ? `  Sugestão da escola: ${x.marcaSugerida}`
+      : null;
+    const prefCliente = (x.preferenciaCliente || '').trim()
+      ? `  Preferência do cliente: ${x.preferenciaCliente.trim()}`
+      : null;
+    const clienteAlterou =
+      (x.preferenciaCliente || '').trim() &&
+      x.marcaSugerida &&
+      x.preferenciaCliente.trim().toLowerCase() !== x.marcaSugerida.toLowerCase()
+        ? `  (Cliente alterou a sugestão da escola para este item.)`
+        : null;
+    return [base, sugestao, prefCliente, clienteAlterou].filter(Boolean).join('\n');
+  }
 
+  const linhasQuero = inclusos.map(linhaItem).join('\n\n');
   const linhasTem = excluidos.length > 0
-    ? excluidos.map(x => `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`).join('\n')
+    ? excluidos.map(linhaItem).join('\n\n')
     : 'Nenhum item marcado como já tenho.';
 
   const mensagem =
@@ -311,6 +393,9 @@ ${dadosLista}
 
 *WhatsApp informado no site:*
 ${estado.whatsapp}
+
+*Preferência para o orçamento:*
+${pref.label} — ${pref.desc}
 
 *Itens que quero comprar:*
 ${linhasQuero}
