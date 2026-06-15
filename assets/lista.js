@@ -57,7 +57,25 @@ let estado = {
 function trocarEstado(id) {
   document.querySelectorAll('.estado').forEach(el => el.classList.remove('ativo'));
   document.getElementById(id).classList.add('ativo');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function scrollPara(el, block = 'center') {
+  if (!el) return;
+  const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  el.scrollIntoView({ behavior: reduzido ? 'instant' : 'smooth', block });
+}
+
+function mostrarErro(msg) {
+  const el = document.getElementById('lista-erro');
+  if (!el) return;
+  el.innerHTML = `<span class="lista-erro-ico" aria-hidden="true">⚠</span><div><strong>Não foi possível analisar a lista</strong><p>${esc(msg)}</p></div>`;
+  el.style.display = '';
+  scrollPara(el, 'nearest');
+}
+
+function ocultarErro() {
+  const el = document.getElementById('lista-erro');
+  if (el) { el.style.display = 'none'; el.innerHTML = ''; }
 }
 
 function formatarTelefone(valor) {
@@ -115,10 +133,11 @@ formUpload.addEventListener('submit', async (e) => {
   const whatsapp = inputWhatsapp.value.trim();
   const arquivo = arquivoInput.files?.[0];
 
-  if (!nome || !whatsapp) { alert('Preencha nome e WhatsApp.'); return; }
-  if (!arquivo) { alert('Anexe a foto ou PDF da lista.'); return; }
+  ocultarErro();
+  if (!nome || !whatsapp) { mostrarErro('Preencha nome e WhatsApp antes de continuar.'); return; }
+  if (!arquivo) { mostrarErro('Anexe a foto ou PDF da lista antes de continuar.'); return; }
   if (arquivo.size > LIMITE_BYTES) {
-    alert('O arquivo é maior que 4MB. Reduza o tamanho e tente novamente.');
+    mostrarErro('O arquivo é maior que 4MB. Reduza o tamanho e tente novamente.');
     return;
   }
 
@@ -130,12 +149,24 @@ formUpload.addEventListener('submit', async (e) => {
 
 // =============== ANÁLISE COM IA ===============
 async function iniciarAnalise(arquivo) {
+  const btnAnalisar = document.getElementById('btn-analisar');
+  if (btnAnalisar) { btnAnalisar.disabled = true; btnAnalisar.textContent = 'Analisando...'; }
+
+  const reativarBtn = () => {
+    if (btnAnalisar) { btnAnalisar.disabled = false; btnAnalisar.textContent = 'Analisar lista'; }
+  };
+
+  const tituloLoading = document.getElementById('lista-loading-titulo');
+  if (tituloLoading) {
+    tituloLoading.textContent = estado.listas.length > 0 ? 'Analisando nova lista...' : 'Analisando sua lista...';
+  }
+
   trocarEstado('estado-loading');
+  scrollPara(document.getElementById('estado-loading'), 'start');
 
   const hint = document.getElementById('loading-hint');
-  const isAdicionando = estado.listas.length > 0;
   let i = 0;
-  hint.textContent = isAdicionando ? 'Analisando nova lista...' : LOADING_MSGS[0];
+  hint.textContent = LOADING_MSGS[0];
   const interval = setInterval(() => {
     i = (i + 1) % LOADING_MSGS.length;
     hint.textContent = LOADING_MSGS[i];
@@ -156,7 +187,9 @@ async function iniciarAnalise(arquivo) {
       estado.rascunho.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
       estado.rascunho.itens = dados.itens.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
+      reativarBtn();
       trocarEstado('estado-resultado');
+      scrollPara(document.getElementById('estado-resultado'), 'start');
       return;
     }
 
@@ -164,12 +197,15 @@ async function iniciarAnalise(arquivo) {
       estado.rascunho.metadados = META_MOCK;
       estado.rascunho.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
+      reativarBtn();
       trocarEstado('estado-resultado');
+      scrollPara(document.getElementById('estado-resultado'), 'start');
       return;
     }
 
+    reativarBtn();
     trocarEstado('estado-upload');
-    alert(dados.error || 'Não consegui identificar itens na lista. Tente enviar uma foto mais nítida ou um PDF.');
+    mostrarErro(dados.error || 'Não consegui identificar itens na lista. Tente enviar uma foto mais nítida ou um PDF.');
   } catch (err) {
     clearInterval(interval);
     console.error('[lista] Erro na análise:', err);
@@ -178,12 +214,15 @@ async function iniciarAnalise(arquivo) {
       estado.rascunho.metadados = META_MOCK;
       estado.rascunho.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
+      reativarBtn();
       trocarEstado('estado-resultado');
+      scrollPara(document.getElementById('estado-resultado'), 'start');
       return;
     }
 
+    reativarBtn();
     trocarEstado('estado-upload');
-    alert('Erro de conexão. Verifique sua internet e tente novamente.');
+    mostrarErro('Erro de conexão. Verifique sua internet e tente novamente.');
   }
 }
 
@@ -555,6 +594,7 @@ btnAdicionarLista.addEventListener('click', () => {
   uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
 
   trocarEstado('estado-upload');
+  scrollPara(document.getElementById('estado-upload'), 'start');
 });
 
 btnRecomecar.addEventListener('click', () => {
@@ -569,5 +609,6 @@ btnRecomecar.addEventListener('click', () => {
     uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
 
     trocarEstado('estado-upload');
+    scrollPara(document.getElementById('estado-upload'), 'start');
   }
 });

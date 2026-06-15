@@ -86,7 +86,9 @@
               <br><small>Use esta opção quando for comprar materiais para mais de uma criança, escola ou série.</small>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block btn-lg">
+            <div id="lista-erro" class="lista-erro-card" style="display:none" role="alert" aria-live="assertive"></div>
+
+            <button type="submit" id="btn-analisar" class="btn btn-primary btn-block btn-lg">
               Analisar lista
             </button>
             <p class="dica-analise">A ferramenta vai identificar os principais itens para você revisar antes de enviar para a Sartec.</p>
@@ -101,10 +103,17 @@
 
       <!-- ESTADO 2: LOADING -->
       <div class="estado" id="estado-loading">
-        <div class="loading-box">
-          <div class="loading-spinner"></div>
-          <div class="loading-msg">Lendo sua lista...</div>
-          <div class="loading-hint" id="loading-hint">Identificando os itens um por um.</div>
+        <div class="lista-loading-card">
+          <div class="lista-loading-chips" aria-hidden="true">
+            <span class="loading-chip chip-1">✏ Lápis</span>
+            <span class="loading-chip chip-2">📓 Caderno</span>
+            <span class="loading-chip chip-3">🧴 Cola</span>
+            <span class="loading-chip chip-4">✂ Tesoura</span>
+            <span class="loading-chip chip-5">📁 Pasta</span>
+          </div>
+          <p class="lista-loading-titulo" id="lista-loading-titulo">Analisando sua lista...</p>
+          <p class="lista-loading-hint" id="loading-hint" aria-live="polite">Enviando lista para análise...</p>
+          <div class="lista-loading-bar" aria-hidden="true"><div class="lista-loading-bar-fill"></div></div>
         </div>
       </div>
 

@@ -945,6 +945,109 @@ section { padding: 64px 0; }
   color: var(--azul);
 }
 
+/* ======================== LOADING CARD ======================== */
+.lista-loading-card {
+  max-width: 520px;
+  margin: 56px auto;
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 40px 36px 36px;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,.06);
+}
+.lista-loading-chips {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.loading-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E3A8A;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: .82rem;
+  font-weight: 600;
+  animation: chipBounce 1.6s ease-in-out infinite;
+}
+.loading-chip.chip-1 { animation-delay: 0s; }
+.loading-chip.chip-2 { animation-delay: .18s; }
+.loading-chip.chip-3 { animation-delay: .36s; }
+.loading-chip.chip-4 { animation-delay: .54s; }
+.loading-chip.chip-5 { animation-delay: .72s; }
+@keyframes chipBounce {
+  0%, 100% { transform: translateY(0); opacity: .65; }
+  50%       { transform: translateY(-6px); opacity: 1; }
+}
+.lista-loading-titulo {
+  font-family: Archivo, sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #1E3A8A;
+  margin: 0 0 6px;
+}
+.lista-loading-hint {
+  font-size: .88rem;
+  color: var(--texto-suave);
+  margin: 0 0 28px;
+  min-height: 1.4em;
+}
+.lista-loading-bar {
+  height: 4px;
+  background: #E2E8F0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.lista-loading-bar-fill {
+  height: 100%;
+  width: 38%;
+  background: #1E3A8A;
+  border-radius: 2px;
+  animation: barSlide 1.9s ease-in-out infinite;
+}
+@keyframes barSlide {
+  0%   { transform: translateX(-160%); }
+  100% { transform: translateX(380%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-chip { animation: none; opacity: 1; }
+  .lista-loading-bar-fill { animation: none; width: 100%; background: #BFDBFE; }
+}
+
+/* ======================== ERRO CARD ======================== */
+.lista-erro-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  color: #991B1B;
+  font-size: .88rem;
+  line-height: 1.5;
+}
+.lista-erro-card strong {
+  display: block;
+  font-weight: 700;
+  font-size: .9rem;
+  color: #7F1D1D;
+  margin-bottom: 3px;
+}
+.lista-erro-card p { margin: 0; }
+.lista-erro-ico {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
 /* ======================== CÓPIAS ======================== */
 .copias-hero {
   padding: 64px 0 40px;
