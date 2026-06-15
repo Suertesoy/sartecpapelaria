@@ -9,7 +9,7 @@ window.SARTEC = {
   ENDERECO: 'Av. Andrômeda, 1805 — Jardim Satélite, São José dos Campos/SP',
   CEP: '12230-000',
   CNPJ: '06.241.041/0001-56',
-  HORARIO:  'Seg a Sex: 8h às 18h • Sáb: 8h às 13h',
+  HORARIO:  'Seg a Sex: 8h30 às 18h30 • Sáb: 9h às 14h',
   TELEFONE_DISPLAY: '(12) 98159-4959',
   EMAIL: 'sartecpapelaria@uol.com.br'
 };

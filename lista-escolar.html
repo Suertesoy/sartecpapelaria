@@ -81,9 +81,15 @@
               </div>
             </div>
 
+            <div id="info-adicionando-lista" class="info-adicionando" style="display:none">
+              <strong>📋 Adicionando ao pedido</strong> — envie a próxima lista para continuar.
+              <br><small>Use esta opção quando for comprar materiais para mais de uma criança, escola ou série.</small>
+            </div>
+
             <button type="submit" class="btn btn-primary btn-block btn-lg">
-              Identificar itens da lista
+              Analisar lista
             </button>
+            <p class="dica-analise">A ferramenta vai identificar os principais itens para você revisar antes de enviar para a Sartec.</p>
 
             <div class="dica-box">
               <strong>💡 Dica:</strong> Tire a foto com boa iluminação e enquadre toda a lista.
@@ -136,13 +142,18 @@
           <!-- Cards renderizados via JS -->
         </div>
 
+        <div id="bloco-pedido-resumo"></div>
+
         <div class="acoes-finais">
           <div class="resumo">
-            Sua lista final: <strong id="resumo-total">0 itens</strong>
+            Nesta lista: <strong id="resumo-total">0 itens</strong>
           </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
             <button id="btn-recomecar" class="btn btn-ghost">
-              ← Recomeçar
+              Recomeçar pedido
+            </button>
+            <button id="btn-adicionar-lista" class="btn btn-adicionar">
+              + Adicionar outra lista
             </button>
             <a id="btn-enviar" class="btn btn-wpp btn-lg" target="_blank" rel="noopener">
               Enviar pelo WhatsApp

@@ -892,6 +892,59 @@ section { padding: 64px 0; }
 .acoes-finais .resumo strong { color: var(--azul); }
 .acoes-finais .resumo { font-size: 1rem; }
 
+/* ======================== MÚLTIPLAS LISTAS ======================== */
+.info-adicionando {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: .88rem;
+  color: #1E3A8A;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.dica-analise {
+  font-size: .8rem;
+  color: var(--texto-suave);
+  text-align: center;
+  margin: -6px 0 4px;
+}
+.pedido-resumo {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.pedido-resumo-titulo {
+  font-weight: 700;
+  font-size: .95rem;
+  color: #166534;
+  margin: 0 0 8px;
+}
+.pedido-resumo-lista {
+  margin: 0 0 6px;
+  padding-left: 18px;
+  font-size: .88rem;
+  color: #166534;
+  line-height: 1.7;
+}
+.pedido-resumo-dica {
+  font-size: .78rem;
+  color: #166534;
+  opacity: .75;
+  margin: 0;
+}
+.btn-adicionar {
+  background: transparent;
+  color: var(--azul);
+  border: 2px solid var(--azul);
+}
+.btn-adicionar:hover {
+  background: #EFF6FF;
+  color: var(--azul);
+}
+
 /* ======================== CÓPIAS ======================== */
 .copias-hero {
   padding: 64px 0 40px;

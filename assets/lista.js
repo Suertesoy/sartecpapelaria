@@ -35,13 +35,22 @@ const LOADING_MSGS = [
 
 const LIMITE_BYTES = 4 * 1024 * 1024;
 
+// =============== ESTADO ===============
+
+function rascunhoVazio() {
+  return {
+    metadados: { escola: '', anoSerie: '', segmento: '', anoLetivo: '' },
+    aluno: { nome: '', preferenciaCor: '', observacoes: '' },
+    preferenciaGeral: 'economico',
+    itens: [],
+  };
+}
+
 let estado = {
   nome: '',
   whatsapp: '',
-  itens: [],
-  metadados: { escola: '', anoSerie: '', segmento: '', anoLetivo: '' },
-  preferenciaGeral: 'economico',
-  aluno: { nome: '', preferenciaCor: '', observacoes: '' },
+  listas: [],           // listas já revisadas e salvas
+  rascunho: rascunhoVazio(),  // lista em revisão atual
 };
 
 // =============== UTILITÁRIOS ===============
@@ -124,8 +133,9 @@ async function iniciarAnalise(arquivo) {
   trocarEstado('estado-loading');
 
   const hint = document.getElementById('loading-hint');
+  const isAdicionando = estado.listas.length > 0;
   let i = 0;
-  hint.textContent = LOADING_MSGS[0];
+  hint.textContent = isAdicionando ? 'Analisando nova lista...' : LOADING_MSGS[0];
   const interval = setInterval(() => {
     i = (i + 1) % LOADING_MSGS.length;
     hint.textContent = LOADING_MSGS[i];
@@ -143,16 +153,16 @@ async function iniciarAnalise(arquivo) {
     clearInterval(interval);
 
     if (dados.ok && dados.itens?.length) {
-      estado.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
-      estado.itens = dados.itens.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
+      estado.rascunho.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
+      estado.rascunho.itens = dados.itens.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
       trocarEstado('estado-resultado');
       return;
     }
 
     if (isLocal) {
-      estado.metadados = META_MOCK;
-      estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
+      estado.rascunho.metadados = META_MOCK;
+      estado.rascunho.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
       trocarEstado('estado-resultado');
       return;
@@ -165,8 +175,8 @@ async function iniciarAnalise(arquivo) {
     console.error('[lista] Erro na análise:', err);
 
     if (isLocal) {
-      estado.metadados = META_MOCK;
-      estado.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
+      estado.rascunho.metadados = META_MOCK;
+      estado.rascunho.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
       renderizarResultado();
       trocarEstado('estado-resultado');
       return;
@@ -185,11 +195,12 @@ const resumoTotal = document.getElementById('resumo-total');
 const btnEnviar = document.getElementById('btn-enviar');
 const btnMarcarTodosTem = document.getElementById('btn-marcar-todos-tem');
 const btnRecomecar = document.getElementById('btn-recomecar');
+const btnAdicionarLista = document.getElementById('btn-adicionar-lista');
 
 function renderizarAluno() {
   const bloco = document.getElementById('bloco-aluno');
   if (!bloco) return;
-  const a = estado.aluno;
+  const a = estado.rascunho.aluno;
   bloco.innerHTML = `
     <div class="aluno-lista">
       <p class="aluno-lista-titulo">Dados do aluno</p>
@@ -211,15 +222,15 @@ function renderizarAluno() {
     </div>
   `;
   document.getElementById('aluno-nome').addEventListener('input', e => {
-    estado.aluno.nome = e.target.value;
+    estado.rascunho.aluno.nome = e.target.value;
     atualizarLinkEnviar();
   });
   document.getElementById('aluno-cor').addEventListener('input', e => {
-    estado.aluno.preferenciaCor = e.target.value;
+    estado.rascunho.aluno.preferenciaCor = e.target.value;
     atualizarLinkEnviar();
   });
   document.getElementById('aluno-obs').addEventListener('input', e => {
-    estado.aluno.observacoes = e.target.value;
+    estado.rascunho.aluno.observacoes = e.target.value;
     atualizarLinkEnviar();
   });
 }
@@ -233,7 +244,7 @@ function renderizarPreferenciaGeral() {
       <p class="preferencia-desc">Escolha como a equipe deve priorizar marcas e opções ao montar seu orçamento. A disponibilidade, marcas/modelos e valores são confirmados pelo WhatsApp.</p>
       <div class="preferencia-options">
         ${PREFERENCIAS_GERAL.map(p => `
-        <button class="preferencia-option${estado.preferenciaGeral === p.id ? ' ativo' : ''}" type="button" data-pref="${p.id}">
+        <button class="preferencia-option${estado.rascunho.preferenciaGeral === p.id ? ' ativo' : ''}" type="button" data-pref="${p.id}">
           <strong>${esc(p.label)}</strong>
           <span>${esc(p.desc)}</span>
         </button>`).join('')}
@@ -242,7 +253,7 @@ function renderizarPreferenciaGeral() {
   `;
   bloco.querySelectorAll('.preferencia-option').forEach(btn => {
     btn.addEventListener('click', () => {
-      estado.preferenciaGeral = btn.dataset.pref;
+      estado.rascunho.preferenciaGeral = btn.dataset.pref;
       bloco.querySelectorAll('.preferencia-option').forEach(b => {
         b.classList.toggle('ativo', b === btn);
       });
@@ -254,7 +265,7 @@ function renderizarPreferenciaGeral() {
 function renderizarMetadados() {
   const bloco = document.getElementById('bloco-metadados');
   if (!bloco) return;
-  const m = estado.metadados;
+  const m = estado.rascunho.metadados;
   bloco.innerHTML = `
     <div class="meta-lista">
       <p class="meta-lista-titulo">Dados identificados na lista</p>
@@ -269,18 +280,43 @@ function renderizarMetadados() {
   `;
   ['escola', 'anoSerie', 'segmento', 'anoLetivo'].forEach(campo => {
     document.getElementById(`meta-${campo}`).addEventListener('input', (e) => {
-      estado.metadados[campo] = e.target.value;
+      estado.rascunho.metadados[campo] = e.target.value;
       atualizarLinkEnviar();
     });
   });
+}
+
+function renderizarPedidoResumo() {
+  const bloco = document.getElementById('bloco-pedido-resumo');
+  if (!bloco) return;
+  if (estado.listas.length === 0) {
+    bloco.innerHTML = '';
+    return;
+  }
+  const numero = estado.listas.length + 1;
+  const items = estado.listas.map((l, i) => {
+    const partes = [`Lista ${i + 1}`];
+    if (l.aluno.nome) partes.push(l.aluno.nome);
+    if (l.metadados.escola) partes.push(l.metadados.escola);
+    if (l.metadados.anoSerie) partes.push(l.metadados.anoSerie);
+    return `<li>${partes.join(' — ')}</li>`;
+  }).join('');
+  bloco.innerHTML = `
+    <div class="pedido-resumo">
+      <p class="pedido-resumo-titulo">📋 Listas adicionadas ao pedido</p>
+      <ul class="pedido-resumo-lista">${items}</ul>
+      <p class="pedido-resumo-dica">A lista que você está revisando agora será a Lista ${numero}.</p>
+    </div>
+  `;
 }
 
 function renderizarResultado() {
   renderizarMetadados();
   renderizarAluno();
   renderizarPreferenciaGeral();
+  renderizarPedidoResumo();
 
-  grid.innerHTML = estado.itens.map(it => {
+  grid.innerHTML = estado.rascunho.itens.map(it => {
     const busca = encodeURIComponent('material escolar ' + it.nome + (it.obs ? ' ' + it.obs : ''));
     const marcaLabel = it.marcaSugerida ? it.marcaSugerida : 'não informada';
     const temPref = (it.preferenciaCliente || '').trim() !== '';
@@ -318,7 +354,7 @@ function renderizarResultado() {
 
   grid.querySelectorAll('.item-card').forEach(card => {
     const id = card.dataset.id;
-    const item = estado.itens.find(x => x.id === id);
+    const item = estado.rascunho.itens.find(x => x.id === id);
 
     card.querySelectorAll('.item-choice-option').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -362,7 +398,7 @@ function renderizarResultado() {
 function atualizarUI() {
   grid.querySelectorAll('.item-card').forEach(card => {
     const id = card.dataset.id;
-    const item = estado.itens.find(x => x.id === id);
+    const item = estado.rascunho.itens.find(x => x.id === id);
     card.classList.toggle('excluido', !item.incluso);
     card.querySelector('.qty-num').textContent = item.qty;
     card.querySelectorAll('.item-choice-option').forEach(btn => {
@@ -376,28 +412,38 @@ function atualizarUI() {
 }
 
 function atualizarContadores() {
-  const inclusos = estado.itens.filter(x => x.incluso);
-  const excluidos = estado.itens.filter(x => !x.incluso);
+  const inclusos = estado.rascunho.itens.filter(x => x.incluso);
+  const excluidos = estado.rascunho.itens.filter(x => !x.incluso);
   counterQuero.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
   counterTem.textContent = `${excluidos.length} não ${excluidos.length === 1 ? 'quero' : 'quero'}`;
   resumoTotal.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
 }
 
-function atualizarLinkEnviar() {
-  const inclusos = estado.itens.filter(x => x.incluso);
-  if (inclusos.length === 0) {
-    btnEnviar.style.opacity = '0.5';
-    btnEnviar.style.pointerEvents = 'none';
-    btnEnviar.removeAttribute('href');
-    return;
-  }
-  btnEnviar.style.opacity = '';
-  btnEnviar.style.pointerEvents = '';
+// =============== GERAÇÃO DA MENSAGEM ===============
 
-  const excluidos = estado.itens.filter(x => !x.incluso);
-  const m = estado.metadados;
-  const a = estado.aluno;
-  const pref = PREFERENCIAS_GERAL.find(p => p.id === estado.preferenciaGeral) || PREFERENCIAS_GERAL[0];
+function linhaItem(x) {
+  const base = `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`;
+  const sugestao = x.marcaSugerida
+    ? `  Sugestão da escola: ${x.marcaSugerida}`
+    : null;
+  const prefCliente = (x.preferenciaCliente || '').trim()
+    ? `  Preferência do cliente: ${x.preferenciaCliente.trim()}`
+    : null;
+  const clienteAlterou =
+    (x.preferenciaCliente || '').trim() &&
+    x.marcaSugerida &&
+    x.preferenciaCliente.trim().toLowerCase() !== x.marcaSugerida.toLowerCase()
+      ? `  (Cliente alterou a sugestão da escola para este item.)`
+      : null;
+  return [base, sugestao, prefCliente, clienteAlterou].filter(Boolean).join('\n');
+}
+
+function gerarBlocoLista(lista, numero) {
+  const m = lista.metadados;
+  const a = lista.aluno;
+  const pref = PREFERENCIAS_GERAL.find(p => p.id === lista.preferenciaGeral) || PREFERENCIAS_GERAL[0];
+  const inclusos  = lista.itens.filter(x => x.incluso);
+  const excluidos = lista.itens.filter(x => !x.incluso);
 
   const dadosLista = [
     `Escola: ${m.escola || 'Não informado'}`,
@@ -413,43 +459,20 @@ function atualizarLinkEnviar() {
     'Quando a lista indicar cor específica, considerar a cor da lista. Quando não indicar, considerar a preferência informada, conforme disponibilidade.',
   ].join('\n');
 
-  function linhaItem(x) {
-    const base = `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`;
-    const sugestao = x.marcaSugerida
-      ? `  Sugestão da escola: ${x.marcaSugerida}`
-      : null;
-    const prefCliente = (x.preferenciaCliente || '').trim()
-      ? `  Preferência do cliente: ${x.preferenciaCliente.trim()}`
-      : null;
-    const clienteAlterou =
-      (x.preferenciaCliente || '').trim() &&
-      x.marcaSugerida &&
-      x.preferenciaCliente.trim().toLowerCase() !== x.marcaSugerida.toLowerCase()
-        ? `  (Cliente alterou a sugestão da escola para este item.)`
-        : null;
-    return [base, sugestao, prefCliente, clienteAlterou].filter(Boolean).join('\n');
-  }
-
-  const linhasQuero = inclusos.map(linhaItem).join('\n\n');
+  const linhasQuero = inclusos.length > 0
+    ? inclusos.map(linhaItem).join('\n\n')
+    : 'Nenhum item selecionado.';
   const linhasNaoQuero = excluidos.length > 0
     ? excluidos.map(linhaItem).join('\n\n')
     : 'Nenhum item marcado como Não quero.';
 
-  const mensagem =
-`Olá, Sartec! Sou *${estado.nome}*.
-
-[SITE_LISTA_ESCOLAR]
-
-*Lista escolar organizada pelo site*
+  return `*Lista ${numero}*
 
 *Dados da lista:*
 ${dadosLista}
 
 *Dados do aluno:*
 ${dadosAluno}
-
-*WhatsApp informado no site:*
-${estado.whatsapp}
 
 *Preferência para o orçamento:*
 ${pref.label} — ${pref.desc}
@@ -458,7 +481,44 @@ ${pref.label} — ${pref.desc}
 ${linhasQuero}
 
 *Itens marcados como Não quero:*
-${linhasNaoQuero}
+${linhasNaoQuero}`;
+}
+
+function atualizarLinkEnviar() {
+  const inclusos = estado.rascunho.itens.filter(x => x.incluso);
+
+  // Conta todos os itens: listas salvas + rascunho atual
+  const totalInclusos = estado.listas.reduce(
+    (acc, l) => acc + l.itens.filter(x => x.incluso).length, 0
+  ) + inclusos.length;
+
+  if (totalInclusos === 0) {
+    btnEnviar.style.opacity = '0.5';
+    btnEnviar.style.pointerEvents = 'none';
+    btnEnviar.removeAttribute('href');
+    return;
+  }
+  btnEnviar.style.opacity = '';
+  btnEnviar.style.pointerEvents = '';
+
+  // Monta todas as listas: salvas + rascunho (somente se tiver itens)
+  const todasListas = [
+    ...estado.listas,
+    ...(estado.rascunho.itens.length > 0 ? [estado.rascunho] : []),
+  ];
+  const blocos = todasListas.map((l, i) => gerarBlocoLista(l, i + 1)).join('\n\n---\n\n');
+
+  const mensagem =
+`Olá, Sartec! Sou *${estado.nome}*.
+
+[SITE_LISTA_ESCOLAR]
+
+*Pedido com listas escolares organizado pelo site*
+
+*WhatsApp informado no site:*
+${estado.whatsapp}
+
+${blocos}
 
 Aguardo o orçamento e a confirmação de disponibilidade, marcas/modelos e valores.
 
@@ -467,19 +527,47 @@ Aguardo o orçamento e a confirmação de disponibilidade, marcas/modelos e valo
   btnEnviar.href = montarWpp(SARTEC.WPP_PRINCIPAL, mensagem);
 }
 
+// =============== BOTÕES ===============
+
 btnMarcarTodosTem.addEventListener('click', () => {
-  const algumIncluso = estado.itens.some(x => x.incluso);
-  estado.itens.forEach(x => x.incluso = !algumIncluso);
+  const algumIncluso = estado.rascunho.itens.some(x => x.incluso);
+  estado.rascunho.itens.forEach(x => x.incluso = !algumIncluso);
   atualizarUI();
   btnMarcarTodosTem.textContent = algumIncluso
     ? 'Marcar todos como "Não quero"'
     : 'Marcar todos como "Quero comprar"';
 });
 
+btnAdicionarLista.addEventListener('click', () => {
+  // Salva rascunho atual (se tiver itens) na lista de listas concluídas
+  if (estado.rascunho.itens.length > 0) {
+    estado.listas.push({ ...estado.rascunho, itens: [...estado.rascunho.itens] });
+  }
+  // Reseta o rascunho para a próxima lista
+  estado.rascunho = rascunhoVazio();
+
+  // Mostra banner no formulário de upload
+  const infoDiv = document.getElementById('info-adicionando-lista');
+  if (infoDiv) infoDiv.style.display = '';
+
+  // Limpa o campo de arquivo
+  formUpload.querySelector('input[type="file"]').value = '';
+  uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+
+  trocarEstado('estado-upload');
+});
+
 btnRecomecar.addEventListener('click', () => {
-  if (confirm('Recomeçar do zero? Sua seleção atual será perdida.')) {
+  if (confirm('Recomeçar do zero? Todas as listas do pedido atual serão apagadas.')) {
+    estado.listas = [];
+    estado.rascunho = rascunhoVazio();
+
+    const infoDiv = document.getElementById('info-adicionando-lista');
+    if (infoDiv) infoDiv.style.display = 'none';
+
     formUpload.reset();
     uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+
     trocarEstado('estado-upload');
   }
 });
