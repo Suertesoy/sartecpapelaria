@@ -5,7 +5,7 @@
 
 window.SARTEC = {
   WPP_PRINCIPAL: '5512981594959',
-  WPP_COPIAS:    '5512981594959',
+  WPP_COPIAS:    '551239341666',
   ENDERECO: 'Av. Andrômeda, 1805 — Jardim Satélite, São José dos Campos/SP',
   CEP: '12230-000',
   CNPJ: '06.241.041/0001-56',
@@ -211,7 +211,7 @@ function renderFab(modo) {
   const isCopias = modo === 'copias';
   const numero = isCopias ? SARTEC.WPP_COPIAS : SARTEC.WPP_PRINCIPAL;
   const msg = isCopias
-    ? 'Olá! Quero falar com o setor de cópias e impressão.'
+    ? 'Olá! Vim pelo site da Sartec e quero falar com o setor de cópias e impressão.'
     : 'Olá! Vim pelo site da Sartec.';
   const cls = isCopias ? 'fab-wpp copias' : 'fab-wpp';
   const label = isCopias ? 'WhatsApp Cópias' : 'Falar no WhatsApp';
