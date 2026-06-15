@@ -197,6 +197,7 @@ function renderFooter() {
         <div class="container footer-bottom-inner">
           <span>© 2026 Sartec Papelaria e Informática. Todos os direitos reservados.</span>
           <span>Este site faz parte da nova experiência digital da Sartec. Implementado pela <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="footer-digital-link">Sartec Digital →</a></span>
+          <span class="footer-ai-note">Algumas imagens deste site foram geradas ou editadas com inteligência artificial para fins ilustrativos. Elas podem se inspirar em produtos, ambientes e referências reais da Sartec, mas não representam necessariamente fotos exatas da loja, dos produtos ou dos serviços.</span>
         </div>
       </div>
     </footer>
