@@ -776,8 +776,23 @@ section { padding: 64px 0; }
   gap: 8px;
 }
 .item-card.excluido {
-  opacity: 0.5;
-  background: var(--cinza-fundo);
+  background: #F5F7FA;
+  border-color: #E4E8EF;
+}
+/* Fade content; the choice toggle stays crisp for easy re-activation */
+.item-card.excluido .item-info,
+.item-card.excluido .marca-sugerida,
+.item-card.excluido .marca-preferencia-toggle,
+.item-card.excluido .marca-preferencia-wrap,
+.item-card.excluido .item-img-buscar,
+.item-card.excluido .qty-control {
+  opacity: 0.42;
+}
+.item-card.excluido .item-choice-toggle { opacity: 1; }
+/* When excluded, make "Quero comprar" visually stand out as the restore action */
+.item-card.excluido .item-choice-option[data-acao="incluir"] {
+  color: var(--azul);
+  font-weight: 700;
 }
 .item-info { flex: 1; }
 .item-card h4 { font-size: .97rem; margin-bottom: 2px; line-height: 1.35; }
@@ -824,6 +839,39 @@ section { padding: 64px 0; }
   background: #FEE2E2;
   color: #991B1B;
   border-color: #FECACA;
+}
+
+/* Toggle duplo: Quero comprar / Não quero */
+.item-choice-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid var(--cinza-borda);
+  flex-shrink: 0;
+}
+.item-choice-option {
+  background: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: .77rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--texto-suave);
+  font-family: inherit;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.item-choice-option + .item-choice-option {
+  border-left: 1.5px solid var(--cinza-borda);
+}
+.item-choice-option.ativo[data-acao="incluir"] {
+  background: #DCFCE7;
+  color: #166534;
+}
+.item-choice-option.ativo[data-acao="excluir"] {
+  background: #F1F5F9;
+  color: var(--texto);
 }
 
 .acoes-finais {
@@ -1918,6 +1966,59 @@ section { padding: 64px 0; }
     padding: 11px 18px;
   }
 }
+
+/* ======================== DADOS DO ALUNO ======================== */
+.aluno-lista {
+  background: white;
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  margin-bottom: 20px;
+}
+.aluno-lista-titulo {
+  font-weight: 700;
+  font-size: .82rem;
+  color: var(--texto);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin: 0 0 4px;
+}
+.aluno-lista-desc {
+  font-size: .8rem;
+  color: var(--texto-suave);
+  margin: 0 0 14px;
+  line-height: 1.45;
+}
+.aluno-lista-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (max-width: 640px) {
+  .aluno-lista-grid { grid-template-columns: 1fr; }
+}
+.aluno-lista-field {
+  display: flex;
+  flex-direction: column;
+  font-size: .78rem;
+  color: var(--texto-suave);
+  font-weight: 600;
+  gap: 4px;
+}
+.aluno-lista-field-full {
+  grid-column: 1 / -1;
+}
+.aluno-lista-field input {
+  padding: 7px 10px;
+  border: 1px solid var(--cinza-borda);
+  border-radius: 8px;
+  font-size: .88rem;
+  background: white;
+  color: var(--texto);
+  font-family: inherit;
+  font-weight: 400;
+}
+.aluno-lista-field input:focus { outline: 2px solid var(--azul); border-color: transparent; }
 
 /* ======================== PREFERÊNCIA DE ORÇAMENTO ======================== */
 .preferencia-orcamento {

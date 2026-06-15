@@ -41,6 +41,7 @@ let estado = {
   itens: [],
   metadados: { escola: '', anoSerie: '', segmento: '', anoLetivo: '' },
   preferenciaGeral: 'economico',
+  aluno: { nome: '', preferenciaCor: '', observacoes: '' },
 };
 
 // =============== UTILITÁRIOS ===============
@@ -185,6 +186,44 @@ const btnEnviar = document.getElementById('btn-enviar');
 const btnMarcarTodosTem = document.getElementById('btn-marcar-todos-tem');
 const btnRecomecar = document.getElementById('btn-recomecar');
 
+function renderizarAluno() {
+  const bloco = document.getElementById('bloco-aluno');
+  if (!bloco) return;
+  const a = estado.aluno;
+  bloco.innerHTML = `
+    <div class="aluno-lista">
+      <p class="aluno-lista-titulo">Dados do aluno</p>
+      <p class="aluno-lista-desc">Quando a escola indicar uma cor específica, seguimos a indicação da lista. Quando não houver cor indicada, informe aqui se há alguma preferência de cor, estampa ou estilo para ajudar a equipe a separar os materiais.</p>
+      <div class="aluno-lista-grid">
+        <label class="aluno-lista-field">
+          Nome do aluno
+          <input id="aluno-nome" type="text" value="${esc(a.nome)}" placeholder="Ex: Gustavo" />
+        </label>
+        <label class="aluno-lista-field">
+          Preferência de cor quando a lista não indicar
+          <input id="aluno-cor" type="text" value="${esc(a.preferenciaCor)}" placeholder="Ex: rosa, azul, cores neutras, sem preferência" />
+        </label>
+        <label class="aluno-lista-field aluno-lista-field-full">
+          Observações sobre cores/modelos
+          <input id="aluno-obs" type="text" value="${esc(a.observacoes)}" placeholder="Ex: evitar personagens, pode ser qualquer estampa, preferência por tons claros" />
+        </label>
+      </div>
+    </div>
+  `;
+  document.getElementById('aluno-nome').addEventListener('input', e => {
+    estado.aluno.nome = e.target.value;
+    atualizarLinkEnviar();
+  });
+  document.getElementById('aluno-cor').addEventListener('input', e => {
+    estado.aluno.preferenciaCor = e.target.value;
+    atualizarLinkEnviar();
+  });
+  document.getElementById('aluno-obs').addEventListener('input', e => {
+    estado.aluno.observacoes = e.target.value;
+    atualizarLinkEnviar();
+  });
+}
+
 function renderizarPreferenciaGeral() {
   const bloco = document.getElementById('bloco-preferencia');
   if (!bloco) return;
@@ -238,6 +277,7 @@ function renderizarMetadados() {
 
 function renderizarResultado() {
   renderizarMetadados();
+  renderizarAluno();
   renderizarPreferenciaGeral();
 
   grid.innerHTML = estado.itens.map(it => {
@@ -268,9 +308,10 @@ function renderizarResultado() {
           <span class="qty-num">${it.qty}</span>
           <button class="qty-btn" data-acao="mais" aria-label="Aumentar">+</button>
         </div>
-        <button class="toggle-incluir ${it.incluso ? 'sim' : 'nao'}">
-          ${it.incluso ? '✓ Quero' : '✗ Já tenho'}
-        </button>
+        <div class="item-choice-toggle">
+          <button class="item-choice-option${it.incluso ? ' ativo' : ''}" type="button" data-acao="incluir">Quero comprar</button>
+          <button class="item-choice-option${!it.incluso ? ' ativo' : ''}" type="button" data-acao="excluir">Não quero</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -279,9 +320,11 @@ function renderizarResultado() {
     const id = card.dataset.id;
     const item = estado.itens.find(x => x.id === id);
 
-    card.querySelector('.toggle-incluir').addEventListener('click', () => {
-      item.incluso = !item.incluso;
-      atualizarUI();
+    card.querySelectorAll('.item-choice-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        item.incluso = btn.dataset.acao === 'incluir';
+        atualizarUI();
+      });
     });
 
     card.querySelectorAll('.qty-btn').forEach(b => {
@@ -311,6 +354,7 @@ function renderizarResultado() {
     });
   });
 
+  btnMarcarTodosTem.textContent = 'Marcar todos como "Não quero"';
   atualizarContadores();
   atualizarLinkEnviar();
 }
@@ -321,9 +365,11 @@ function atualizarUI() {
     const item = estado.itens.find(x => x.id === id);
     card.classList.toggle('excluido', !item.incluso);
     card.querySelector('.qty-num').textContent = item.qty;
-    const tg = card.querySelector('.toggle-incluir');
-    tg.className = `toggle-incluir ${item.incluso ? 'sim' : 'nao'}`;
-    tg.textContent = item.incluso ? '✓ Quero' : '✗ Já tenho';
+    card.querySelectorAll('.item-choice-option').forEach(btn => {
+      btn.classList.toggle('ativo',
+        item.incluso ? btn.dataset.acao === 'incluir' : btn.dataset.acao === 'excluir'
+      );
+    });
   });
   atualizarContadores();
   atualizarLinkEnviar();
@@ -333,7 +379,7 @@ function atualizarContadores() {
   const inclusos = estado.itens.filter(x => x.incluso);
   const excluidos = estado.itens.filter(x => !x.incluso);
   counterQuero.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
-  counterTem.textContent = `${excluidos.length} já tenho`;
+  counterTem.textContent = `${excluidos.length} não ${excluidos.length === 1 ? 'quero' : 'quero'}`;
   resumoTotal.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
 }
 
@@ -350,6 +396,7 @@ function atualizarLinkEnviar() {
 
   const excluidos = estado.itens.filter(x => !x.incluso);
   const m = estado.metadados;
+  const a = estado.aluno;
   const pref = PREFERENCIAS_GERAL.find(p => p.id === estado.preferenciaGeral) || PREFERENCIAS_GERAL[0];
 
   const dadosLista = [
@@ -358,6 +405,13 @@ function atualizarLinkEnviar() {
     m.segmento  ? `Segmento: ${m.segmento}`  : null,
     m.anoLetivo ? `Ano letivo: ${m.anoLetivo}` : null,
   ].filter(Boolean).join('\n');
+
+  const dadosAluno = [
+    `Nome: ${a.nome || 'Não informado'}`,
+    `Preferência de cor quando a lista não indicar: ${a.preferenciaCor || 'Não informado'}`,
+    `Observações sobre cores/modelos: ${a.observacoes || 'Não informado'}`,
+    'Quando a lista indicar cor específica, considerar a cor da lista. Quando não indicar, considerar a preferência informada, conforme disponibilidade.',
+  ].join('\n');
 
   function linhaItem(x) {
     const base = `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`;
@@ -377,9 +431,9 @@ function atualizarLinkEnviar() {
   }
 
   const linhasQuero = inclusos.map(linhaItem).join('\n\n');
-  const linhasTem = excluidos.length > 0
+  const linhasNaoQuero = excluidos.length > 0
     ? excluidos.map(linhaItem).join('\n\n')
-    : 'Nenhum item marcado como já tenho.';
+    : 'Nenhum item marcado como Não quero.';
 
   const mensagem =
 `Olá, Sartec! Sou *${estado.nome}*.
@@ -391,6 +445,9 @@ function atualizarLinkEnviar() {
 *Dados da lista:*
 ${dadosLista}
 
+*Dados do aluno:*
+${dadosAluno}
+
 *WhatsApp informado no site:*
 ${estado.whatsapp}
 
@@ -400,8 +457,8 @@ ${pref.label} — ${pref.desc}
 *Itens que quero comprar:*
 ${linhasQuero}
 
-*Itens que já tenho em casa:*
-${linhasTem}
+*Itens marcados como Não quero:*
+${linhasNaoQuero}
 
 Aguardo o orçamento e a confirmação de disponibilidade, marcas/modelos e valores.
 
@@ -415,8 +472,8 @@ btnMarcarTodosTem.addEventListener('click', () => {
   estado.itens.forEach(x => x.incluso = !algumIncluso);
   atualizarUI();
   btnMarcarTodosTem.textContent = algumIncluso
-    ? 'Marcar todos como "Quero"'
-    : 'Marcar todos como "Já tenho"';
+    ? 'Marcar todos como "Não quero"'
+    : 'Marcar todos como "Quero comprar"';
 });
 
 btnRecomecar.addEventListener('click', () => {
