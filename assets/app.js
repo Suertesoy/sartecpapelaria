@@ -265,21 +265,22 @@ function initPageTransitions() {
    HOME — ANIMATED LIST PREVIEW
    ========================================================= */
 function initHomeListPreview() {
-  const panel = document.getElementById('home-list-preview');
+  const panel      = document.getElementById('home-list-preview');
   if (!panel) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const qty0      = document.getElementById('hlp-qty-0');
-  const qty2      = document.getElementById('hlp-qty-2');
-  const pref1     = document.getElementById('hlp-pref-1');
-  const inc3      = document.getElementById('hlp-inc-3');
-  const exc3      = document.getElementById('hlp-exc-3');
-  const card3     = document.getElementById('hlpc-3');
-  const counter   = document.getElementById('hlp-footer-count');
-  const wppBtn    = document.getElementById('hlp-wpp-btn');
-  const popup     = document.getElementById('hlp-popup');
-  const popupSend = document.getElementById('hlp-popup-send');
-  const allCards  = panel.querySelectorAll('.hlp-card');
+  const qty0       = document.getElementById('hlp-qty-0');
+  const qty2       = document.getElementById('hlp-qty-2');
+  const pref1      = document.getElementById('hlp-pref-1');
+  const inc3       = document.getElementById('hlp-inc-3');
+  const exc3       = document.getElementById('hlp-exc-3');
+  const card3      = document.getElementById('hlpc-3');
+  const counter    = document.getElementById('hlp-footer-count');
+  const wppBtn     = document.getElementById('hlp-wpp-btn');
+  const popup      = document.getElementById('hlp-popup');
+  const popupSend  = document.getElementById('hlp-popup-send');
+  const uploadStep = document.getElementById('hlp-upload-step');
+  const allCards   = panel.querySelectorAll('.hlp-card');
 
   function clearActive() { allCards.forEach(c => c.classList.remove('hlp-is-active')); }
   function activate(id)  { clearActive(); const c = document.getElementById(id); if (c) c.classList.add('hlp-is-active'); }
@@ -330,6 +331,7 @@ function initHomeListPreview() {
   }
 
   function reset() {
+    panel.classList.remove('hlp-show-upload');
     clearActive();
     if (qty0)    qty0.textContent = '4';
     if (qty2)    qty2.textContent = '8';
@@ -343,28 +345,31 @@ function initHomeListPreview() {
 
   hidePref(pref1);
 
-  function cycle() {
-    reset();
+  let activeCycle = 0;
+
+  function startPhases(cycleId) {
+    if (cycleId !== activeCycle) return;
 
     setTimeout(() => {
-      // Fase 1 — Caderno: qty 4 → 8
+      if (cycleId !== activeCycle) return;
       activate('hlpc-0');
       stepQty(qty0, 8, 380, () => {
 
         setTimeout(() => {
-          // Fase 2 — Pasta: digitar preferência
+          if (cycleId !== activeCycle) return;
           activate('hlpc-1');
           typeText(pref1, 'Preferência: cor vermelha opaca', () => {
 
             setTimeout(() => {
-              // Fase 3 — Lápis: qty 8 → 2
+              if (cycleId !== activeCycle) return;
               activate('hlpc-2');
               stepQty(qty2, 2, 320, () => {
 
                 setTimeout(() => {
-                  // Fase 4 — Borracha: toggle "Não quero"
+                  if (cycleId !== activeCycle) return;
                   activate('hlpc-3');
                   setTimeout(() => {
+                    if (cycleId !== activeCycle) return;
                     clickFx(exc3, () => {
                       if (card3)   card3.classList.add('hlp-excluido');
                       if (inc3)    inc3.classList.remove('hlp-ativo');
@@ -372,20 +377,23 @@ function initHomeListPreview() {
                       if (counter) counter.textContent = '3 itens para comprar';
 
                       setTimeout(() => {
-                        // Fase 5 — Clicar "Enviar pelo WhatsApp"
+                        if (cycleId !== activeCycle) return;
                         clearActive();
                         clickFx(wppBtn, () => {
+                          if (cycleId !== activeCycle) return;
 
                           setTimeout(() => {
-                            // Fase 6 — Popup aparece
+                            if (cycleId !== activeCycle) return;
                             if (popup) popup.classList.add('hlp-popup-visible');
 
                             setTimeout(() => {
-                              // Fase 7 — Clicar "Enviar" no popup
+                              if (cycleId !== activeCycle) return;
                               clickFx(popupSend, () => {
+                                if (cycleId !== activeCycle) return;
                                 setTimeout(() => {
+                                  if (cycleId !== activeCycle) return;
                                   if (popup) popup.classList.remove('hlp-popup-visible');
-                                  setTimeout(cycle, 1800);
+                                  setTimeout(() => cycle(cycleId), 1800);
                                 }, 350);
                               });
                             }, 2200);
@@ -403,7 +411,58 @@ function initHomeListPreview() {
     }, 900);
   }
 
-  setTimeout(cycle, 800);
+  function cycle(cycleId) {
+    if (cycleId !== activeCycle) return;
+    reset();
+
+    if (uploadStep) {
+      panel.classList.add('hlp-show-upload');
+      setTimeout(() => {
+        if (cycleId !== activeCycle) return;
+        panel.classList.remove('hlp-show-upload');
+        setTimeout(() => startPhases(cycleId), 350);
+      }, 1600);
+    } else {
+      startPhases(cycleId);
+    }
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = ++activeCycle;
+        setTimeout(() => cycle(id), 600);
+      } else {
+        activeCycle++;
+        reset();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  io.observe(panel);
+}
+
+/* =========================================================
+   FAIXA SARTEC DIGITAL COMPACTA (páginas internas)
+   ========================================================= */
+function renderSartecDigitalCompact() {
+  const mount = document.getElementById('digital-compact-mount');
+  if (!mount) return;
+  mount.innerHTML = `
+    <div class="sdc-faixa">
+      <div class="sdc-inner">
+        <div class="sdc-copy">
+          <span class="sdc-label">Sartec Digital</span>
+          <span class="sdc-sep"></span>
+          <span class="sdc-text">Este site foi implementado pela Sartec Digital — automação e atendimento inteligente para pequenos negócios.</span>
+        </div>
+        <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="sdc-btn">
+          Conhecer
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  `;
 }
 
 /* =========================================================
@@ -414,6 +473,7 @@ window.SartecInit = function ({ active, fab }) {
     renderHeader(active);
     renderDeliveryFaixa();
     renderEscolasFaixa();
+    renderSartecDigitalCompact();
     renderFooter();
     renderFab(fab || 'principal');
     initPageTransitions();
