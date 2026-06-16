@@ -275,36 +275,55 @@ function initHomeListPreview() {
   if (!panel) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const qty2    = document.getElementById('hlp-qty-2');
-  const pref1   = document.getElementById('hlp-pref-1');
-  const inc3    = document.getElementById('hlp-inc-3');
-  const exc3    = document.getElementById('hlp-exc-3');
-  const card3   = document.getElementById('hlpc-3');
-  const counter = document.getElementById('hlp-footer-count');
-  const cards   = panel.querySelectorAll('.hlp-card');
+  const qty0      = document.getElementById('hlp-qty-0');
+  const qty2      = document.getElementById('hlp-qty-2');
+  const pref1     = document.getElementById('hlp-pref-1');
+  const inc3      = document.getElementById('hlp-inc-3');
+  const exc3      = document.getElementById('hlp-exc-3');
+  const card3     = document.getElementById('hlpc-3');
+  const counter   = document.getElementById('hlp-footer-count');
+  const wppBtn    = document.getElementById('hlp-wpp-btn');
+  const popup     = document.getElementById('hlp-popup');
+  const popupSend = document.getElementById('hlp-popup-send');
+  const allCards  = panel.querySelectorAll('.hlp-card');
 
-  function clearActive() { cards.forEach(c => c.classList.remove('hlp-is-active')); }
+  function clearActive() { allCards.forEach(c => c.classList.remove('hlp-is-active')); }
+  function activate(id)  { clearActive(); const c = document.getElementById(id); if (c) c.classList.add('hlp-is-active'); }
 
-  function activate(id) {
-    clearActive();
-    const c = document.getElementById(id);
-    if (c) c.classList.add('hlp-is-active');
+  function clickFx(el, cb) {
+    if (el) {
+      el.classList.add('hlp-clicking');
+      setTimeout(() => el.classList.remove('hlp-clicking'), 200);
+    }
+    setTimeout(cb, 220);
   }
 
-  function bumpQty(el, val) {
-    if (!el) return;
-    el.textContent = val;
-    el.style.transform = 'scale(1.35)';
-    el.style.color = '#1E3A8A';
-    setTimeout(() => { el.style.transform = ''; el.style.color = ''; }, 350);
+  function stepQty(el, target, gap, cb) {
+    if (!el) { if (cb) cb(); return; }
+    const current = parseInt(el.textContent, 10);
+    if (current === target) { if (cb) cb(); return; }
+    const dir  = target > current ? 1 : -1;
+    const wrap = el.closest('.hlp-qty');
+    const btns = wrap ? wrap.querySelectorAll('.hlp-qty-btn') : [];
+    const btn  = btns.length ? (dir > 0 ? btns[btns.length - 1] : btns[0]) : null;
+    clickFx(btn, () => {
+      el.textContent = String(current + dir);
+      setTimeout(() => stepQty(el, target, gap, cb), gap);
+    });
   }
 
-  function showPref(el) {
-    if (!el) return;
-    el.style.transition = 'max-height .4s ease, opacity .35s ease, margin-top .35s ease';
+  function typeText(el, text, cb) {
+    if (!el) { if (cb) cb(); return; }
+    el.style.transition = 'max-height .3s ease, opacity .3s ease, margin-top .3s ease';
     el.style.maxHeight  = '22px';
     el.style.opacity    = '1';
     el.style.marginTop  = '4px';
+    el.textContent = '';
+    let i = 0;
+    const iv = setInterval(() => {
+      el.textContent = text.slice(0, ++i);
+      if (i >= text.length) { clearInterval(iv); if (cb) setTimeout(cb, 400); }
+    }, 72);
   }
 
   function hidePref(el) {
@@ -313,49 +332,84 @@ function initHomeListPreview() {
     el.style.maxHeight  = '0';
     el.style.opacity    = '0';
     el.style.marginTop  = '0';
+    el.textContent      = '';
   }
 
   function reset() {
     clearActive();
-    if (qty2) { qty2.textContent = '6'; qty2.style.transform = ''; qty2.style.color = ''; }
+    if (qty0)    qty0.textContent = '4';
+    if (qty2)    qty2.textContent = '8';
     hidePref(pref1);
-    if (card3) card3.classList.remove('hlp-excluido');
-    if (inc3)  { inc3.classList.add('hlp-ativo'); }
-    if (exc3)  { exc3.classList.remove('hlp-ativo'); }
+    if (card3)   card3.classList.remove('hlp-excluido');
+    if (inc3)    inc3.classList.add('hlp-ativo');
+    if (exc3)    exc3.classList.remove('hlp-ativo');
     if (counter) counter.textContent = '4 itens para comprar';
+    if (popup)   popup.classList.remove('hlp-popup-visible');
   }
+
+  hidePref(pref1);
 
   function cycle() {
     reset();
 
-    const t1 = setTimeout(() => {
-      // Phase 1 — Lápis preto: quantidade 6 → 8
-      activate('hlpc-2');
-      bumpQty(qty2, '8');
+    setTimeout(() => {
+      // Fase 1 — Caderno: qty 4 → 8
+      activate('hlpc-0');
+      stepQty(qty0, 8, 380, () => {
 
-      const t2 = setTimeout(() => {
-        // Phase 2 — Pasta: preferência "cor vermelha" aparece
-        activate('hlpc-1');
-        showPref(pref1);
+        setTimeout(() => {
+          // Fase 2 — Pasta: digitar preferência
+          activate('hlpc-1');
+          typeText(pref1, 'Preferência: cor vermelha opaca', () => {
 
-        const t3 = setTimeout(() => {
-          // Phase 3 — Borracha: muda para "Não quero"
-          activate('hlpc-3');
-          if (card3) card3.classList.add('hlp-excluido');
-          if (inc3)  inc3.classList.remove('hlp-ativo');
-          if (exc3)  exc3.classList.add('hlp-ativo');
-          if (counter) counter.textContent = '3 itens para comprar';
+            setTimeout(() => {
+              // Fase 3 — Lápis: qty 8 → 2
+              activate('hlpc-2');
+              stepQty(qty2, 2, 320, () => {
 
-          const t4 = setTimeout(() => {
-            clearActive();
-            setTimeout(cycle, 2000);
-          }, 2500);
-        }, 2200);
-      }, 2200);
-    }, 1500);
+                setTimeout(() => {
+                  // Fase 4 — Borracha: toggle "Não quero"
+                  activate('hlpc-3');
+                  setTimeout(() => {
+                    clickFx(exc3, () => {
+                      if (card3)   card3.classList.add('hlp-excluido');
+                      if (inc3)    inc3.classList.remove('hlp-ativo');
+                      if (exc3)    exc3.classList.add('hlp-ativo');
+                      if (counter) counter.textContent = '3 itens para comprar';
+
+                      setTimeout(() => {
+                        // Fase 5 — Clicar "Enviar pelo WhatsApp"
+                        clearActive();
+                        clickFx(wppBtn, () => {
+
+                          setTimeout(() => {
+                            // Fase 6 — Popup aparece
+                            if (popup) popup.classList.add('hlp-popup-visible');
+
+                            setTimeout(() => {
+                              // Fase 7 — Clicar "Enviar" no popup
+                              clickFx(popupSend, () => {
+                                setTimeout(() => {
+                                  if (popup) popup.classList.remove('hlp-popup-visible');
+                                  setTimeout(cycle, 1800);
+                                }, 350);
+                              });
+                            }, 2200);
+                          }, 450);
+                        });
+                      }, 1000);
+                    });
+                  }, 700);
+                }, 700);
+              });
+            }, 700);
+          });
+        }, 700);
+      });
+    }, 900);
   }
 
-  setTimeout(cycle, 1000);
+  setTimeout(cycle, 800);
 }
 
 /* =========================================================

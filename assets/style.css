@@ -394,14 +394,10 @@ section { padding: 64px 0; }
 .why-header-copy p { max-width: 560px; margin: 0; }
 .why-seal {
   flex-shrink: 0;
-  width: 140px;
-  background: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.20);
-  border-radius: 16px;
-  padding: 16px;
+  width: 280px;
   text-align: center;
 }
-.why-seal img { width: 100%; height: auto; }
+.why-seal img { width: 100%; height: auto; display: block; }
 .why-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -424,7 +420,7 @@ section { padding: 64px 0; }
 @media (max-width: 900px) { .why-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) {
   .why-header { flex-direction: column; align-items: flex-start; gap: 24px; }
-  .why-seal { align-self: center; width: 110px; }
+  .why-seal { align-self: center; width: 190px; }
 }
 @media (max-width: 540px) { .why-grid { grid-template-columns: 1fr; } }
 
@@ -1744,6 +1740,7 @@ section { padding: 64px 0; }
   border-top: 3px solid #1E3A8A;
   width: 100%;
   max-width: 400px;
+  position: relative;
 }
 .hlp-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -1782,6 +1779,10 @@ section { padding: 64px 0; }
   font-weight: 700; font-size: 15px; display: flex;
   align-items: center; justify-content: center;
   pointer-events: none; user-select: none; line-height: 1;
+  transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
+.hlp-qty-btn.hlp-clicking {
+  background: #1E3A8A; color: white; border-color: #1E3A8A; transform: scale(0.88);
 }
 .hlp-qty-num {
   font-weight: 700; min-width: 20px; text-align: center; font-size: 14px;
@@ -1793,10 +1794,12 @@ section { padding: 64px 0; }
 .hlp-opt {
   padding: 5px 9px; font-size: 11px; font-weight: 600; color: #94A3B8;
   white-space: nowrap; line-height: 1.3; background: white;
+  transition: background .15s, color .15s, opacity .1s, transform .1s;
 }
 .hlp-opt + .hlp-opt { border-left: 1.5px solid #E2E8F0; }
 .hlp-opt-inc.hlp-ativo { background: #DCFCE7; color: #166534; }
 .hlp-opt-exc.hlp-ativo { background: #F1F5F9; color: #475569; }
+.hlp-opt.hlp-clicking { opacity: 0.6; transform: scale(0.94); }
 .hlp-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 18px; border-top: 1px solid #E2E8F0; gap: 10px;
@@ -1806,9 +1809,47 @@ section { padding: 64px 0; }
   background: #25D366; color: white; font-weight: 700; font-size: 13px;
   padding: 9px 14px; border-radius: 10px; text-decoration: none;
   pointer-events: none; display: inline-block;
+  transition: opacity .15s, transform .1s;
 }
+.hlp-wpp-btn.hlp-clicking { opacity: 0.7; transform: scale(0.96); }
+.hlp-popup {
+  position: absolute; inset: 0;
+  background: rgba(15,23,42,0.46);
+  display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease;
+  z-index: 10;
+}
+.hlp-popup.hlp-popup-visible { opacity: 1; pointer-events: auto; }
+.hlp-popup-inner {
+  width: 100%; background: white;
+  border-top: 2px solid #25D366;
+  padding: 14px 16px 16px;
+  transform: translateY(16px);
+  transition: transform .35s ease;
+}
+.hlp-popup.hlp-popup-visible .hlp-popup-inner { transform: translateY(0); }
+.hlp-popup-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.hlp-popup-icon { font-size: 1rem; }
+.hlp-popup-header strong { font-size: 13px; color: #0F172A; }
+.hlp-popup-body { font-size: 12px; color: #0F172A; line-height: 1.6; margin-bottom: 12px; }
+.hlp-popup-body p { margin: 0 0 2px; }
+.hlp-popup-item { padding-left: 8px; color: #334155; }
+.hlp-popup-btn {
+  display: block; width: 100%;
+  background: #25D366; color: white;
+  font-weight: 700; font-size: 13px;
+  padding: 10px; border-radius: 10px;
+  border: none; cursor: default; font-family: inherit;
+  transition: opacity .15s, transform .1s;
+}
+.hlp-popup-btn.hlp-clicking { opacity: 0.7; transform: scale(0.97); }
 @media (prefers-reduced-motion: reduce) {
-  .hlp-card, .hlp-card-main, .hlp-qty-num, .hlp-opt { transition: none !important; }
+  .hlp-card, .hlp-card-main, .hlp-qty-num, .hlp-opt,
+  .hlp-qty-btn, .hlp-wpp-btn, .hlp-popup, .hlp-popup-inner,
+  .hlp-popup-btn { transition: none !important; }
 }
 
 /* ======================== COMO FUNCIONA — GRADIENTE AZUL ======================== */
