@@ -12,11 +12,6 @@
   <style>
     html { scroll-behavior: smooth; }
 
-    /* --- Lista escolar (demo card hover) --- */
-    .hero-demo-card { transition: box-shadow .25s, transform .25s; }
-    .hero-demo-card:hover { box-shadow: 0 28px 72px rgba(30,58,138,0.20), 0 6px 20px rgba(0,0,0,0.08) !important; transform: translateY(-2px); }
-    .wpp-demo-btn:hover { background: #1FB858 !important; }
-
     /* --- Service cards como links --- */
     a.service-card { color: var(--texto); }
     a.service-card:hover { color: var(--azul); }
@@ -89,39 +84,97 @@
           <div style="display: flex; flex-direction: column; gap: 20px; max-width: 520px;">
             <span class="kicker">Lista Escolar</span>
             <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(26px, 3.5vw, 38px); margin: 0; letter-spacing: -0.02em; line-height: 1.15; color: #0F172A;">Tire foto da lista. A gente organiza o pedido com você.</h2>
-            <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #475569;">Envie a foto ou o PDF, marque o que já tem em casa e receba o orçamento pelo WhatsApp. Nossa equipe confere tudo antes de fechar.</p>
+            <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #475569;">Envie a foto ou o PDF, revise os itens encontrados, ajuste quantidades, marque o que já tem em casa e receba o orçamento pelo WhatsApp.</p>
             <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px;">
               <a href="lista-escolar.html" style="background: #DC2626; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 16px; padding: 14px 24px; border-radius: 13px; box-shadow: 0 4px 14px rgba(220,38,38,0.25);">Enviar minha lista</a>
             </div>
             <p style="margin: 4px 0 0; font-size: 13.5px; color: #94A3B8;">Sem cadastro e sem pagamento no site. A equipe confirma tudo com você antes do orçamento.</p>
           </div>
 
-          <!-- Demo card direita -->
+          <!-- Preview animado da ferramenta -->
           <div style="display: flex; justify-content: center;">
-            <div class="hero-demo-card" style="background: #FFFFFF; color: #0F172A; border-radius: 18px; box-shadow: 0 20px 56px rgba(30,58,138,0.14), 0 4px 16px rgba(0,0,0,0.06); width: 100%; max-width: 400px; overflow: hidden; border-top: 3px solid #1E3A8A;">
-              <div style="padding: 16px 20px; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                  <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 16px;">Lista escolar — 3º ano</strong>
-                  <span style="font-size: 13px; color: #475569;">12 itens identificados</span>
-                </div>
-                <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #1E3A8A; background: #EFF3FB; padding: 5px 10px; border-radius: 100px;">demonstração</span>
+            <div class="hlp-panel" id="home-list-preview" aria-hidden="true">
+              <div class="hlp-header">
+                <strong>Lista escolar — 3º ano</strong>
+                <span class="hlp-badge">Prévia da revisão</span>
               </div>
-              <div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 20px; border-bottom: 1px solid #F1F5F9;">
-                  <span style="font-size: 15px; font-weight: 500;">Caderno 96 folhas <span style="color: #475569; font-weight: 400;">× 4</span></span>
-                  <span style="font-size: 12px; font-weight: 700; color: #FFFFFF; background: #1E3A8A; padding: 5px 12px; border-radius: 100px;">Quero</span>
+
+              <div class="hlp-card" id="hlpc-0">
+                <div class="hlp-card-main">
+                  <p class="hlp-name">Caderno brochura 96 folhas</p>
+                  <span class="hlp-obs">Capa dura · Sugestão: Tilibra</span>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 20px; border-bottom: 1px solid #F1F5F9;">
-                  <span style="font-size: 15px; font-weight: 500; color: #94A3B8; text-decoration: line-through;">Lápis de cor 24 cores <span style="font-weight: 400;">× 1</span></span>
-                  <span style="font-size: 12px; font-weight: 700; color: #475569; background: #F1F5F9; padding: 5px 12px; border-radius: 100px;">✓ Já tenho</span>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 20px;">
-                  <span style="font-size: 15px; font-weight: 500;">Tesoura sem ponta <span style="color: #475569; font-weight: 400;">× 1</span></span>
-                  <span style="font-size: 12px; font-weight: 700; color: #FFFFFF; background: #1E3A8A; padding: 5px 12px; border-radius: 100px;">Quero</span>
+                <div class="hlp-card-bottom">
+                  <div class="hlp-qty">
+                    <span class="hlp-qty-btn">−</span>
+                    <span class="hlp-qty-num">4</span>
+                    <span class="hlp-qty-btn">+</span>
+                  </div>
+                  <div class="hlp-toggle">
+                    <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero comprar</span>
+                    <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                  </div>
                 </div>
               </div>
-              <div style="padding: 16px 20px 20px;">
-                <a href="lista-escolar.html" class="wpp-demo-btn" style="display: block; background: #25D366; color: #FFFFFF; text-align: center; text-decoration: none; font-weight: 700; font-size: 15px; padding: 14px; border-radius: 14px;">Enviar pedido no WhatsApp</a>
+
+              <div class="hlp-card" id="hlpc-1">
+                <div class="hlp-card-main">
+                  <p class="hlp-name">Pasta polionda com elástico</p>
+                  <span class="hlp-obs">Sugestão: não informada</span>
+                  <span class="hlp-pref" id="hlp-pref-1">✓ Preferência: cor vermelha</span>
+                </div>
+                <div class="hlp-card-bottom">
+                  <div class="hlp-qty">
+                    <span class="hlp-qty-btn">−</span>
+                    <span class="hlp-qty-num">1</span>
+                    <span class="hlp-qty-btn">+</span>
+                  </div>
+                  <div class="hlp-toggle">
+                    <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero comprar</span>
+                    <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hlp-card" id="hlpc-2">
+                <div class="hlp-card-main">
+                  <p class="hlp-name">Lápis preto nº 02</p>
+                  <span class="hlp-obs">Sugestão: Faber-Castell</span>
+                </div>
+                <div class="hlp-card-bottom">
+                  <div class="hlp-qty">
+                    <span class="hlp-qty-btn">−</span>
+                    <span class="hlp-qty-num" id="hlp-qty-2">6</span>
+                    <span class="hlp-qty-btn">+</span>
+                  </div>
+                  <div class="hlp-toggle">
+                    <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero comprar</span>
+                    <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hlp-card" id="hlpc-3">
+                <div class="hlp-card-main">
+                  <p class="hlp-name">Borracha branca macia</p>
+                  <span class="hlp-obs">2 unidades</span>
+                </div>
+                <div class="hlp-card-bottom">
+                  <div class="hlp-qty">
+                    <span class="hlp-qty-btn">−</span>
+                    <span class="hlp-qty-num">2</span>
+                    <span class="hlp-qty-btn">+</span>
+                  </div>
+                  <div class="hlp-toggle">
+                    <span class="hlp-opt hlp-opt-inc hlp-ativo" id="hlp-inc-3">Quero comprar</span>
+                    <span class="hlp-opt hlp-opt-exc" id="hlp-exc-3">Não quero</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hlp-footer">
+                <span class="hlp-footer-count" id="hlp-footer-count">4 itens para comprar</span>
+                <span class="hlp-wpp-btn">Enviar pelo WhatsApp</span>
               </div>
             </div>
           </div>

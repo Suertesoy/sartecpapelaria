@@ -268,6 +268,97 @@ function initPageTransitions() {
 }
 
 /* =========================================================
+   HOME — ANIMATED LIST PREVIEW
+   ========================================================= */
+function initHomeListPreview() {
+  const panel = document.getElementById('home-list-preview');
+  if (!panel) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const qty2    = document.getElementById('hlp-qty-2');
+  const pref1   = document.getElementById('hlp-pref-1');
+  const inc3    = document.getElementById('hlp-inc-3');
+  const exc3    = document.getElementById('hlp-exc-3');
+  const card3   = document.getElementById('hlpc-3');
+  const counter = document.getElementById('hlp-footer-count');
+  const cards   = panel.querySelectorAll('.hlp-card');
+
+  function clearActive() { cards.forEach(c => c.classList.remove('hlp-is-active')); }
+
+  function activate(id) {
+    clearActive();
+    const c = document.getElementById(id);
+    if (c) c.classList.add('hlp-is-active');
+  }
+
+  function bumpQty(el, val) {
+    if (!el) return;
+    el.textContent = val;
+    el.style.transform = 'scale(1.35)';
+    el.style.color = '#1E3A8A';
+    setTimeout(() => { el.style.transform = ''; el.style.color = ''; }, 350);
+  }
+
+  function showPref(el) {
+    if (!el) return;
+    el.style.transition = 'max-height .4s ease, opacity .35s ease, margin-top .35s ease';
+    el.style.maxHeight  = '22px';
+    el.style.opacity    = '1';
+    el.style.marginTop  = '4px';
+  }
+
+  function hidePref(el) {
+    if (!el) return;
+    el.style.transition = 'none';
+    el.style.maxHeight  = '0';
+    el.style.opacity    = '0';
+    el.style.marginTop  = '0';
+  }
+
+  function reset() {
+    clearActive();
+    if (qty2) { qty2.textContent = '6'; qty2.style.transform = ''; qty2.style.color = ''; }
+    hidePref(pref1);
+    if (card3) card3.classList.remove('hlp-excluido');
+    if (inc3)  { inc3.classList.add('hlp-ativo'); }
+    if (exc3)  { exc3.classList.remove('hlp-ativo'); }
+    if (counter) counter.textContent = '4 itens para comprar';
+  }
+
+  function cycle() {
+    reset();
+
+    const t1 = setTimeout(() => {
+      // Phase 1 — Lápis preto: quantidade 6 → 8
+      activate('hlpc-2');
+      bumpQty(qty2, '8');
+
+      const t2 = setTimeout(() => {
+        // Phase 2 — Pasta: preferência "cor vermelha" aparece
+        activate('hlpc-1');
+        showPref(pref1);
+
+        const t3 = setTimeout(() => {
+          // Phase 3 — Borracha: muda para "Não quero"
+          activate('hlpc-3');
+          if (card3) card3.classList.add('hlp-excluido');
+          if (inc3)  inc3.classList.remove('hlp-ativo');
+          if (exc3)  exc3.classList.add('hlp-ativo');
+          if (counter) counter.textContent = '3 itens para comprar';
+
+          const t4 = setTimeout(() => {
+            clearActive();
+            setTimeout(cycle, 2000);
+          }, 2500);
+        }, 2200);
+      }, 2200);
+    }, 1500);
+  }
+
+  setTimeout(cycle, 1000);
+}
+
+/* =========================================================
    INIT
    ========================================================= */
 window.SartecInit = function ({ active, fab }) {
@@ -278,5 +369,6 @@ window.SartecInit = function ({ active, fab }) {
     renderFooter();
     renderFab(fab || 'principal');
     initPageTransitions();
+    initHomeListPreview();
   });
 };
