@@ -734,9 +734,23 @@ section { padding: 64px 0; }
 }
 
 /* ======================== FERRAMENTA DE LISTA ======================== */
-.lista-tool { padding: 56px 0; }
+.lista-tool { padding: 28px 0 56px; }
 .lista-tool h1 { text-align: center; }
 .lista-tool .sub { text-align: center; color: var(--texto-suave); font-size: 1.1rem; margin-bottom: 36px; }
+.form-upload-intro {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--cinza-borda);
+}
+.form-upload-intro strong {
+  display: block;
+  font-family: Archivo, sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--texto);
+  margin-bottom: 4px;
+}
+.form-upload-intro p { margin: 0; font-size: .88rem; color: var(--texto-suave); }
 
 .estado { display: none; }
 .estado.ativo { display: block; }

@@ -75,19 +75,12 @@
 
       <!-- ESTADO 1: UPLOAD -->
       <div class="estado ativo" id="estado-upload">
-        <div style="text-align:center; max-width: 720px; margin: 0 auto 32px;">
-          <span class="kicker">Lista Escolar</span>
-          <h2>Envie sua lista escolar</h2>
-          <p class="sub">
-            Tire foto da lista impressa ou envie o PDF que a escola mandou. Você pode anexar mais de uma página da mesma lista, revisar os itens encontrados e enviar tudo pelo WhatsApp.
-          </p>
-          <p style="font-size:.83rem; color:var(--texto-suave); margin-top:-8px;">
-            A ferramenta está em evolução. As imagens são ilustrativas e as identificações estão sendo aprimoradas.
-          </p>
-        </div>
-
         <div class="form-card" style="max-width: 640px;">
           <form id="form-upload">
+            <div class="form-upload-intro">
+              <strong>Dados para orçamento</strong>
+              <p>Preencha seus dados e anexe os arquivos da lista.</p>
+            </div>
             <div class="form-group">
               <label for="nome">Seu nome</label>
               <input type="text" id="nome" name="nome" required placeholder="Ex: Maria Silva" />
@@ -127,8 +120,7 @@
             <p class="dica-analise">A ferramenta vai identificar os principais itens para você revisar antes de enviar para a Sartec.</p>
 
             <div class="dica-box">
-              <strong>💡 Dica:</strong> Tire a foto com boa iluminação e enquadre toda a lista.
-              Se a escola mandou PDF, esse é o melhor formato.
+              <strong>💡 Dica:</strong> fotografe a lista com boa iluminação, enquadre a página inteira e envie frente e verso quando houver.
             </div>
           </form>
         </div>
