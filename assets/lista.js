@@ -1,5 +1,5 @@
 /* ======================================================
-   SARTEC — Ferramenta de lista escolar
+   SARTEC — Ferramenta de lista escolar (multi-lista)
    Chama /api/analisar-lista para leitura real com IA.
    ITENS_MOCK é usado apenas em localhost como fallback.
    ====================================================== */
@@ -37,8 +37,13 @@ const LIMITE_BYTES = 4 * 1024 * 1024;
 
 // =============== ESTADO ===============
 
+let nextListNum = 1;
+
 function rascunhoVazio() {
   return {
+    num: null,
+    id: null,
+    arquivoNome: '',
     metadados: { escola: '', anoSerie: '', segmento: '', anoLetivo: '' },
     aluno: { nome: '', preferenciaCor: '', observacoes: '' },
     preferenciaGeral: 'economico',
@@ -49,8 +54,9 @@ function rascunhoVazio() {
 let estado = {
   nome: '',
   whatsapp: '',
-  listas: [],           // listas já revisadas e salvas
-  rascunho: rascunhoVazio(),  // lista em revisão atual
+  listas: [],
+  rascunho: rascunhoVazio(),
+  modoNovaLista: false,
 };
 
 // =============== UTILITÁRIOS ===============
@@ -133,12 +139,18 @@ function onArquivoEscolhido() {
 
 formUpload.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const nome = document.getElementById('nome').value.trim();
-  const whatsapp = inputWhatsapp.value.trim();
   const arquivos = arquivoInput.files;
 
   ocultarErro();
-  if (!nome || !whatsapp) { mostrarErro('Preencha nome e WhatsApp antes de continuar.'); return; }
+
+  if (!estado.modoNovaLista) {
+    const nome = document.getElementById('nome').value.trim();
+    const whatsapp = inputWhatsapp.value.trim();
+    if (!nome || !whatsapp) { mostrarErro('Preencha nome e WhatsApp antes de continuar.'); return; }
+    estado.nome = nome;
+    estado.whatsapp = whatsapp;
+  }
+
   if (!arquivos || arquivos.length === 0) { mostrarErro('Anexe a foto ou PDF da lista antes de continuar.'); return; }
   for (const arq of arquivos) {
     if (arq.size > LIMITE_BYTES) {
@@ -147,14 +159,18 @@ formUpload.addEventListener('submit', async (e) => {
     }
   }
 
-  estado.nome = nome;
-  estado.whatsapp = whatsapp;
-
+  estado.rascunho.arquivoNome = arquivos[0].name;
   await iniciarAnalise(arquivos[0]);
 });
 
 // =============== ANÁLISE COM IA ===============
 async function iniciarAnalise(arquivo) {
+  // Assign permanent number only when analysis actually starts
+  if (!estado.rascunho.num) {
+    estado.rascunho.num = nextListNum++;
+    estado.rascunho.id = 'lista_' + estado.rascunho.num + '_' + Date.now();
+  }
+
   const btnAnalisar = document.getElementById('btn-analisar');
   if (btnAnalisar) { btnAnalisar.disabled = true; btnAnalisar.textContent = 'Analisando...'; }
 
@@ -192,20 +208,22 @@ async function iniciarAnalise(arquivo) {
     if (dados.ok && dados.itens?.length) {
       estado.rascunho.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
       estado.rascunho.itens = dados.itens.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
+      renderizarFaixas();
       renderizarResultado();
       reativarBtn();
       trocarEstado('estado-resultado');
-      scrollPara(document.getElementById('estado-resultado'), 'start');
+      scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
       return;
     }
 
     if (isLocal) {
       estado.rascunho.metadados = META_MOCK;
       estado.rascunho.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
+      renderizarFaixas();
       renderizarResultado();
       reativarBtn();
       trocarEstado('estado-resultado');
-      scrollPara(document.getElementById('estado-resultado'), 'start');
+      scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
       return;
     }
 
@@ -219,10 +237,11 @@ async function iniciarAnalise(arquivo) {
     if (isLocal) {
       estado.rascunho.metadados = META_MOCK;
       estado.rascunho.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
+      renderizarFaixas();
       renderizarResultado();
       reativarBtn();
       trocarEstado('estado-resultado');
-      scrollPara(document.getElementById('estado-resultado'), 'start');
+      scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
       return;
     }
 
@@ -232,14 +251,87 @@ async function iniciarAnalise(arquivo) {
   }
 }
 
+// =============== FAIXAS DE LISTAS SALVAS ===============
+
+function renderizarFaixas() {
+  const container = document.getElementById('listas-container');
+  if (!container) return;
+
+  if (estado.listas.length === 0) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  container.style.display = '';
+  const ordenadas = [...estado.listas].sort((a, b) => (a.num || 0) - (b.num || 0));
+
+  container.innerHTML = ordenadas.map(lista => {
+    const quero    = lista.itens.filter(x => x.incluso).length;
+    const naoQuero = lista.itens.filter(x => !x.incluso).length;
+    const total    = lista.itens.length;
+
+    const partes = [`Lista ${lista.num}`];
+    if (lista.aluno.nome) partes.push(lista.aluno.nome);
+    if (lista.metadados.escola) partes.push(lista.metadados.escola);
+
+    const resumo = [
+      `${total} identificado${total !== 1 ? 's' : ''}`,
+      quero > 0    ? `${quero} para orçamento`       : null,
+      naoQuero > 0 ? `${naoQuero} não quero`         : null,
+      lista.arquivoNome ? lista.arquivoNome           : null,
+    ].filter(Boolean).join(' · ');
+
+    return `
+      <div class="lista-faixa" data-id="${lista.id}">
+        <div class="lista-faixa-info">
+          <span class="lista-faixa-titulo">${esc(partes.join(' · '))}</span>
+          <span class="lista-faixa-resumo">${esc(resumo)}</span>
+        </div>
+        <button class="lista-faixa-btn" type="button" data-id="${lista.id}">Revisar</button>
+      </div>`;
+  }).join('');
+
+  container.querySelectorAll('.lista-faixa').forEach(faixa => {
+    faixa.addEventListener('click', () => expandirLista(faixa.dataset.id));
+  });
+  container.querySelectorAll('.lista-faixa-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); expandirLista(btn.dataset.id); });
+  });
+}
+
+function salvarRascunhoNaListas() {
+  if (!estado.rascunho || estado.rascunho.itens.length === 0) return;
+  const idx = estado.listas.findIndex(l => l.id === estado.rascunho.id);
+  const copia = { ...estado.rascunho, itens: estado.rascunho.itens.map(it => ({ ...it })) };
+  if (idx >= 0) estado.listas[idx] = copia;
+  else estado.listas.push(copia);
+}
+
+function expandirLista(id) {
+  salvarRascunhoNaListas();
+
+  const idx = estado.listas.findIndex(l => l.id === id);
+  if (idx < 0) return;
+
+  estado.rascunho = { ...estado.listas[idx], itens: estado.listas[idx].itens.map(it => ({ ...it })) };
+  estado.listas.splice(idx, 1);
+
+  renderizarFaixas();
+  renderizarResultado();
+  trocarEstado('estado-resultado');
+  const alvo = document.getElementById('listas-container');
+  scrollPara(alvo && alvo.children.length ? alvo : document.getElementById('estado-resultado'), 'start');
+}
+
 // =============== RESULTADO ===============
-const grid = document.getElementById('itens-grid');
-const counterQuero = document.getElementById('counter-quero');
-const counterTem = document.getElementById('counter-tem');
-const resumoTotal = document.getElementById('resumo-total');
-const btnEnviar = document.getElementById('btn-enviar');
+const grid            = document.getElementById('itens-grid');
+const counterQuero    = document.getElementById('counter-quero');
+const counterTem      = document.getElementById('counter-tem');
+const resumoTotal     = document.getElementById('resumo-total');
+const btnEnviar       = document.getElementById('btn-enviar');
 const btnMarcarTodosTem = document.getElementById('btn-marcar-todos-tem');
-const btnRecomecar = document.getElementById('btn-recomecar');
+const btnLimpar       = document.getElementById('btn-recomecar');
 const btnAdicionarLista = document.getElementById('btn-adicionar-lista');
 
 function renderizarAluno() {
@@ -266,18 +358,9 @@ function renderizarAluno() {
       </div>
     </div>
   `;
-  document.getElementById('aluno-nome').addEventListener('input', e => {
-    estado.rascunho.aluno.nome = e.target.value;
-    atualizarLinkEnviar();
-  });
-  document.getElementById('aluno-cor').addEventListener('input', e => {
-    estado.rascunho.aluno.preferenciaCor = e.target.value;
-    atualizarLinkEnviar();
-  });
-  document.getElementById('aluno-obs').addEventListener('input', e => {
-    estado.rascunho.aluno.observacoes = e.target.value;
-    atualizarLinkEnviar();
-  });
+  document.getElementById('aluno-nome').addEventListener('input', e => { estado.rascunho.aluno.nome = e.target.value; atualizarLinkEnviar(); });
+  document.getElementById('aluno-cor').addEventListener('input',  e => { estado.rascunho.aluno.preferenciaCor = e.target.value; atualizarLinkEnviar(); });
+  document.getElementById('aluno-obs').addEventListener('input',  e => { estado.rascunho.aluno.observacoes = e.target.value; atualizarLinkEnviar(); });
 }
 
 function renderizarPreferenciaGeral() {
@@ -299,9 +382,7 @@ function renderizarPreferenciaGeral() {
   bloco.querySelectorAll('.preferencia-option').forEach(btn => {
     btn.addEventListener('click', () => {
       estado.rascunho.preferenciaGeral = btn.dataset.pref;
-      bloco.querySelectorAll('.preferencia-option').forEach(b => {
-        b.classList.toggle('ativo', b === btn);
-      });
+      bloco.querySelectorAll('.preferencia-option').forEach(b => b.classList.toggle('ativo', b === btn));
       atualizarLinkEnviar();
     });
   });
@@ -315,9 +396,9 @@ function renderizarMetadados() {
     <div class="meta-lista">
       <p class="meta-lista-titulo">Dados identificados na lista</p>
       <div class="meta-lista-campos">
-        <label>Escola<input id="meta-escola" value="${esc(m.escola)}" placeholder="Não identificado" /></label>
-        <label>Ano / Série<input id="meta-anoSerie" value="${esc(m.anoSerie)}" placeholder="Não identificado" /></label>
-        <label>Segmento<input id="meta-segmento" value="${esc(m.segmento)}" placeholder="Não identificado" /></label>
+        <label>Escola<input id="meta-escola"    value="${esc(m.escola)}"    placeholder="Não identificado" /></label>
+        <label>Ano / Série<input id="meta-anoSerie"  value="${esc(m.anoSerie)}"  placeholder="Não identificado" /></label>
+        <label>Segmento<input id="meta-segmento"  value="${esc(m.segmento)}"  placeholder="Não identificado" /></label>
         <label>Ano letivo<input id="meta-anoLetivo" value="${esc(m.anoLetivo)}" placeholder="Não identificado" /></label>
       </div>
       <p class="meta-lista-dica">Confira se os dados estão corretos. Eles ajudam a equipe da Sartec a localizar a lista certa e confirmar o orçamento.</p>
@@ -331,35 +412,53 @@ function renderizarMetadados() {
   });
 }
 
-function renderizarPedidoResumo() {
+function renderizarResumoPedido() {
   const bloco = document.getElementById('bloco-pedido-resumo');
   if (!bloco) return;
-  if (estado.listas.length === 0) {
-    bloco.innerHTML = '';
-    return;
-  }
-  const numero = estado.listas.length + 1;
-  const items = estado.listas.map((l, i) => {
-    const partes = [`Lista ${i + 1}`];
-    if (l.aluno.nome) partes.push(l.aluno.nome);
-    if (l.metadados.escola) partes.push(l.metadados.escola);
-    if (l.metadados.anoSerie) partes.push(l.metadados.anoSerie);
-    return `<li>${partes.join(' — ')}</li>`;
+
+  const totalListas = estado.listas.length + (estado.rascunho.itens.length > 0 ? 1 : 0);
+  if (totalListas <= 1) { bloco.innerHTML = ''; return; }
+
+  const todasOrdenadas = [
+    ...estado.listas,
+    ...(estado.rascunho.itens.length > 0 ? [estado.rascunho] : []),
+  ].sort((a, b) => (a.num || 0) - (b.num || 0));
+
+  const totalInclusos = todasOrdenadas.reduce((acc, l) => acc + l.itens.filter(x => x.incluso).length, 0);
+
+  const linhas = todasOrdenadas.map(l => {
+    const quero    = l.itens.filter(x => x.incluso).length;
+    const naoQuero = l.itens.filter(x => !x.incluso).length;
+    const nome     = l.aluno.nome ? ` · ${l.aluno.nome}` : '';
+    const ativo    = l.id === estado.rascunho.id ? ' <em>(revisando agora)</em>' : '';
+    return `<li>Lista ${l.num}${nome}: <strong>${quero}</strong> para orçamento · ${naoQuero} não quero${ativo}</li>`;
   }).join('');
+
   bloco.innerHTML = `
-    <div class="pedido-resumo">
-      <p class="pedido-resumo-titulo">📋 Listas adicionadas ao pedido</p>
-      <ul class="pedido-resumo-lista">${items}</ul>
-      <p class="pedido-resumo-dica">A lista que você está revisando agora será a Lista ${numero}.</p>
+    <div class="resumo-total-pedido">
+      <p class="resumo-total-titulo">Total do pedido: <strong>${totalInclusos} ${totalInclusos === 1 ? 'item' : 'itens'}</strong> para orçamento em ${totalListas} ${totalListas === 1 ? 'lista' : 'listas'}</p>
+      <ul class="resumo-total-lista">${linhas}</ul>
     </div>
   `;
 }
 
+function renderizarBadge() {
+  const bloco = document.getElementById('resultado-badge');
+  if (!bloco) return;
+  const totalListas = estado.listas.length + 1;
+  if (totalListas > 1 && estado.rascunho.num) {
+    bloco.innerHTML = `<span class="resultado-lista-badge">Lista ${estado.rascunho.num}</span>`;
+  } else {
+    bloco.innerHTML = '';
+  }
+}
+
 function renderizarResultado() {
+  renderizarBadge();
   renderizarMetadados();
   renderizarAluno();
   renderizarPreferenciaGeral();
-  renderizarPedidoResumo();
+  renderizarResumoPedido();
 
   grid.innerHTML = estado.rascunho.itens.map(it => {
     const busca = encodeURIComponent('material escolar ' + it.nome + (it.obs ? ' ' + it.obs : ''));
@@ -398,14 +497,11 @@ function renderizarResultado() {
   }).join('');
 
   grid.querySelectorAll('.item-card').forEach(card => {
-    const id = card.dataset.id;
+    const id   = card.dataset.id;
     const item = estado.rascunho.itens.find(x => x.id === id);
 
     card.querySelectorAll('.item-choice-option').forEach(btn => {
-      btn.addEventListener('click', () => {
-        item.incluso = btn.dataset.acao === 'incluir';
-        atualizarUI();
-      });
+      btn.addEventListener('click', () => { item.incluso = btn.dataset.acao === 'incluir'; atualizarUI(); });
     });
 
     card.querySelectorAll('.qty-btn').forEach(b => {
@@ -428,9 +524,7 @@ function renderizarResultado() {
 
     input.addEventListener('input', () => {
       item.preferenciaCliente = input.value;
-      toggle.textContent = input.value.trim()
-        ? 'Editar marca/preferência'
-        : '+ adicionar marca/preferência';
+      toggle.textContent = input.value.trim() ? 'Editar marca/preferência' : '+ adicionar marca/preferência';
       atualizarLinkEnviar();
     });
   });
@@ -442,14 +536,12 @@ function renderizarResultado() {
 
 function atualizarUI() {
   grid.querySelectorAll('.item-card').forEach(card => {
-    const id = card.dataset.id;
+    const id   = card.dataset.id;
     const item = estado.rascunho.itens.find(x => x.id === id);
     card.classList.toggle('excluido', !item.incluso);
     card.querySelector('.qty-num').textContent = item.qty;
     card.querySelectorAll('.item-choice-option').forEach(btn => {
-      btn.classList.toggle('ativo',
-        item.incluso ? btn.dataset.acao === 'incluir' : btn.dataset.acao === 'excluir'
-      );
+      btn.classList.toggle('ativo', item.incluso ? btn.dataset.acao === 'incluir' : btn.dataset.acao === 'excluir');
     });
   });
   atualizarContadores();
@@ -457,119 +549,90 @@ function atualizarUI() {
 }
 
 function atualizarContadores() {
-  const inclusos = estado.rascunho.itens.filter(x => x.incluso);
+  const inclusos  = estado.rascunho.itens.filter(x => x.incluso);
   const excluidos = estado.rascunho.itens.filter(x => !x.incluso);
-  counterQuero.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
-  counterTem.textContent = `${excluidos.length} não ${excluidos.length === 1 ? 'quero' : 'quero'}`;
-  resumoTotal.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
+  if (counterQuero) counterQuero.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
+  if (counterTem)   counterTem.textContent   = `${excluidos.length} não quero`;
+  if (resumoTotal)  resumoTotal.textContent  = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
+  renderizarResumoPedido();
 }
 
 // =============== GERAÇÃO DA MENSAGEM ===============
 
 function linhaItem(x) {
-  const base = `${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`;
-  const sugestao = x.marcaSugerida
-    ? `  Sugestão da escola: ${x.marcaSugerida}`
-    : null;
-  const prefCliente = (x.preferenciaCliente || '').trim()
-    ? `  Preferência do cliente: ${x.preferenciaCliente.trim()}`
-    : null;
-  const clienteAlterou =
-    (x.preferenciaCliente || '').trim() &&
-    x.marcaSugerida &&
-    x.preferenciaCliente.trim().toLowerCase() !== x.marcaSugerida.toLowerCase()
-      ? `  (Cliente alterou a sugestão da escola para este item.)`
-      : null;
-  return [base, sugestao, prefCliente, clienteAlterou].filter(Boolean).join('\n');
+  const base = `✅ ${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`;
+  const sugestao    = x.marcaSugerida ? `   Sugestão da escola: ${x.marcaSugerida}` : null;
+  const prefCliente = (x.preferenciaCliente || '').trim() ? `   Preferência: ${x.preferenciaCliente.trim()}` : null;
+  return [base, sugestao, prefCliente].filter(Boolean).join('\n');
 }
 
 function gerarBlocoLista(lista, numero) {
-  const m = lista.metadados;
-  const a = lista.aluno;
+  const m    = lista.metadados;
+  const a    = lista.aluno;
   const pref = PREFERENCIAS_GERAL.find(p => p.id === lista.preferenciaGeral) || PREFERENCIAS_GERAL[0];
-  const inclusos  = lista.itens.filter(x => x.incluso);
-  const excluidos = lista.itens.filter(x => !x.incluso);
+  const inclusos = lista.itens.filter(x => x.incluso);
 
-  const dadosLista = [
-    `Escola: ${m.escola || 'Não informado'}`,
-    `Ano/Série: ${m.anoSerie || 'Não informado'}`,
-    m.segmento  ? `Segmento: ${m.segmento}`  : null,
-    m.anoLetivo ? `Ano letivo: ${m.anoLetivo}` : null,
+  const tituloPartes = [`*Lista ${numero}`];
+  if (a.nome) tituloPartes.push(a.nome);
+  const titulo = tituloPartes.join(' · ') + '*';
+
+  const meta = [
+    m.escola    ? `Escola: ${m.escola}`           : null,
+    m.anoSerie  ? `Ano/Série: ${m.anoSerie}`      : null,
+    m.segmento  ? `Segmento: ${m.segmento}`       : null,
+    m.anoLetivo ? `Ano letivo: ${m.anoLetivo}`    : null,
+    a.preferenciaCor ? `Preferência de cor: ${a.preferenciaCor}` : null,
+    a.observacoes    ? `Observações: ${a.observacoes}`           : null,
+    `Critério para o orçamento: ${pref.label}`,
   ].filter(Boolean).join('\n');
 
-  const dadosAluno = [
-    `Nome: ${a.nome || 'Não informado'}`,
-    `Preferência de cor quando a lista não indicar: ${a.preferenciaCor || 'Não informado'}`,
-    `Observações sobre cores/modelos: ${a.observacoes || 'Não informado'}`,
-    'Quando a lista indicar cor específica, considerar a cor da lista. Quando não indicar, considerar a preferência informada, conforme disponibilidade.',
-  ].join('\n');
+  const linhasItens = inclusos.length > 0
+    ? inclusos.map(linhaItem).join('\n')
+    : 'Nenhum item selecionado para orçamento.';
 
-  const linhasQuero = inclusos.length > 0
-    ? inclusos.map(linhaItem).join('\n\n')
-    : 'Nenhum item selecionado.';
-  const linhasNaoQuero = excluidos.length > 0
-    ? excluidos.map(linhaItem).join('\n\n')
-    : 'Nenhum item marcado como Não quero.';
-
-  return `*Lista ${numero}*
-
-*Dados da lista:*
-${dadosLista}
-
-*Dados do aluno:*
-${dadosAluno}
-
-*Preferência para o orçamento:*
-${pref.label} — ${pref.desc}
-
-*Itens que quero comprar:*
-${linhasQuero}
-
-*Itens marcados como Não quero:*
-${linhasNaoQuero}`;
+  return `${titulo}\n${meta}\n\n${linhasItens}`;
 }
 
 function atualizarLinkEnviar() {
-  const inclusos = estado.rascunho.itens.filter(x => x.incluso);
+  const inclRascunho = estado.rascunho.itens.filter(x => x.incluso).length;
+  const inclSalvas   = estado.listas.reduce((acc, l) => acc + l.itens.filter(x => x.incluso).length, 0);
+  const totalInclusos = inclRascunho + inclSalvas;
 
-  // Conta todos os itens: listas salvas + rascunho atual
-  const totalInclusos = estado.listas.reduce(
-    (acc, l) => acc + l.itens.filter(x => x.incluso).length, 0
-  ) + inclusos.length;
-
-  if (totalInclusos === 0) {
-    btnEnviar.style.opacity = '0.5';
-    btnEnviar.style.pointerEvents = 'none';
-    btnEnviar.removeAttribute('href');
-    return;
-  }
-  btnEnviar.style.opacity = '';
-  btnEnviar.style.pointerEvents = '';
-
-  // Monta todas as listas: salvas + rascunho (somente se tiver itens)
   const todasListas = [
     ...estado.listas,
     ...(estado.rascunho.itens.length > 0 ? [estado.rascunho] : []),
-  ];
-  const blocos = todasListas.map((l, i) => gerarBlocoLista(l, i + 1)).join('\n\n---\n\n');
+  ].sort((a, b) => (a.num || 0) - (b.num || 0));
+
+  const plural = todasListas.length > 1;
+  if (btnEnviar) btnEnviar.textContent = plural ? 'Enviar listas para orçamento' : 'Enviar lista para orçamento';
+
+  if (totalInclusos === 0) {
+    if (btnEnviar) { btnEnviar.style.opacity = '0.5'; btnEnviar.style.pointerEvents = 'none'; btnEnviar.removeAttribute('href'); }
+    return;
+  }
+  if (btnEnviar) { btnEnviar.style.opacity = ''; btnEnviar.style.pointerEvents = ''; }
+
+  const intro = plural
+    ? `Montei ${todasListas.length} listas escolares pelo site da Sartec:`
+    : 'Organizei minha lista escolar pelo site da Sartec:';
+
+  const blocos = todasListas.map(l => gerarBlocoLista(l, l.num)).join('\n\n---\n\n');
 
   const mensagem =
 `Olá, Sartec! Sou *${estado.nome}*.
 
+${intro}
+
 [SITE_LISTA_ESCOLAR]
-
-*Pedido com listas escolares organizado pelo site*
-
-*WhatsApp informado no site:*
-${estado.whatsapp}
+*WhatsApp:* ${estado.whatsapp}
 
 ${blocos}
 
-Aguardo o orçamento e a confirmação de disponibilidade, marcas/modelos e valores.
+A equipe pode conferir estoque, marcas e valores e me enviar o orçamento pelo WhatsApp?
 
 — Enviado pela ferramenta de lista escolar do site da Sartec`;
 
-  btnEnviar.href = montarWpp(SARTEC.WPP_PRINCIPAL, mensagem);
+  if (btnEnviar) btnEnviar.href = montarWpp(SARTEC.WPP_PRINCIPAL, mensagem);
 }
 
 // =============== BOTÕES ===============
@@ -578,39 +641,49 @@ btnMarcarTodosTem.addEventListener('click', () => {
   const algumIncluso = estado.rascunho.itens.some(x => x.incluso);
   estado.rascunho.itens.forEach(x => x.incluso = !algumIncluso);
   atualizarUI();
-  btnMarcarTodosTem.textContent = algumIncluso
-    ? 'Marcar todos como "Não quero"'
-    : 'Marcar todos como "Quero comprar"';
+  btnMarcarTodosTem.textContent = algumIncluso ? 'Marcar todos como "Não quero"' : 'Marcar todos como "Quero comprar"';
 });
 
 btnAdicionarLista.addEventListener('click', () => {
-  // Salva rascunho atual (se tiver itens) na lista de listas concluídas
-  if (estado.rascunho.itens.length > 0) {
-    estado.listas.push({ ...estado.rascunho, itens: [...estado.rascunho.itens] });
+  salvarRascunhoNaListas();
+  estado.rascunho    = rascunhoVazio();
+  estado.modoNovaLista = true;
+
+  // Exibir modo nova lista no formulário
+  const formEl = document.getElementById('form-upload');
+  if (formEl) formEl.classList.add('nova-lista');
+
+  const novaHeader = document.getElementById('nova-lista-header');
+  if (novaHeader) {
+    novaHeader.style.display = '';
+    const tituloEl = novaHeader.querySelector('.nova-lista-num');
+    if (tituloEl) tituloEl.textContent = nextListNum;
   }
-  // Reseta o rascunho para a próxima lista
-  estado.rascunho = rascunhoVazio();
 
-  // Mostra banner no formulário de upload
-  const infoDiv = document.getElementById('info-adicionando-lista');
-  if (infoDiv) infoDiv.style.display = '';
+  renderizarFaixas();
 
-  // Limpa o campo de arquivo
-  formUpload.querySelector('input[type="file"]').value = '';
+  arquivoInput.value = '';
   uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
 
   trocarEstado('estado-upload');
-  scrollPara(document.getElementById('estado-upload'), 'start');
+  const alvo = document.getElementById('listas-container');
+  scrollPara(alvo && alvo.children.length ? alvo : document.getElementById('estado-upload'), 'start');
 });
 
-btnRecomecar.addEventListener('click', () => {
-  if (confirm('Recomeçar do zero? Todas as listas do pedido atual serão apagadas.')) {
-    estado.listas = [];
-    estado.rascunho = rascunhoVazio();
+btnLimpar.addEventListener('click', () => {
+  if (confirm('Tem certeza que deseja apagar todas as listas deste pedido?')) {
+    estado.listas        = [];
+    estado.rascunho      = rascunhoVazio();
+    nextListNum          = 1;
+    estado.modoNovaLista = false;
 
-    const infoDiv = document.getElementById('info-adicionando-lista');
-    if (infoDiv) infoDiv.style.display = 'none';
+    const formEl = document.getElementById('form-upload');
+    if (formEl) formEl.classList.remove('nova-lista');
 
+    const novaHeader = document.getElementById('nova-lista-header');
+    if (novaHeader) novaHeader.style.display = 'none';
+
+    renderizarFaixas();
     formUpload.reset();
     uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
 

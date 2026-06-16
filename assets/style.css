@@ -2554,3 +2554,126 @@ body.is-leaving {
   body { animation: none; opacity: 1; }
   body.is-leaving { transition: none; opacity: 1; }
 }
+
+/* ======================== MULTI-LISTA: FAIXAS ======================== */
+#listas-container { margin-bottom: 16px; }
+
+.lista-faixa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #F0FDF4;
+  border: 1.5px solid #BBF7D0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.lista-faixa:hover { background: #DCFCE7; border-color: #86EFAC; }
+.lista-faixa:last-child { margin-bottom: 0; }
+
+.lista-faixa-info { flex: 1; min-width: 0; }
+.lista-faixa-titulo {
+  display: block;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  color: #166534;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lista-faixa-resumo {
+  font-size: .81rem;
+  color: #166534;
+  opacity: .78;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.lista-faixa-btn {
+  flex-shrink: 0;
+  background: white;
+  color: #166534;
+  border: 1.5px solid #86EFAC;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.lista-faixa-btn:hover { background: #DCFCE7; }
+
+/* Nova lista: ocultar campos de responsável e aviso único */
+#form-upload.nova-lista .campos-responsavel { display: none; }
+#form-upload.nova-lista .aviso-lista-unica  { display: none; }
+
+/* Cabeçalho da nova lista no formulário */
+.nova-lista-header {
+  background: #EFF6FF;
+  border: 1.5px solid #BFDBFE;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 18px;
+}
+.nova-lista-header strong {
+  display: block;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: .97rem;
+  color: #1E3A8A;
+  margin-bottom: 4px;
+}
+.nova-lista-header p { margin: 0; font-size: .86rem; color: #1E40AF; line-height: 1.5; }
+
+/* Badge de lista no resultado */
+.resultado-lista-badge {
+  display: inline-block;
+  background: #1E3A8A;
+  color: white;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: .82rem;
+  border-radius: 8px;
+  padding: 5px 13px;
+  margin-bottom: 14px;
+  letter-spacing: .02em;
+}
+
+/* Resumo total do pedido */
+.resumo-total-pedido {
+  background: #F0FDF4;
+  border: 1.5px solid #BBF7D0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.resumo-total-titulo {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  color: #166534;
+  margin: 0 0 8px;
+}
+.resumo-total-titulo strong { color: #166534; }
+.resumo-total-lista {
+  margin: 0;
+  padding-left: 18px;
+  font-size: .86rem;
+  color: #166534;
+  line-height: 1.8;
+}
+.resumo-total-lista em { font-style: normal; opacity: .65; }
+
+@media (max-width: 540px) {
+  .lista-faixa { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .lista-faixa-btn { align-self: flex-end; }
+  .lista-faixa-resumo { white-space: normal; }
+}

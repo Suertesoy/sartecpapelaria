@@ -73,23 +73,32 @@
   <section class="lista-tool">
     <div class="container">
 
+      <!-- Faixas de listas salvas (visível em qualquer estado) -->
+      <div id="listas-container" style="display:none"></div>
+
       <!-- ESTADO 1: UPLOAD -->
       <div class="estado ativo" id="estado-upload">
         <div class="form-card" style="max-width: 640px;">
           <form id="form-upload">
-            <div class="form-upload-intro">
-              <strong>Dados para orçamento</strong>
-              <p>Preencha seus dados e anexe os arquivos da lista.</p>
-            </div>
-            <div class="form-group">
-              <label for="nome">Seu nome</label>
-              <input type="text" id="nome" name="nome" required placeholder="Ex: Maria Silva" />
+            <div class="campos-responsavel">
+              <div class="form-upload-intro">
+                <strong>Dados para orçamento</strong>
+                <p>Preencha seus dados e anexe os arquivos da lista.</p>
+              </div>
+              <div class="form-group">
+                <label for="nome">Seu nome</label>
+                <input type="text" id="nome" name="nome" required placeholder="Ex: Maria Silva" />
+              </div>
+              <div class="form-group">
+                <label for="whatsapp">WhatsApp pra contato</label>
+                <input type="tel" id="whatsapp" name="whatsapp" required placeholder="(12) 99999-9999" />
+                <div class="hint">Vamos te chamar nesse número quando tiver o orçamento.</div>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="whatsapp">WhatsApp pra contato</label>
-              <input type="tel" id="whatsapp" name="whatsapp" required placeholder="(12) 99999-9999" />
-              <div class="hint">Vamos te chamar nesse número quando tiver o orçamento.</div>
+            <div id="nova-lista-header" class="nova-lista-header" style="display:none">
+              <strong>Adicionando lista <span class="nova-lista-num">2</span></strong>
+              <p>Envie o arquivo da próxima lista para análise. Não é preciso informar nome e WhatsApp novamente.</p>
             </div>
 
             <div class="form-group">
@@ -105,11 +114,6 @@
             <div class="aviso-lista-unica">
               <span class="aviso-lista-unica-ico" aria-hidden="true">ℹ</span>
               <p>Envie uma lista por vez. Você pode anexar várias fotos ou PDFs da mesma lista, como frente e verso ou páginas diferentes. Para listas de filhos diferentes, faça um envio separado para cada criança.</p>
-            </div>
-
-            <div id="info-adicionando-lista" class="info-adicionando" style="display:none">
-              <strong>📋 Adicionando ao pedido</strong> — envie a próxima lista para continuar.
-              <br><small>Use esta opção quando for comprar materiais para mais de uma criança, escola ou série.</small>
             </div>
 
             <div id="lista-erro" class="lista-erro-card" style="display:none" role="alert" aria-live="assertive"></div>
@@ -144,11 +148,12 @@
 
       <!-- ESTADO 3: RESULTADO -->
       <div class="estado" id="estado-resultado">
+        <div id="resultado-badge"></div>
         <div style="text-align:center; max-width: 720px; margin: 0 auto 32px;">
           <span class="kicker">✓ Itens para revisar</span>
           <h2>Confirme o que você quer comprar</h2>
           <p class="sub">
-            Confira os itens abaixo. Marque <strong>"Já tenho"</strong> nos que você não precisa
+            Confira os itens abaixo. Marque <strong>"Não quero"</strong> nos que não precisa
             e ajuste a quantidade do que falta. Nossa equipe confirma disponibilidade e preços pelo WhatsApp.
           </p>
           <p style="font-size:.8rem; color:var(--texto-suave); margin-top:-8px;">
@@ -184,10 +189,10 @@
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
             <button id="btn-recomecar" class="btn btn-ghost">
-              Recomeçar pedido
+              Limpar pedido
             </button>
             <button id="btn-adicionar-lista" class="btn btn-adicionar">
-              + Adicionar outra lista
+              + Adicionar nova lista
             </button>
             <a id="btn-enviar" class="btn btn-wpp btn-lg" target="_blank" rel="noopener">
               Enviar lista para orçamento
