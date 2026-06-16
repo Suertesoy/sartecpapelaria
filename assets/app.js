@@ -178,26 +178,20 @@ function renderFooter() {
             <a href="escolas.html">Escolas Parceiras</a>
           </div>
           <div class="footer-col">
-            <h4>Contato</h4>
-            <p>${SARTEC.TELEFONE_DISPLAY}</p>
-            <p>${SARTEC.EMAIL}</p>
-            <p>CNPJ: ${SARTEC.CNPJ}</p>
-          </div>
-          <div class="footer-col">
-            <h4>Visite a loja</h4>
+            <h4>Loja e contato</h4>
             <p>${SARTEC.ENDERECO}</p>
             <p>CEP: ${SARTEC.CEP}</p>
             <p>${SARTEC.HORARIO}</p>
-            <a href="https://www.google.com/maps/search/?api=1&query=Av.%20Andr%C3%B4meda%2C%201805%20-%20Jardim%20Sat%C3%A9lite%2C%20S%C3%A3o%20Jos%C3%A9%20dos%20Campos%20SP" target="_blank" rel="noopener" class="footer-map-link">Ver no Google Maps →</a>
-            <a href="https://waze.com/ul?q=Av.%20Andr%C3%B4meda%2C%201805%20-%20Jardim%20Sat%C3%A9lite%2C%20S%C3%A3o%20Jos%C3%A9%20dos%20Campos%20SP&navigate=yes" target="_blank" rel="noopener" class="footer-map-link">Ver no Waze →</a>
+            <p>${SARTEC.TELEFONE_DISPLAY}</p>
+            <p>${SARTEC.EMAIL}</p>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
         <div class="container footer-bottom-inner">
-          <span>© 2026 Sartec Papelaria e Informática. Todos os direitos reservados.</span>
-          <span>Este site faz parte da nova experiência digital da Sartec. Implementado pela <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="footer-digital-link">Sartec Digital →</a></span>
-          <span class="footer-ai-note">Algumas imagens deste site foram geradas ou editadas com inteligência artificial para fins ilustrativos. Elas podem se inspirar em produtos, ambientes e referências reais da Sartec, mas não representam necessariamente fotos exatas da loja, dos produtos ou dos serviços.</span>
+          <span>© 2026 Sartec Papelaria e Informática &nbsp;·&nbsp; CNPJ: ${SARTEC.CNPJ}</span>
+          <span>Implementado pela <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="footer-digital-link">Sartec Digital</a></span>
+          <span class="footer-ai-note">Algumas imagens deste site foram geradas ou editadas com inteligência artificial para fins ilustrativos.</span>
         </div>
       </div>
     </footer>

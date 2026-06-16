@@ -557,7 +557,7 @@ section { padding: 64px 0; }
 }
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr 1fr;
+  grid-template-columns: 1.4fr 1fr 1.2fr;
   gap: 40px;
   margin-bottom: 0;
 }
@@ -595,8 +595,6 @@ section { padding: 64px 0; }
   text-decoration: none;
 }
 .footer-col a:hover { color: #FFFFFF; }
-.footer-map-link { color: rgba(255,255,255,0.76) !important; }
-.footer-map-link:hover { color: #FFFFFF !important; }
 .footer-bottom {
   background: rgba(0,0,0,0.25);
   border-top: 1px solid rgba(255,255,255,0.10);
@@ -625,39 +623,18 @@ section { padding: 64px 0; }
   margin-top: 4px;
 }
 
-@media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid > .footer-brand { grid-column: 1 / -1; }
+}
 @media (max-width: 540px) {
   .footer-container { padding-top: 28px; padding-bottom: 24px; }
-
-  /* grid: brand e visite ocupam largura total; nav e contato ficam lado a lado */
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 20px 14px; }
-  .footer-grid > .footer-brand { grid-column: 1 / -1; }
-  .footer-grid > .footer-col:last-child { grid-column: 1 / -1; }
-
-  /* brand: centralizado e empilhado */
-  .footer-brand {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 10px;
-  }
-  .footer-logo-seal {
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    margin-bottom: 0;
-    line-height: inherit;
-    text-align: center;
-  }
-  .footer-brand img { height: auto; width: 160px; }
-  .footer-brand p { font-size: .82rem; line-height: 1.4; margin: 0; text-align: center; }
-
-  /* colunas compactas */
+  .footer-grid { grid-template-columns: 1fr; gap: 20px; }
+  .footer-brand { align-items: center; text-align: center; }
+  .footer-brand img { width: 160px; }
+  .footer-brand p { font-size: .82rem; line-height: 1.4; }
   .footer-col h4 { font-size: .68rem; letter-spacing: .08em; margin-bottom: 10px; }
   .footer-col a, .footer-col p { font-size: .84rem; margin-bottom: 7px; }
-
-  /* rodapé final compacto */
   .footer-bottom-inner { padding-top: 14px; padding-bottom: 14px; font-size: .78rem; gap: 4px; }
 }
 @media (max-width: 360px) {
