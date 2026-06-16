@@ -38,6 +38,7 @@ const LIMITE_BYTES = 4 * 1024 * 1024;
 // =============== ESTADO ===============
 
 let nextListNum = 1;
+let pedidoEnviado = false;
 
 function rascunhoVazio() {
   return {
@@ -103,6 +104,88 @@ function esc(str) {
   return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// =============== PERSISTÊNCIA LOCAL ===============
+const LS_KEY = 'sartec_lista_progress';
+
+function salvarProgresso() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      v: 1,
+      ts: Date.now(),
+      nextListNum,
+      nome: estado.nome,
+      whatsapp: estado.whatsapp,
+      modoNovaLista: estado.modoNovaLista,
+      listas: estado.listas,
+      rascunho: estado.rascunho,
+    }));
+  } catch (_) {}
+}
+
+function restaurarProgresso() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return false;
+    const snap = JSON.parse(raw);
+    if (!snap || snap.v !== 1) return false;
+    nextListNum          = snap.nextListNum || 1;
+    estado.nome          = snap.nome || '';
+    estado.whatsapp      = snap.whatsapp || '';
+    estado.modoNovaLista = !!snap.modoNovaLista;
+    estado.listas        = Array.isArray(snap.listas) ? snap.listas : [];
+    estado.rascunho      = snap.rascunho || rascunhoVazio();
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function limparProgresso() {
+  try { localStorage.removeItem(LS_KEY); } catch (_) {}
+}
+
+function temProgresso() {
+  return estado.listas.length > 0
+    || estado.rascunho.itens.length > 0
+    || estado.nome.trim() !== ''
+    || estado.whatsapp.trim() !== '';
+}
+
+function mostrarBannerRestaurado() {
+  const banner = document.getElementById('pedido-salvo-banner');
+  if (banner) banner.style.display = '';
+}
+
+function ocultarBannerSalvo() {
+  const banner = document.getElementById('pedido-salvo-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+function limparTudoERecomecar() {
+  limparProgresso();
+  pedidoEnviado        = false;
+  estado.listas        = [];
+  estado.rascunho      = rascunhoVazio();
+  nextListNum          = 1;
+  estado.modoNovaLista = false;
+
+  const formEl = document.getElementById('form-upload');
+  if (formEl) formEl.classList.remove('nova-lista');
+
+  const novaHeader = document.getElementById('nova-lista-header');
+  if (novaHeader) novaHeader.style.display = 'none';
+
+  renderizarFaixas();
+  formUpload.reset();
+  clearTimeout(uploadFeedbackTimer);
+  uploadArea.classList.remove('upload-lendo', 'upload-ok');
+  uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
+  ocultarBannerSalvo();
+
+  trocarEstado('estado-upload');
+  scrollPara(document.getElementById('estado-upload'), 'start');
+}
+
 // =============== UPLOAD ===============
 const uploadArea = document.getElementById('upload-area');
 const arquivoInput = document.getElementById('arquivo');
@@ -112,7 +195,19 @@ const inputWhatsapp = document.getElementById('whatsapp');
 
 inputWhatsapp.addEventListener('input', (e) => {
   e.target.value = formatarTelefone(e.target.value);
+  estado.whatsapp = e.target.value;
+  salvarProgresso();
 });
+
+const nomeInput = document.getElementById('nome');
+if (nomeInput) {
+  nomeInput.addEventListener('input', e => {
+    estado.nome = e.target.value;
+    salvarProgresso();
+  });
+}
+
+let uploadFeedbackTimer = null;
 
 uploadArea.addEventListener('click', () => arquivoInput.click());
 uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
@@ -130,11 +225,24 @@ arquivoInput.addEventListener('change', onArquivoEscolhido);
 function onArquivoEscolhido() {
   const files = arquivoInput.files;
   if (!files || files.length === 0) return;
-  if (files.length === 1) {
-    uploadLabel.textContent = `✓ 1 arquivo selecionado: ${files[0].name}`;
-  } else {
-    uploadLabel.textContent = `✓ ${files.length} arquivos selecionados`;
-  }
+
+  clearTimeout(uploadFeedbackTimer);
+  uploadArea.classList.remove('upload-ok');
+  uploadArea.classList.add('upload-lendo');
+  uploadLabel.innerHTML = '<span class="upload-spinner" aria-hidden="true"></span><span> Lendo arquivo...</span>';
+
+  const nome = files.length === 1
+    ? files[0].name
+    : `${files.length} arquivos selecionados`;
+
+  uploadFeedbackTimer = setTimeout(() => {
+    uploadArea.classList.remove('upload-lendo');
+    uploadArea.classList.add('upload-ok');
+    const span = document.createElement('span');
+    span.textContent = `✓ Arquivo adicionado: ${nome}`;
+    uploadLabel.innerHTML = '';
+    uploadLabel.appendChild(span);
+  }, 520);
 }
 
 formUpload.addEventListener('submit', async (e) => {
@@ -375,6 +483,9 @@ function validarEEnviar(e) {
       return;
     }
   }
+
+  // Validação passou — suprimir aviso de saída
+  pedidoEnviado = true;
 }
 
 // =============== RESULTADO ===============
@@ -666,6 +777,8 @@ function atualizarLinkEnviar() {
   }
   if (btnEnviar) { btnEnviar.style.opacity = ''; btnEnviar.style.pointerEvents = ''; }
 
+  salvarProgresso();
+
   const intro = plural
     ? `Montei ${todasListas.length} listas escolares pelo site da Sartec:`
     : 'Organizei minha lista escolar pelo site da Sartec:';
@@ -700,10 +813,9 @@ btnMarcarTodosTem.addEventListener('click', () => {
 
 btnAdicionarLista.addEventListener('click', () => {
   salvarRascunhoNaListas();
-  estado.rascunho    = rascunhoVazio();
+  estado.rascunho      = rascunhoVazio();
   estado.modoNovaLista = true;
 
-  // Exibir modo nova lista no formulário
   const formEl = document.getElementById('form-upload');
   if (formEl) formEl.classList.add('nova-lista');
 
@@ -715,8 +827,11 @@ btnAdicionarLista.addEventListener('click', () => {
   }
 
   renderizarFaixas();
+  salvarProgresso();
 
+  clearTimeout(uploadFeedbackTimer);
   arquivoInput.value = '';
+  uploadArea.classList.remove('upload-lendo', 'upload-ok');
   uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
 
   trocarEstado('estado-upload');
@@ -726,26 +841,60 @@ btnAdicionarLista.addEventListener('click', () => {
 
 btnLimpar.addEventListener('click', () => {
   if (confirm('Tem certeza que deseja apagar todas as listas deste pedido?')) {
-    estado.listas        = [];
-    estado.rascunho      = rascunhoVazio();
-    nextListNum          = 1;
-    estado.modoNovaLista = false;
-
-    const formEl = document.getElementById('form-upload');
-    if (formEl) formEl.classList.remove('nova-lista');
-
-    const novaHeader = document.getElementById('nova-lista-header');
-    if (novaHeader) novaHeader.style.display = 'none';
-
-    renderizarFaixas();
-    formUpload.reset();
-    uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
-
-    trocarEstado('estado-upload');
-    scrollPara(document.getElementById('estado-upload'), 'start');
+    limparTudoERecomecar();
   }
 });
 
 if (btnEnviar) {
   btnEnviar.addEventListener('click', validarEEnviar);
 }
+
+// =============== PROTEÇÃO CONTRA SAÍDA ===============
+window.addEventListener('beforeunload', (e) => {
+  if (!pedidoEnviado && temProgresso()) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// =============== LIMPAR PEDIDO — BANNER ===============
+const btnLimparSalvo = document.getElementById('btn-limpar-salvo');
+if (btnLimparSalvo) {
+  btnLimparSalvo.addEventListener('click', () => {
+    if (confirm('Tem certeza que deseja apagar todas as listas deste pedido?')) {
+      limparTudoERecomecar();
+    }
+  });
+}
+
+// =============== RESTAURAR PROGRESSO AO CARREGAR ===============
+(function inicializarProgresso() {
+  const restaurado = restaurarProgresso();
+  if (!restaurado) return;
+
+  if (nomeInput && estado.nome) nomeInput.value = estado.nome;
+  if (inputWhatsapp && estado.whatsapp) inputWhatsapp.value = estado.whatsapp;
+
+  const temRascunho = estado.rascunho.itens.length > 0;
+  const temListas   = estado.listas.length > 0;
+
+  if (!temRascunho && !temListas) return;
+
+  renderizarFaixas();
+
+  if (temRascunho) {
+    renderizarResultado();
+    trocarEstado('estado-resultado');
+  } else if (estado.modoNovaLista) {
+    const formEl = document.getElementById('form-upload');
+    if (formEl) formEl.classList.add('nova-lista');
+    const novaHeader = document.getElementById('nova-lista-header');
+    if (novaHeader) {
+      novaHeader.style.display = '';
+      const tituloEl = novaHeader.querySelector('.nova-lista-num');
+      if (tituloEl) tituloEl.textContent = nextListNum;
+    }
+  }
+
+  mostrarBannerRestaurado();
+})();

@@ -2685,3 +2685,68 @@ body.is-leaving {
 .campo-erro { border-color: var(--vermelho) !important; }
 .campo-erro:focus { outline: 2px solid rgba(220,38,38,.25) !important; border-color: var(--vermelho) !important; }
 .aluno-campo-erro-msg { font-size: .8rem; color: var(--vermelho); margin: 4px 0 0; font-weight: 600; line-height: 1.4; }
+
+/* ======================== UPLOAD — FEEDBACK DE ARQUIVO ======================== */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.upload-spinner {
+  display: inline-block;
+  width: 13px; height: 13px;
+  border: 2px solid rgba(30,58,138,.18);
+  border-top-color: #1E3A8A;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.upload-area.upload-lendo {
+  border-color: #93C5FD;
+  background: #EFF6FF;
+  transition: border-color .2s, background .2s;
+}
+.upload-area.upload-ok {
+  border-color: #86EFAC;
+  background: #F0FDF4;
+  transition: border-color .25s, background .25s;
+}
+.upload-area.upload-ok .label,
+.upload-area.upload-lendo .label {
+  color: inherit;
+}
+
+/* ======================== BANNER — PEDIDO SALVO ======================== */
+.pedido-salvo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 10px;
+  padding: 11px 18px;
+  margin-bottom: 18px;
+  font-size: .84rem;
+  color: #1E3A8A;
+  line-height: 1.4;
+}
+.pedido-salvo-texto { display: flex; flex-direction: column; gap: 2px; }
+.pedido-salvo-nota { font-size: .73rem; color: #3B82F6; opacity: .8; }
+.pedido-salvo-limpar {
+  background: none;
+  border: none;
+  color: #1D4ED8;
+  font-size: .81rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pedido-salvo-limpar:hover { color: #1E3A8A; }
+
+@media (max-width: 480px) {
+  .pedido-salvo-banner { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
