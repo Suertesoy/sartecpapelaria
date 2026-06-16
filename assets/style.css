@@ -2677,3 +2677,11 @@ body.is-leaving {
   .lista-faixa-btn { align-self: flex-end; }
   .lista-faixa-resumo { white-space: normal; }
 }
+
+/* ======================== VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS ======================== */
+.campo-req { color: var(--vermelho); margin-left: 2px; }
+.campo-obrigatorio-nota { font-size: .68rem; font-weight: 400; color: var(--texto-suave); text-transform: none; letter-spacing: 0; margin-left: 6px; }
+.campo-dica { font-size: .75rem; color: var(--texto-suave); line-height: 1.4; margin-top: 2px; display: block; }
+.campo-erro { border-color: var(--vermelho) !important; }
+.campo-erro:focus { outline: 2px solid rgba(220,38,38,.25) !important; border-color: var(--vermelho) !important; }
+.aluno-campo-erro-msg { font-size: .8rem; color: var(--vermelho); margin: 4px 0 0; font-weight: 600; line-height: 1.4; }

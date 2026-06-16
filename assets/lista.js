@@ -272,7 +272,7 @@ function renderizarFaixas() {
     const total    = lista.itens.length;
 
     const partes = [`Lista ${lista.num}`];
-    if (lista.aluno.nome) partes.push(lista.aluno.nome);
+    partes.push((lista.aluno.nome || '').trim() || 'nome pendente');
     if (lista.metadados.escola) partes.push(lista.metadados.escola);
 
     const resumo = [
@@ -324,6 +324,59 @@ function expandirLista(id) {
   scrollPara(alvo && alvo.children.length ? alvo : document.getElementById('estado-resultado'), 'start');
 }
 
+// =============== VALIDAÇÃO POR LISTA ===============
+
+function ocultarErroAluno() {
+  const msg = document.getElementById('aluno-erro-inline');
+  if (msg) msg.remove();
+  document.querySelectorAll('.campo-erro').forEach(el => el.classList.remove('campo-erro'));
+}
+
+function mostrarErroAluno(campoId, msg) {
+  ocultarErroAluno();
+  const campo = document.getElementById(campoId);
+  if (!campo) return;
+  campo.classList.add('campo-erro');
+  const erroEl = document.createElement('p');
+  erroEl.id = 'aluno-erro-inline';
+  erroEl.className = 'aluno-campo-erro-msg';
+  erroEl.textContent = msg;
+  campo.insertAdjacentElement('afterend', erroEl);
+  setTimeout(() => {
+    scrollPara(campo, 'center');
+    campo.focus();
+  }, 80);
+}
+
+function abrirListaComErro(listaId, campoId, msg) {
+  if (estado.rascunho.id === listaId) {
+    mostrarErroAluno(campoId, msg);
+  } else {
+    expandirLista(listaId);
+    setTimeout(() => mostrarErroAluno(campoId, msg), 120);
+  }
+}
+
+function validarEEnviar(e) {
+  const todasListas = [
+    ...estado.listas,
+    ...(estado.rascunho.itens.length > 0 ? [estado.rascunho] : []),
+  ].sort((a, b) => (a.num || 0) - (b.num || 0));
+
+  for (const lista of todasListas) {
+    if (!(lista.aluno.nome || '').trim()) {
+      e.preventDefault();
+      abrirListaComErro(lista.id, 'aluno-nome', 'Informe o nome da criança/aluno para identificar esta lista.');
+      return;
+    }
+    if (!(lista.aluno.preferenciaCor || '').trim()) {
+      e.preventDefault();
+      abrirListaComErro(lista.id, 'aluno-cor', 'Informe uma preferência de cor, personagem ou estilo. Se não tiver preferência, escreva "qualquer cor".');
+      return;
+    }
+  }
+}
+
 // =============== RESULTADO ===============
 const grid            = document.getElementById('itens-grid');
 const counterQuero    = document.getElementById('counter-quero');
@@ -340,26 +393,27 @@ function renderizarAluno() {
   const a = estado.rascunho.aluno;
   bloco.innerHTML = `
     <div class="aluno-lista">
-      <p class="aluno-lista-titulo">Dados do aluno</p>
-      <p class="aluno-lista-desc">Quando a escola indicar uma cor específica, seguimos a indicação da lista. Quando não houver cor indicada, informe aqui se há alguma preferência de cor, estampa ou estilo para ajudar a equipe a separar os materiais.</p>
+      <p class="aluno-lista-titulo">Dados da criança/aluno <span class="campo-obrigatorio-nota">campos obrigatórios</span></p>
+      <p class="aluno-lista-desc">Para separar tudo certinho, informe de quem é esta lista e quais cores ou estilos a criança prefere.</p>
       <div class="aluno-lista-grid">
         <label class="aluno-lista-field">
-          Nome do aluno
-          <input id="aluno-nome" type="text" value="${esc(a.nome)}" placeholder="Ex: Gustavo" />
+          Nome da criança/aluno <span class="campo-req" aria-hidden="true">*</span>
+          <input id="aluno-nome" type="text" value="${esc(a.nome)}" placeholder="Ex: Pedro, Ana, Lucas" />
         </label>
         <label class="aluno-lista-field">
-          Preferência de cor quando a lista não indicar
-          <input id="aluno-cor" type="text" value="${esc(a.preferenciaCor)}" placeholder="Ex: rosa, azul, cores neutras, sem preferência" />
+          Preferência de cores, personagens ou estilo <span class="campo-req" aria-hidden="true">*</span>
+          <input id="aluno-cor" type="text" value="${esc(a.preferenciaCor)}" placeholder="Ex: azul, rosa, tons claros, sem personagem, qualquer cor" />
+          <span class="campo-dica">Ajuda a equipe a separar opções sem assumir preferência. Pode escrever "qualquer cor" se não tiver preferência.</span>
         </label>
         <label class="aluno-lista-field aluno-lista-field-full">
-          Observações sobre cores/modelos
+          Observações adicionais
           <input id="aluno-obs" type="text" value="${esc(a.observacoes)}" placeholder="Ex: evitar personagens, pode ser qualquer estampa, preferência por tons claros" />
         </label>
       </div>
     </div>
   `;
-  document.getElementById('aluno-nome').addEventListener('input', e => { estado.rascunho.aluno.nome = e.target.value; atualizarLinkEnviar(); });
-  document.getElementById('aluno-cor').addEventListener('input',  e => { estado.rascunho.aluno.preferenciaCor = e.target.value; atualizarLinkEnviar(); });
+  document.getElementById('aluno-nome').addEventListener('input', e => { estado.rascunho.aluno.nome = e.target.value; ocultarErroAluno(); atualizarLinkEnviar(); });
+  document.getElementById('aluno-cor').addEventListener('input',  e => { estado.rascunho.aluno.preferenciaCor = e.target.value; ocultarErroAluno(); atualizarLinkEnviar(); });
   document.getElementById('aluno-obs').addEventListener('input',  e => { estado.rascunho.aluno.observacoes = e.target.value; atualizarLinkEnviar(); });
 }
 
@@ -691,3 +745,7 @@ btnLimpar.addEventListener('click', () => {
     scrollPara(document.getElementById('estado-upload'), 'start');
   }
 });
+
+if (btnEnviar) {
+  btnEnviar.addEventListener('click', validarEEnviar);
+}
