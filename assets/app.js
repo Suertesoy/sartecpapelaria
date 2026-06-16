@@ -274,12 +274,17 @@ function initHomeListPreview() {
   const analysisRow = document.getElementById('hlp-analysis-row');
   const itemsArea   = document.getElementById('hlp-items-area');
   const footerEl    = document.getElementById('hlp-footer');
-  const qty0        = document.getElementById('hlp-qty-0');
-  const inc4        = document.getElementById('hlp-inc-4');
-  const exc4        = document.getElementById('hlp-exc-4');
-  const card4       = document.getElementById('hlpc-4');
+  const chip0       = document.getElementById('hlp-chip-0');
+  const chip1       = document.getElementById('hlp-chip-1');
+  const chip2       = document.getElementById('hlp-chip-2');
+  const qty3        = document.getElementById('hlp-qty-3');
+  const qty4        = document.getElementById('hlp-qty-4');
+  const inc5        = document.getElementById('hlp-inc-5');
+  const exc5        = document.getElementById('hlp-exc-5');
+  const card5       = document.getElementById('hlpc-5');
   const counter     = document.getElementById('hlp-footer-count');
-  const wppBtn      = document.getElementById('hlp-wpp-btn');
+  const summaryEl   = document.getElementById('hlp-summary');
+  const summarySend = document.getElementById('hlp-summary-send');
   const confirmEl   = document.getElementById('hlp-confirm');
   const allCards    = panel.querySelectorAll('.hlp-card');
 
@@ -289,29 +294,34 @@ function initHomeListPreview() {
   function clickFx(el, cb) {
     if (el) {
       el.classList.add('hlp-clicking');
-      setTimeout(() => el.classList.remove('hlp-clicking'), 200);
+      setTimeout(() => el.classList.remove('hlp-clicking'), 180);
     }
-    setTimeout(cb, 220);
+    setTimeout(cb, 200);
   }
 
-  function stepQty(el, target, gap, cb) {
+  function showChip(el, cb) {
+    if (el) el.classList.add('hlp-chip-visible');
+    setTimeout(cb, 420);
+  }
+
+  function stepQtyFast(el, target, gap, cb) {
     if (!el) { if (cb) cb(); return; }
     const current = parseInt(el.textContent, 10);
     if (current === target) { if (cb) cb(); return; }
-    const dir  = target > current ? 1 : -1;
+    const dir = target > current ? 1 : -1;
     const wrap = el.closest('.hlp-qty');
     const btns = wrap ? wrap.querySelectorAll('.hlp-qty-btn') : [];
     const btn  = btns.length ? (dir > 0 ? btns[btns.length - 1] : btns[0]) : null;
-    clickFx(btn, () => {
-      el.textContent = String(current + dir);
-      setTimeout(() => stepQty(el, target, gap, cb), gap);
-    });
+    if (btn) { btn.classList.add('hlp-clicking'); setTimeout(() => btn.classList.remove('hlp-clicking'), 80); }
+    el.textContent = String(current + dir);
+    setTimeout(() => stepQtyFast(el, target, gap, cb), gap);
   }
 
   function reset() {
     if (uploadArea)  uploadArea.style.display  = '';
     if (itemsArea)   itemsArea.style.display   = '';
     if (footerEl)    footerEl.style.display    = '';
+    if (summaryEl)   summaryEl.classList.remove('hlp-summary-visible');
     if (confirmEl)   confirmEl.classList.remove('hlp-confirm-visible');
     if (analisarBtn) {
       analisarBtn.textContent = 'Analisar lista';
@@ -320,10 +330,12 @@ function initHomeListPreview() {
     }
     if (analysisRow) analysisRow.style.display = '';
     allCards.forEach(c => c.classList.remove('hlp-card-in', 'hlp-is-active', 'hlp-excluido'));
-    if (qty0)    qty0.textContent = '4';
-    if (inc4)    inc4.classList.add('hlp-ativo');
-    if (exc4)    exc4.classList.remove('hlp-ativo');
-    if (counter) counter.textContent = '5 itens para comprar';
+    [chip0, chip1, chip2].forEach(c => { if (c) c.classList.remove('hlp-chip-visible'); });
+    if (qty3)    qty3.textContent = '8';
+    if (qty4)    qty4.textContent = '2';
+    if (inc5)    inc5.classList.add('hlp-ativo');
+    if (exc5)    exc5.classList.remove('hlp-ativo');
+    if (counter) counter.textContent = '6 itens para comprar';
   }
 
   let activeCycle = 0;
@@ -332,9 +344,9 @@ function initHomeListPreview() {
     const cards = Array.from(allCards);
     function addNext(i) {
       if (cycleId !== activeCycle) return;
-      if (i >= cards.length) { if (cb) setTimeout(cb, 260); return; }
+      if (i >= cards.length) { if (cb) setTimeout(cb, 200); return; }
       cards[i].classList.add('hlp-card-in');
-      setTimeout(() => addNext(i + 1), 155);
+      setTimeout(() => addNext(i + 1), 110);
     }
     addNext(0);
   }
@@ -343,29 +355,25 @@ function initHomeListPreview() {
     if (cycleId !== activeCycle) return;
     reset();
 
-    // Fase 0 — PDF selecionado visível (700ms antes do clique)
+    // Fase 0 — PDF selecionado (500ms)
     setTimeout(() => {
       if (cycleId !== activeCycle) return;
 
-      // Fase 1 — simular clique em "Analisar lista"
+      // Fase 1 — clicar "Analisar lista"
       clickFx(analisarBtn, () => {
         if (cycleId !== activeCycle) return;
-        if (analisarBtn) {
-          analisarBtn.textContent = 'Analisando...';
-          analisarBtn.classList.add('hlp-analisando');
-        }
+        if (analisarBtn) { analisarBtn.textContent = 'Analisando...'; analisarBtn.classList.add('hlp-analisando'); }
 
-        // Fase 2 — mostrar progresso de análise
+        // Fase 2 — progresso de análise (230ms → mostrar → 980ms)
         setTimeout(() => {
           if (cycleId !== activeCycle) return;
           if (analisarBtn) analisarBtn.style.display = 'none';
           if (analysisRow) analysisRow.style.display = 'flex';
 
-          // Aguardar ~1200ms simulando a análise
           setTimeout(() => {
             if (cycleId !== activeCycle) return;
 
-            // Fase 3 — revelar itens (upload area some, itens aparecem em cascata)
+            // Fase 3 — cascade de itens
             if (uploadArea) uploadArea.style.display = 'none';
             if (itemsArea)  itemsArea.style.display  = 'block';
             if (footerEl)   footerEl.style.display   = 'flex';
@@ -373,57 +381,98 @@ function initHomeListPreview() {
             cascadeCards(cycleId, () => {
               if (cycleId !== activeCycle) return;
 
-              // Fase 4 — editar quantidade: caderno 4 → 6
+              // Fase 4a — Caderno: chip "Preferência: capa simples"
               setTimeout(() => {
                 if (cycleId !== activeCycle) return;
                 activate('hlpc-0');
-                stepQty(qty0, 6, 260, () => {
+                showChip(chip0, () => {
+                  if (cycleId !== activeCycle) return;
 
-                  // Fase 5 — marcar tesoura como "Não quero" (vermelho)
+                  // Fase 4b — Lápis de cor: chip "Marca: Faber-Castell ou similar"
                   setTimeout(() => {
                     if (cycleId !== activeCycle) return;
-                    clearActive();
-                    activate('hlpc-4');
-                    setTimeout(() => {
+                    activate('hlpc-1');
+                    showChip(chip1, () => {
                       if (cycleId !== activeCycle) return;
-                      clickFx(exc4, () => {
+
+                      // Fase 4c — Pasta: chip "Cor: amarela"
+                      setTimeout(() => {
                         if (cycleId !== activeCycle) return;
-                        if (card4) card4.classList.add('hlp-excluido');
-                        if (inc4)  inc4.classList.remove('hlp-ativo');
-                        if (exc4)  exc4.classList.add('hlp-ativo');
-                        if (counter) counter.textContent = '4 itens para comprar';
-
-                        // Fase 6 — clicar "Enviar para orçamento"
-                        setTimeout(() => {
+                        activate('hlpc-2');
+                        showChip(chip2, () => {
                           if (cycleId !== activeCycle) return;
-                          clearActive();
-                          clickFx(wppBtn, () => {
+
+                          // Fase 4d — Lápis grafite: qty 8 → 3
+                          setTimeout(() => {
                             if (cycleId !== activeCycle) return;
+                            activate('hlpc-3');
+                            stepQtyFast(qty3, 3, 115, () => {
 
-                            // Fase 7 — confirmação final
-                            setTimeout(() => {
-                              if (cycleId !== activeCycle) return;
-                              if (confirmEl) confirmEl.classList.add('hlp-confirm-visible');
-
-                              // Reiniciar ciclo
+                              // Fase 4e — Borracha: qty 2 → 1
                               setTimeout(() => {
                                 if (cycleId !== activeCycle) return;
-                                setTimeout(() => cycle(cycleId), 400);
-                              }, 2600);
-                            }, 380);
-                          });
-                        }, 620);
-                      });
-                    }, 480);
-                  }, 380);
+                                activate('hlpc-4');
+                                stepQtyFast(qty4, 1, 115, () => {
+
+                                  // Fase 5 — Tesoura: "Não quero" vermelho
+                                  setTimeout(() => {
+                                    if (cycleId !== activeCycle) return;
+                                    clearActive();
+                                    activate('hlpc-5');
+                                    setTimeout(() => {
+                                      if (cycleId !== activeCycle) return;
+                                      clickFx(exc5, () => {
+                                        if (cycleId !== activeCycle) return;
+                                        if (card5) card5.classList.add('hlp-excluido');
+                                        if (inc5)  inc5.classList.remove('hlp-ativo');
+                                        if (exc5)  exc5.classList.add('hlp-ativo');
+                                        if (counter) counter.textContent = '5 itens para comprar';
+
+                                        // Fase 6 — Mostrar resumo
+                                        setTimeout(() => {
+                                          if (cycleId !== activeCycle) return;
+                                          clearActive();
+                                          if (summaryEl) summaryEl.classList.add('hlp-summary-visible');
+
+                                          // Fase 6b — Clicar "Enviar lista para orçamento"
+                                          setTimeout(() => {
+                                            if (cycleId !== activeCycle) return;
+                                            clickFx(summarySend, () => {
+                                              if (cycleId !== activeCycle) return;
+
+                                              // Fase 7 — Confirmação
+                                              setTimeout(() => {
+                                                if (cycleId !== activeCycle) return;
+                                                if (summaryEl) summaryEl.classList.remove('hlp-summary-visible');
+                                                if (confirmEl) confirmEl.classList.add('hlp-confirm-visible');
+
+                                                setTimeout(() => {
+                                                  if (cycleId !== activeCycle) return;
+                                                  setTimeout(() => cycle(cycleId), 380);
+                                                }, 2400);
+                                              }, 320);
+                                            });
+                                          }, 850);
+                                        }, 500);
+                                      });
+                                    }, 340);
+                                  }, 260);
+                                });
+                              }, 220);
+                            });
+                          }, 250);
+                        });
+                      }, 220);
+                    });
+                  }, 210);
                 });
-              }, 280);
+              }, 240);
             });
 
-          }, 1200);
-        }, 280);
+          }, 980);
+        }, 230);
       });
-    }, 700);
+    }, 500);
   }
 
   const io = new IntersectionObserver((entries) => {
