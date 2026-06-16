@@ -2750,3 +2750,64 @@ body.is-leaving {
 @media (max-width: 480px) {
   .pedido-salvo-banner { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
+
+/* ======================== UPLOAD — MÚLTIPLOS ARQUIVOS ======================== */
+.upload-arquivos-lista {
+  display: block;
+  font-size: .73rem;
+  color: #166534;
+  margin-top: 4px;
+  opacity: .8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ======================== ERROS MULTI-ARQUIVO — BLOQUEIO E CONFIRMAÇÃO ======================== */
+.lista-erro-dica {
+  font-size: .82rem;
+  color: inherit;
+  opacity: .75;
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+.lista-erro-btn-novo {
+  display: inline-block;
+  margin-top: 12px;
+  background: white;
+  border: 1.5px solid currentColor;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: .84rem;
+  font-weight: 700;
+  color: #C53030;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.lista-erro-btn-novo:hover { background: #FFF5F5; }
+
+.lista-confirmacao-card {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+  color: #78350F;
+}
+.lista-confirmacao-card .lista-erro-ico {
+  font-size: 1.3rem;
+  color: #D97706;
+}
+.lista-confirmacao-btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.lista-confirmacao-btns .btn-primary {
+  font-size: .88rem;
+  padding: 10px 18px;
+}
+.lista-confirmacao-btns .btn-ghost {
+  font-size: .88rem;
+  padding: 10px 18px;
+}

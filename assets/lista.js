@@ -33,12 +33,15 @@ const LOADING_MSGS = [
   'Organizando os itens para você revisar...',
 ];
 
-const LIMITE_BYTES = 4 * 1024 * 1024;
+const LIMITE_BYTES       = 4 * 1024 * 1024;
+const MAX_ARQUIVOS       = 5;
+const LIMITE_TOTAL_BYTES = 20 * 1024 * 1024;
 
 // =============== ESTADO ===============
 
-let nextListNum = 1;
+let nextListNum   = 1;
 let pedidoEnviado = false;
+let pendingDados  = null;
 
 function rascunhoVazio() {
   return {
@@ -179,7 +182,7 @@ function limparTudoERecomecar() {
   formUpload.reset();
   clearTimeout(uploadFeedbackTimer);
   uploadArea.classList.remove('upload-lendo', 'upload-ok');
-  uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
+  uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
   ocultarBannerSalvo();
 
   trocarEstado('estado-upload');
@@ -229,19 +232,27 @@ function onArquivoEscolhido() {
   clearTimeout(uploadFeedbackTimer);
   uploadArea.classList.remove('upload-ok');
   uploadArea.classList.add('upload-lendo');
-  uploadLabel.innerHTML = '<span class="upload-spinner" aria-hidden="true"></span><span> Lendo arquivo...</span>';
-
-  const nome = files.length === 1
-    ? files[0].name
-    : `${files.length} arquivos selecionados`;
+  const loadingMsg = files.length > 1 ? 'Lendo arquivos...' : 'Lendo arquivo...';
+  uploadLabel.innerHTML = `<span class="upload-spinner" aria-hidden="true"></span><span> ${loadingMsg}</span>`;
 
   uploadFeedbackTimer = setTimeout(() => {
     uploadArea.classList.remove('upload-lendo');
     uploadArea.classList.add('upload-ok');
-    const span = document.createElement('span');
-    span.textContent = `✓ Arquivo adicionado: ${nome}`;
     uploadLabel.innerHTML = '';
-    uploadLabel.appendChild(span);
+
+    if (files.length === 1) {
+      const span = document.createElement('span');
+      span.textContent = `✓ Arquivo adicionado: ${files[0].name}`;
+      uploadLabel.appendChild(span);
+    } else {
+      const titulo = document.createElement('span');
+      titulo.textContent = `✓ ${files.length} arquivos adicionados`;
+      uploadLabel.appendChild(titulo);
+      const lista = document.createElement('span');
+      lista.className = 'upload-arquivos-lista';
+      lista.textContent = Array.from(files).map(f => f.name).join(' · ');
+      uploadLabel.appendChild(lista);
+    }
   }, 520);
 }
 
@@ -260,25 +271,105 @@ formUpload.addEventListener('submit', async (e) => {
   }
 
   if (!arquivos || arquivos.length === 0) { mostrarErro('Anexe a foto ou PDF da lista antes de continuar.'); return; }
+  if (arquivos.length > MAX_ARQUIVOS) {
+    mostrarErro(`Você pode enviar até ${MAX_ARQUIVOS} arquivos por lista. Selecione os mais completos da mesma criança.`);
+    return;
+  }
+  let totalBytes = 0;
   for (const arq of arquivos) {
     if (arq.size > LIMITE_BYTES) {
       mostrarErro(`O arquivo "${arq.name}" é maior que 4MB. Reduza o tamanho e tente novamente.`);
       return;
     }
+    totalBytes += arq.size;
+  }
+  if (totalBytes > LIMITE_TOTAL_BYTES) {
+    mostrarErro(`O conjunto de arquivos ultrapassou ${Math.round(LIMITE_TOTAL_BYTES / (1024 * 1024))}MB. Reduza o tamanho ou envie menos arquivos.`);
+    return;
   }
 
-  estado.rascunho.arquivoNome = arquivos[0].name;
-  await iniciarAnalise(arquivos[0]);
+  estado.rascunho.arquivoNome = Array.from(arquivos).map(f => f.name).join(', ');
+  await iniciarAnalise(Array.from(arquivos));
 });
 
 // =============== ANÁLISE COM IA ===============
-async function iniciarAnalise(arquivo) {
-  // Assign permanent number only when analysis actually starts
+
+function aplicarDadosAnalisados(dados) {
   if (!estado.rascunho.num) {
     estado.rascunho.num = nextListNum++;
-    estado.rascunho.id = 'lista_' + estado.rascunho.num + '_' + Date.now();
+    estado.rascunho.id  = 'lista_' + estado.rascunho.num + '_' + Date.now();
   }
+  estado.rascunho.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
+  estado.rascunho.itens     = dados.itens.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
+  renderizarFaixas();
+  renderizarResultado();
+  trocarEstado('estado-resultado');
+  scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
+}
 
+function mostrarErroMultiArquivo() {
+  const el = document.getElementById('lista-erro');
+  if (!el) return;
+  el.className = 'lista-erro-card';
+  el.innerHTML = `
+    <span class="lista-erro-ico" aria-hidden="true">⚠</span>
+    <div>
+      <strong>Identificamos listas de crianças diferentes.</strong>
+      <p>Os arquivos enviados parecem ter escolas ou séries diferentes. Para separar corretamente os materiais por nome e preferência, envie uma criança por vez.</p>
+      <p class="lista-erro-dica">Depois de finalizar esta lista, você poderá clicar em "Adicionar nova lista" para enviar a próxima.</p>
+      <button class="lista-erro-btn-novo" type="button" id="btn-escolher-novamente">Escolher arquivos novamente</button>
+    </div>`;
+  el.style.display = '';
+  scrollPara(el, 'nearest');
+
+  document.getElementById('btn-escolher-novamente')?.addEventListener('click', () => {
+    ocultarErro();
+    clearTimeout(uploadFeedbackTimer);
+    arquivoInput.value = '';
+    uploadArea.classList.remove('upload-lendo', 'upload-ok');
+    uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+    arquivoInput.click();
+  });
+}
+
+function mostrarConfirmacaoMultiArquivo() {
+  const el = document.getElementById('lista-erro');
+  if (!el) return;
+  el.className = 'lista-erro-card lista-confirmacao-card';
+  el.innerHTML = `
+    <span class="lista-erro-ico" aria-hidden="true">❓</span>
+    <div>
+      <strong>Esses arquivos são da mesma criança?</strong>
+      <p>Encontramos informações que podem indicar listas diferentes. Confirme se todos os arquivos pertencem ao mesmo aluno antes de continuar.</p>
+      <div class="lista-confirmacao-btns">
+        <button class="btn btn-primary" type="button" id="btn-confirmar-mesma-crianca">Sim, são da mesma criança</button>
+        <button class="btn btn-ghost"   type="button" id="btn-separar-listas">Não, vou separar as listas</button>
+      </div>
+    </div>`;
+  el.style.display = '';
+  scrollPara(el, 'nearest');
+
+  document.getElementById('btn-confirmar-mesma-crianca')?.addEventListener('click', () => {
+    if (!pendingDados) return;
+    el.style.display = 'none';
+    el.className = 'lista-erro-card';
+    const dados = pendingDados;
+    pendingDados = null;
+    aplicarDadosAnalisados(dados);
+  });
+
+  document.getElementById('btn-separar-listas')?.addEventListener('click', () => {
+    pendingDados = null;
+    el.className = 'lista-erro-card';
+    ocultarErro();
+    clearTimeout(uploadFeedbackTimer);
+    arquivoInput.value = '';
+    uploadArea.classList.remove('upload-lendo', 'upload-ok');
+    uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+  });
+}
+
+async function iniciarAnalise(arquivos) {
   const btnAnalisar = document.getElementById('btn-analisar');
   if (btnAnalisar) { btnAnalisar.disabled = true; btnAnalisar.textContent = 'Analisando...'; }
 
@@ -306,7 +397,7 @@ async function iniciarAnalise(arquivo) {
 
   try {
     const formData = new FormData();
-    formData.append('arquivo', arquivo);
+    for (const arq of arquivos) formData.append('arquivo', arq);
 
     const resposta = await fetch('/api/analisar-lista', { method: 'POST', body: formData });
     const dados = await resposta.json();
@@ -314,24 +405,33 @@ async function iniciarAnalise(arquivo) {
     clearInterval(interval);
 
     if (dados.ok && dados.itens?.length) {
-      estado.rascunho.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
-      estado.rascunho.itens = dados.itens.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
-      renderizarFaixas();
-      renderizarResultado();
+      const vc = dados.validacaoConjunto;
+
+      // Arquivos de crianças diferentes — bloqueado com certeza
+      if (vc && !vc.mesmaCriancaProvavel && vc.confianca === 'alta') {
+        reativarBtn();
+        trocarEstado('estado-upload');
+        mostrarErroMultiArquivo();
+        return;
+      }
+
+      // Incerto — pedir confirmação antes de continuar
+      if (vc && !vc.mesmaCriancaProvavel) {
+        pendingDados = dados;
+        reativarBtn();
+        trocarEstado('estado-upload');
+        mostrarConfirmacaoMultiArquivo();
+        return;
+      }
+
+      aplicarDadosAnalisados(dados);
       reativarBtn();
-      trocarEstado('estado-resultado');
-      scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
       return;
     }
 
     if (isLocal) {
-      estado.rascunho.metadados = META_MOCK;
-      estado.rascunho.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
-      renderizarFaixas();
-      renderizarResultado();
+      aplicarDadosAnalisados({ metadados: META_MOCK, itens: ITENS_MOCK });
       reativarBtn();
-      trocarEstado('estado-resultado');
-      scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
       return;
     }
 
@@ -343,13 +443,8 @@ async function iniciarAnalise(arquivo) {
     console.error('[lista] Erro na análise:', err);
 
     if (isLocal) {
-      estado.rascunho.metadados = META_MOCK;
-      estado.rascunho.itens = ITENS_MOCK.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
-      renderizarFaixas();
-      renderizarResultado();
+      aplicarDadosAnalisados({ metadados: META_MOCK, itens: ITENS_MOCK });
       reativarBtn();
-      trocarEstado('estado-resultado');
-      scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
       return;
     }
 
@@ -741,11 +836,16 @@ function gerarBlocoLista(lista, numero) {
   if (a.nome) tituloPartes.push(a.nome);
   const titulo = tituloPartes.join(' · ') + '*';
 
+  const arquivosNomes = lista.arquivoNome
+    ? lista.arquivoNome.split(',').map(s => s.trim()).filter(Boolean)
+    : [];
+
   const meta = [
     m.escola    ? `Escola: ${m.escola}`           : null,
     m.anoSerie  ? `Ano/Série: ${m.anoSerie}`      : null,
     m.segmento  ? `Segmento: ${m.segmento}`       : null,
     m.anoLetivo ? `Ano letivo: ${m.anoLetivo}`    : null,
+    arquivosNomes.length > 1 ? `Arquivos: ${arquivosNomes.join(', ')}` : null,
     a.preferenciaCor ? `Preferência de cor: ${a.preferenciaCor}` : null,
     a.observacoes    ? `Observações: ${a.observacoes}`           : null,
     `Critério para o orçamento: ${pref.label}`,
@@ -832,7 +932,7 @@ btnAdicionarLista.addEventListener('click', () => {
   clearTimeout(uploadFeedbackTimer);
   arquivoInput.value = '';
   uploadArea.classList.remove('upload-lendo', 'upload-ok');
-  uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
+  uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
 
   trocarEstado('estado-upload');
   const alvo = document.getElementById('listas-container');

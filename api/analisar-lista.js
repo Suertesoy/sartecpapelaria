@@ -4,15 +4,18 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export const config = { api: { bodyParser: false } };
 
-const TIPOS_ACEITOS = ['image/jpeg', 'image/png', 'application/pdf'];
-const LIMITE_BYTES = 4 * 1024 * 1024;
+const TIPOS_ACEITOS       = ['image/jpeg', 'image/png', 'application/pdf'];
+const LIMITE_BYTES        = 4 * 1024 * 1024;
+const LIMITE_TOTAL_BYTES  = 20 * 1024 * 1024;
+const MAX_ARQUIVOS        = 5;
 const MODELO = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 
 const PROMPT_SISTEMA = `Você é um assistente especializado em leitura de listas escolares brasileiras para papelaria.
 
-Sua tarefa é analisar a lista recebida e retornar dois blocos:
+Sua tarefa é analisar o(s) arquivo(s) recebido(s) e retornar:
 1. Metadados da lista (escola, ano/série, segmento, ano letivo)
 2. Apenas os itens que a família provavelmente quer comprar ou pedir orçamento para a papelaria
+3. Validação se os arquivos pertencem à mesma criança (validacaoConjunto)
 
 ━━━ METADADOS ━━━
 Extraia do documento:
@@ -54,6 +57,23 @@ Não retorne nada que seja:
 - Se um item puder ser comprado mas houver dúvida, inclua com confianca "baixa".
 - Retorne apenas JSON válido, sem markdown, sem texto antes ou depois.
 
+━━━ VALIDAÇÃO DO CONJUNTO (obrigatório sempre) ━━━
+Preencha validacaoConjunto com base em todos os arquivos analisados.
+
+BLOQUEAR (mesmaCriancaProvavel: false, confianca: "alta") SOMENTE quando houver evidência clara:
+- Escolas explicitamente diferentes entre os arquivos.
+- Séries/anos claramente incompatíveis entre os arquivos.
+- Dois conjuntos completos de lista de alunos diferentes com cabeçalhos incompatíveis.
+
+NÃO BLOQUEAR em casos como:
+- Seções internas da mesma lista: material individual, coletivo, artes, higiene, livros, uso diário, material que fica na escola.
+- Páginas diferentes da mesma lista (página 1 + página 2).
+- Lista regular + lista de artes da mesma escola e série.
+- Um arquivo sem escola/série identificável e sem conflito com os demais.
+
+CONFIANÇA: "alta" = evidência definitiva; "media" = suspeita sem certeza; "baixa" = dados insuficientes.
+Se houver apenas 1 arquivo: mesmaCriancaProvavel: true, confianca: "alta", motivo: "Arquivo único".
+
 ━━━ SCHEMA OBRIGATÓRIO ━━━
 {
   "metadados": {
@@ -73,7 +93,14 @@ Não retorne nada que seja:
       "confianca": "alta|media|baixa"
     }
   ],
-  "avisos": ["string"]
+  "avisos": ["string"],
+  "validacaoConjunto": {
+    "mesmaCriancaProvavel": true,
+    "confianca": "alta|media|baixa",
+    "escolasIdentificadas": [],
+    "seriesIdentificadas": [],
+    "motivo": "string"
+  }
 }`;
 
 const UNIDADES_VALIDAS = ['un', 'caixa', 'conjunto', 'pacote', 'rolo', 'outro'];
@@ -117,6 +144,19 @@ function normalizarItens(itens) {
     }));
 }
 
+function normalizarValidacaoConjunto(vc) {
+  if (!vc || typeof vc !== 'object') {
+    return { mesmaCriancaProvavel: true, confianca: 'alta', escolasIdentificadas: [], seriesIdentificadas: [], motivo: '' };
+  }
+  return {
+    mesmaCriancaProvavel: vc.mesmaCriancaProvavel !== false,
+    confianca:            ['alta', 'media', 'baixa'].includes(vc.confianca) ? vc.confianca : 'baixa',
+    escolasIdentificadas: Array.isArray(vc.escolasIdentificadas) ? vc.escolasIdentificadas.map(String) : [],
+    seriesIdentificadas:  Array.isArray(vc.seriesIdentificadas)  ? vc.seriesIdentificadas.map(String)  : [],
+    motivo:               typeof vc.motivo === 'string' ? vc.motivo.trim() : '',
+  };
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método não permitido.' });
@@ -126,35 +166,61 @@ export default async function handler(req, res) {
     return res.status(503).json({ ok: false, error: 'API de IA não configurada no servidor.' });
   }
 
-  // Parse multipart/form-data
+  // Parse multipart/form-data — múltiplos arquivos no campo "arquivo"
   const form = formidable({ maxFileSize: LIMITE_BYTES });
-  let arquivo;
+  let arquivos;
   try {
     const [, files] = await form.parse(req);
-    arquivo = files?.arquivo?.[0];
+    const raw = files?.arquivo;
+    arquivos = Array.isArray(raw) ? raw : (raw ? [raw] : []);
   } catch (err) {
     const ehTamanho = err.code === 1009 || String(err.message).includes('maxFileSize');
     return res.status(400).json({
       ok: false,
-      error: ehTamanho ? 'Arquivo muito grande. Máximo permitido: 4MB.' : 'Erro ao processar o arquivo enviado.',
+      error: ehTamanho
+        ? 'Arquivo muito grande. Máximo por arquivo: 4MB.'
+        : 'Erro ao processar os arquivos enviados.',
     });
   }
 
-  if (!arquivo) {
+  if (!arquivos.length) {
     return res.status(400).json({ ok: false, error: 'Nenhum arquivo enviado. Envie o campo "arquivo".' });
   }
-  if (!TIPOS_ACEITOS.includes(arquivo.mimetype)) {
-    return res.status(400).json({ ok: false, error: 'Tipo de arquivo não aceito. Envie JPG, PNG ou PDF.' });
-  }
-  if (arquivo.size > LIMITE_BYTES) {
-    return res.status(400).json({ ok: false, error: 'Arquivo muito grande. Máximo permitido: 4MB.' });
+  if (arquivos.length > MAX_ARQUIVOS) {
+    return res.status(400).json({ ok: false, error: `Envie no máximo ${MAX_ARQUIVOS} arquivos por análise.` });
   }
 
-  const base64 = readFileSync(arquivo.filepath).toString('base64');
+  let totalBytes = 0;
+  for (const arq of arquivos) {
+    if (!TIPOS_ACEITOS.includes(arq.mimetype)) {
+      return res.status(400).json({ ok: false, error: `Arquivo "${arq.originalFilename}" não aceito. Envie JPG, PNG ou PDF.` });
+    }
+    if (arq.size > LIMITE_BYTES) {
+      return res.status(400).json({ ok: false, error: `O arquivo "${arq.originalFilename}" é maior que 4MB. Reduza o tamanho e tente novamente.` });
+    }
+    totalBytes += arq.size;
+  }
+  if (totalBytes > LIMITE_TOTAL_BYTES) {
+    return res.status(400).json({ ok: false, error: `O conjunto ultrapassou ${Math.round(LIMITE_TOTAL_BYTES / (1024 * 1024))}MB. Reduza o tamanho ou envie menos arquivos.` });
+  }
 
-  const blocoArquivo = arquivo.mimetype === 'application/pdf'
-    ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
-    : { type: 'image', source: { type: 'base64', media_type: arquivo.mimetype, data: base64 } };
+  // Montar blocos de conteúdo para Claude
+  const contentBlocks = [];
+  for (const arq of arquivos) {
+    const base64 = readFileSync(arq.filepath).toString('base64');
+    contentBlocks.push(
+      arq.mimetype === 'application/pdf'
+        ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
+        : { type: 'image',    source: { type: 'base64', media_type: arq.mimetype,        data: base64 } }
+    );
+  }
+  const qtd = arquivos.length;
+  contentBlocks.push({
+    type: 'text',
+    text: qtd === 1
+      ? 'Analise esta lista escolar e retorne os metadados, os itens para orçamento e validacaoConjunto conforme o schema.'
+      : `Analise estes ${qtd} arquivos de lista escolar como um conjunto. Extraia todos os itens, preencha metadados consolidados e avalie em validacaoConjunto se os arquivos parecem ser da mesma criança.`,
+  });
 
   let respostaTexto;
   try {
@@ -163,15 +229,7 @@ export default async function handler(req, res) {
       model: MODELO,
       max_tokens: 4096,
       system: PROMPT_SISTEMA,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            blocoArquivo,
-            { type: 'text', text: 'Analise esta lista escolar e retorne os metadados e os itens para orçamento conforme o schema.' },
-          ],
-        },
-      ],
+      messages: [{ role: 'user', content: contentBlocks }],
     });
     respostaTexto = msg.content?.[0]?.text ?? '';
   } catch (err) {
@@ -188,19 +246,21 @@ export default async function handler(req, res) {
     return res.status(502).json({ ok: false, error: 'A IA retornou um formato inesperado. Tente novamente.' });
   }
 
-  const metadados = normalizarMetadados(dados.metadados);
-  const itens = normalizarItens(dados.itens);
-  const avisos = Array.isArray(dados.avisos)
+  const metadados          = normalizarMetadados(dados.metadados);
+  const itens              = normalizarItens(dados.itens);
+  const avisos             = Array.isArray(dados.avisos)
     ? dados.avisos.filter(a => typeof a === 'string').slice(0, 5)
     : [];
+  const validacaoConjunto  = normalizarValidacaoConjunto(dados.validacaoConjunto);
 
   if (itens.length === 0) {
     return res.status(200).json({
       ok: false,
       metadados,
+      validacaoConjunto,
       error: 'Não consegui identificar itens para orçamento nesta lista. Tente enviar uma foto mais nítida ou um PDF.',
     });
   }
 
-  return res.status(200).json({ ok: true, metadados, itens, avisos });
+  return res.status(200).json({ ok: true, metadados, itens, avisos, validacaoConjunto });
 }
