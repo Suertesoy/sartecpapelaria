@@ -451,7 +451,10 @@ section { padding: 64px 0; }
 .faixa-track:hover { animation-play-state: paused; }
 @keyframes marquee-scroll {
   from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  to   { transform: translateX(-25%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .faixa-track { animation: none; }
 }
 .escola-pill {
   display: inline-flex;

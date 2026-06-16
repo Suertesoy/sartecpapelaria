@@ -114,7 +114,7 @@ function renderDeliveryFaixa() {
     <a href="${wpp}" target="_blank" rel="noopener" class="escolas-faixa-link" aria-label="Entrega grátis em São José dos Campos para compras acima de R$ 100">
       <div class="escolas-faixa">
         <div class="faixa-track">
-          ${pills}${pills}
+          ${pills}${pills}${pills}${pills}
         </div>
       </div>
     </a>
@@ -146,7 +146,7 @@ function renderEscolasFaixa() {
     <a href="escolas.html" class="escolas-faixa-link" aria-label="Saiba mais sobre parceria com escolas">
       <div class="escolas-faixa">
         <div class="faixa-track">
-          ${pills}${pills}
+          ${pills}${pills}${pills}${pills}
         </div>
       </div>
     </a>
