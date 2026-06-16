@@ -122,29 +122,35 @@ uploadArea.addEventListener('drop', (e) => {
 arquivoInput.addEventListener('change', onArquivoEscolhido);
 
 function onArquivoEscolhido() {
-  const f = arquivoInput.files?.[0];
-  if (!f) return;
-  uploadLabel.textContent = `✓ ${f.name}`;
+  const files = arquivoInput.files;
+  if (!files || files.length === 0) return;
+  if (files.length === 1) {
+    uploadLabel.textContent = `✓ 1 arquivo selecionado: ${files[0].name}`;
+  } else {
+    uploadLabel.textContent = `✓ ${files.length} arquivos selecionados`;
+  }
 }
 
 formUpload.addEventListener('submit', async (e) => {
   e.preventDefault();
   const nome = document.getElementById('nome').value.trim();
   const whatsapp = inputWhatsapp.value.trim();
-  const arquivo = arquivoInput.files?.[0];
+  const arquivos = arquivoInput.files;
 
   ocultarErro();
   if (!nome || !whatsapp) { mostrarErro('Preencha nome e WhatsApp antes de continuar.'); return; }
-  if (!arquivo) { mostrarErro('Anexe a foto ou PDF da lista antes de continuar.'); return; }
-  if (arquivo.size > LIMITE_BYTES) {
-    mostrarErro('O arquivo é maior que 4MB. Reduza o tamanho e tente novamente.');
-    return;
+  if (!arquivos || arquivos.length === 0) { mostrarErro('Anexe a foto ou PDF da lista antes de continuar.'); return; }
+  for (const arq of arquivos) {
+    if (arq.size > LIMITE_BYTES) {
+      mostrarErro(`O arquivo "${arq.name}" é maior que 4MB. Reduza o tamanho e tente novamente.`);
+      return;
+    }
   }
 
   estado.nome = nome;
   estado.whatsapp = whatsapp;
 
-  await iniciarAnalise(arquivo);
+  await iniciarAnalise(arquivos[0]);
 });
 
 // =============== ANÁLISE COM IA ===============
@@ -591,7 +597,7 @@ btnAdicionarLista.addEventListener('click', () => {
 
   // Limpa o campo de arquivo
   formUpload.querySelector('input[type="file"]').value = '';
-  uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+  uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
 
   trocarEstado('estado-upload');
   scrollPara(document.getElementById('estado-upload'), 'start');
@@ -606,7 +612,7 @@ btnRecomecar.addEventListener('click', () => {
     if (infoDiv) infoDiv.style.display = 'none';
 
     formUpload.reset();
-    uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+    uploadLabel.textContent = 'Clique ou arraste os arquivos da lista aqui';
 
     trocarEstado('estado-upload');
     scrollPara(document.getElementById('estado-upload'), 'start');

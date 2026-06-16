@@ -79,8 +79,7 @@
           <span class="kicker">Lista Escolar</span>
           <h2>Envie sua lista escolar</h2>
           <p class="sub">
-            Tire uma foto da lista impressa ou envie o PDF que a escola mandou.
-            Veja os itens organizados, marque o que já tem em casa e envie pelo WhatsApp — nossa equipe confirma disponibilidade e preços com você.
+            Tire foto da lista impressa ou envie o PDF que a escola mandou. Você pode anexar mais de uma página da mesma lista, revisar os itens encontrados e enviar tudo pelo WhatsApp.
           </p>
           <p style="font-size:.83rem; color:var(--texto-suave); margin-top:-8px;">
             A ferramenta está em evolução. As imagens são ilustrativas e as identificações estão sendo aprimoradas.
@@ -101,13 +100,18 @@
             </div>
 
             <div class="form-group">
-              <label>Arquivo da lista</label>
+              <label>Arquivos da lista</label>
               <div class="upload-area" id="upload-area">
                 <div class="icon">📋</div>
-                <div class="label" id="upload-label">Clique ou arraste sua lista aqui</div>
-                <div class="hint">PDF, JPG ou PNG • até 4MB</div>
-                <input type="file" id="arquivo" accept=".pdf,.jpg,.jpeg,.png" style="display:none" />
+                <div class="label" id="upload-label">Clique ou arraste os arquivos da lista aqui</div>
+                <div class="hint">PDF, JPG ou PNG · mais de uma página da mesma lista · até 4MB por arquivo</div>
+                <input type="file" id="arquivo" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none" />
               </div>
+            </div>
+
+            <div class="aviso-lista-unica">
+              <span class="aviso-lista-unica-ico" aria-hidden="true">ℹ</span>
+              <p>Envie uma lista por vez. Você pode anexar várias fotos ou PDFs da mesma lista, como frente e verso ou páginas diferentes. Para listas de filhos diferentes, faça um envio separado para cada criança.</p>
             </div>
 
             <div id="info-adicionando-lista" class="info-adicionando" style="display:none">
