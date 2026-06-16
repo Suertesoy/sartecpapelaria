@@ -19,9 +19,37 @@
     .wpp-btn:hover { background: #1FB858 !important; }
     .btn-copy-whatsapp { background: #DC2626 !important; box-shadow: 0 4px 14px rgba(220,38,38,0.28) !important; }
     .btn-copy-whatsapp:hover { background: #B91C1C !important; }
-    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    @media (max-width: 760px) { .services-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } }
+
+    /* Grid de serviços — 2 colunas */
+    .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    @media (max-width: 560px) { .services-grid { grid-template-columns: 1fr; } }
+
+    /* Cards expansíveis */
+    .copias-card { background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; overflow: hidden; transition: border-color .2s, box-shadow .2s; }
+    .copias-card[open] { border-color: #BFDBFE; box-shadow: 0 2px 16px rgba(30,58,138,.09); }
+    .copias-card-header { list-style: none; cursor: pointer; padding: 22px 22px 22px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .copias-card-header::-webkit-details-marker { display: none; }
+    .copias-card-header:hover { background: #F1F5F9; }
+    .copias-card-intro { display: flex; align-items: flex-start; gap: 14px; flex: 1; min-width: 0; }
+    .copias-card-icone { width: 10px; height: 10px; transform: rotate(45deg); border-radius: 2px; flex-shrink: 0; margin-top: 5px; }
+    .copias-card-titulo { font-family: Archivo, sans-serif; font-weight: 700; font-size: 16.5px; color: #0F172A; display: block; margin-bottom: 4px; }
+    .copias-card-desc { margin: 0; font-size: 13.5px; color: #64748B; line-height: 1.4; }
+    .copias-ver { font-size: 13px; font-weight: 600; color: #1E3A8A; white-space: nowrap; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .copias-seta { font-size: 18px; color: #94A3B8; flex-shrink: 0; transition: transform .2s; display: inline-block; line-height: 1; }
+    .copias-card[open] .copias-seta { transform: rotate(90deg); }
+    .copias-card[open] .copias-ver-label { display: none; }
+
+    /* Lista de preços */
+    .copias-preco-lista { padding: 4px 24px 20px; border-top: 1px solid #E2E8F0; }
+    .copias-preco-subtitulo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #94A3B8; margin: 16px 0 6px; }
+    .copias-preco-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid #F1F5F9; }
+    .copias-preco-row:last-of-type { border-bottom: none; }
+    .copias-preco-row span:first-child { color: #374151; font-size: 14px; flex: 1; }
+    .copias-preco-row span:last-child { color: #0F172A; font-weight: 700; font-size: 14px; white-space: nowrap; }
+    .copias-preco-sub span:first-child { font-size: 12.5px; color: #6B7280; padding-left: 12px; }
+    .copias-preco-sub span:last-child { font-size: 13px; font-weight: 600; color: #374151; }
+    .copias-preco-obs { font-size: 12.5px; color: #6B7280; margin: 12px 0 0; line-height: 1.5; font-style: italic; }
+    .copias-nota-precos { margin: 28px 0 0; font-size: 14px; color: #64748B; line-height: 1.55; text-align: center; max-width: 640px; margin-left: auto; margin-right: auto; }
   </style>
 </head>
 <body>
@@ -57,42 +85,115 @@
       </div>
     </section>
 
-    <!-- Serviços -->
+    <!-- Serviços com preços expansíveis -->
     <section style="background: #FFFFFF">
       <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px">
-        <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 32px; margin: 0 0 40px; letter-spacing: -0.01em">O que o setor faz</h2>
+        <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 32px; margin: 0 0 8px; letter-spacing: -0.01em">O que o setor faz</h2>
+        <p style="margin: 0 0 36px; font-size: 16px; color: #475569">Clique em uma categoria para ver os preços de referência.</p>
+
         <div class="services-grid">
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 8px">
-            <span style="width: 12px; height: 12px; background: #DC2626; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 6px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Cópias de documentos</strong>
-            <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Simples ou em volume, na hora.</p>
-          </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 8px">
-            <span style="width: 12px; height: 12px; background: #1E3A8A; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 6px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Impressão P&amp;B e colorida</strong>
-            <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Trabalhos, apostilas, contratos e apresentações.</p>
-          </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 8px">
-            <span style="width: 12px; height: 12px; background: #3B82F6; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 6px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Impressão de fotos</strong>
-            <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Direto do celular para o papel.</p>
-          </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 8px">
-            <span style="width: 12px; height: 12px; background: #B91C1C; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 6px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Encadernação</strong>
-            <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Espiral e capa dura para trabalhos e apostilas.</p>
-          </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 8px">
-            <span style="width: 12px; height: 12px; background: #1E3A8A; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 6px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Plastificação</strong>
-            <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Documentos, crachás e cartazes protegidos.</p>
-          </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 8px">
-            <span style="width: 12px; height: 12px; background: #DC2626; transform: rotate(45deg); border-radius: 2px; display: block; margin-bottom: 6px"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Materiais gráficos simples</strong>
-            <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Panfletos, cartazes e convites sem complicação.</p>
-          </div>
+
+          <!-- Cópias de documentos -->
+          <details class="copias-card">
+            <summary class="copias-card-header">
+              <div class="copias-card-intro">
+                <span class="copias-card-icone" style="background:#DC2626"></span>
+                <div>
+                  <strong class="copias-card-titulo">Cópias de documentos</strong>
+                  <p class="copias-card-desc">Cópias simples, coloridas, ampliadas ou reduzidas.</p>
+                </div>
+              </div>
+              <span class="copias-ver"><span class="copias-ver-label">Ver preços</span><span class="copias-seta">›</span></span>
+            </summary>
+            <div class="copias-preco-lista">
+              <p class="copias-preco-subtitulo">Tamanho natural</p>
+              <div class="copias-preco-row"><span>Cópia P&amp;B A4</span><span>R$ 0,50</span></div>
+              <div class="copias-preco-row copias-preco-sub"><span>↳ acima de 100 cópias do mesmo documento</span><span>R$ 0,30</span></div>
+              <div class="copias-preco-row"><span>Cópia colorida A4</span><span>R$ 3,00</span></div>
+              <div class="copias-preco-row"><span>Cópia P&amp;B A3</span><span>R$ 1,00</span></div>
+              <div class="copias-preco-row"><span>Cópia colorida A3</span><span>R$ 6,00</span></div>
+              <p class="copias-preco-subtitulo">Ampliada / reduzida</p>
+              <div class="copias-preco-row"><span>P&amp;B A4</span><span>R$ 0,60</span></div>
+              <div class="copias-preco-row"><span>P&amp;B A3</span><span>R$ 1,20</span></div>
+              <div class="copias-preco-row"><span>Colorida A4</span><span>R$ 5,00</span></div>
+              <div class="copias-preco-row"><span>Colorida A3</span><span>R$ 10,00</span></div>
+            </div>
+          </details>
+
+          <!-- Impressões -->
+          <details class="copias-card">
+            <summary class="copias-card-header">
+              <div class="copias-card-intro">
+                <span class="copias-card-icone" style="background:#1E3A8A"></span>
+                <div>
+                  <strong class="copias-card-titulo">Impressões</strong>
+                  <p class="copias-card-desc">Impressão P&amp;B, colorida e em papéis especiais.</p>
+                </div>
+              </div>
+              <span class="copias-ver"><span class="copias-ver-label">Ver preços</span><span class="copias-seta">›</span></span>
+            </summary>
+            <div class="copias-preco-lista">
+              <p class="copias-preco-subtitulo">Papel comum</p>
+              <div class="copias-preco-row"><span>Impressão P&amp;B A4</span><span>R$ 1,50</span></div>
+              <div class="copias-preco-row"><span>Impressão P&amp;B A3</span><span>R$ 3,00</span></div>
+              <div class="copias-preco-row"><span>Impressão colorida A4</span><span>R$ 3,50</span></div>
+              <div class="copias-preco-row"><span>Impressão colorida A3</span><span>R$ 6,00</span></div>
+              <p class="copias-preco-subtitulo">Papel Canson</p>
+              <div class="copias-preco-row"><span>Impressão P&amp;B A4</span><span>R$ 2,00</span></div>
+              <div class="copias-preco-row"><span>Impressão P&amp;B A3</span><span>R$ 4,00</span></div>
+              <div class="copias-preco-row"><span>Impressão colorida A4</span><span>R$ 4,00</span></div>
+              <div class="copias-preco-row"><span>Impressão colorida A3</span><span>R$ 8,00</span></div>
+              <p class="copias-preco-subtitulo">Papel fotográfico</p>
+              <div class="copias-preco-row"><span>Impressão P&amp;B A4</span><span>R$ 2,25</span></div>
+              <div class="copias-preco-row"><span>Impressão P&amp;B A3</span><span>R$ 5,00</span></div>
+              <div class="copias-preco-row"><span>Impressão colorida A4</span><span>R$ 4,50</span></div>
+              <div class="copias-preco-row"><span>Impressão colorida A3</span><span>R$ 9,00</span></div>
+              <p class="copias-preco-obs">Também imprimimos em papéis mais grossos, até 180g, conforme disponibilidade e arquivo.</p>
+            </div>
+          </details>
+
+          <!-- Encadernações -->
+          <details class="copias-card">
+            <summary class="copias-card-header">
+              <div class="copias-card-intro">
+                <span class="copias-card-icone" style="background:#B91C1C"></span>
+                <div>
+                  <strong class="copias-card-titulo">Encadernações</strong>
+                  <p class="copias-card-desc">Encadernação de trabalhos, apostilas e documentos.</p>
+                </div>
+              </div>
+              <span class="copias-ver"><span class="copias-ver-label">Ver preços</span><span class="copias-seta">›</span></span>
+            </summary>
+            <div class="copias-preco-lista">
+              <div class="copias-preco-row"><span>Até 100 folhas</span><span>R$ 10,00</span></div>
+              <div class="copias-preco-row"><span>Até 300 folhas</span><span>R$ 15,00</span></div>
+              <div class="copias-preco-row"><span>Até 500 folhas</span><span>R$ 29,00</span></div>
+            </div>
+          </details>
+
+          <!-- Plastificações -->
+          <details class="copias-card">
+            <summary class="copias-card-header">
+              <div class="copias-card-intro">
+                <span class="copias-card-icone" style="background:#1E3A8A"></span>
+                <div>
+                  <strong class="copias-card-titulo">Plastificações</strong>
+                  <p class="copias-card-desc">Plastificação de documentos e folhas em diferentes tamanhos.</p>
+                </div>
+              </div>
+              <span class="copias-ver"><span class="copias-ver-label">Ver preços</span><span class="copias-seta">›</span></span>
+            </summary>
+            <div class="copias-preco-lista">
+              <div class="copias-preco-row"><span>Documento</span><span>R$ 7,00</span></div>
+              <div class="copias-preco-row"><span>A5</span><span>R$ 8,00</span></div>
+              <div class="copias-preco-row"><span>A4</span><span>R$ 19,00</span></div>
+              <div class="copias-preco-row"><span>A3</span><span>consultar</span></div>
+            </div>
+          </details>
+
         </div>
+
+        <p class="copias-nota-precos">Valores de referência do setor. Para arquivos, grandes volumes ou acabamentos, <a href="https://wa.me/551239341666?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20confirmar%20valor%20e%20prazo." target="_blank" rel="noopener" style="color:#1E3A8A; font-weight:600; text-decoration:underline">envie pelo WhatsApp</a> para confirmar valor e prazo.</p>
       </div>
     </section>
 
