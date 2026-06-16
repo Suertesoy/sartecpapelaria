@@ -644,87 +644,64 @@ section { padding: 64px 0; }
   .footer-brand img { width: 140px; }
 }
 
-/* ======================== HERO LISTA V2 (sem imagem, dois colunas) ======================== */
-.hero-lista-v2 {
-  background: linear-gradient(135deg, #1E3A8A 0%, #1a317a 60%, #142868 100%);
-  min-height: auto;
+/* ======================== PASSO A PASSO — LISTA ESCOLAR ======================== */
+.lista-como-funciona {
+  background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
 }
-.hero-lista-v2 .internal-hero-content {
-  justify-content: space-between;
-  align-items: center;
-  gap: 48px;
-}
-.hero-lista-v2 .internal-hero-card {
-  flex: 1 1 auto;
-  max-width: 460px;
-}
-.hero-lista-steps {
-  flex: 0 0 340px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 18px;
-  padding: 28px 28px 24px;
-  color: white;
-}
-.hero-lista-steps-titulo {
-  font-family: Archivo, sans-serif;
-  font-weight: 700;
-  font-size: .76rem;
-  color: rgba(255, 255, 255, 0.50);
-  text-transform: uppercase;
-  letter-spacing: .10em;
-  margin: 0 0 20px;
-}
-.hero-lista-step {
+.lista-passos {
   display: flex;
-  gap: 14px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 36px 0;
+}
+.lista-passo {
+  display: flex;
+  gap: 16px;
   align-items: flex-start;
+  flex: 1;
+  padding: 0 28px;
+  border-right: 1px solid #E2E8F0;
 }
-.hero-lista-step + .hero-lista-step {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
-}
-.hero-lista-step-num {
-  width: 26px;
-  height: 26px;
+.lista-passo:first-child { padding-left: 0; }
+.lista-passo:last-child { border-right: none; padding-right: 0; }
+.lista-passo-num {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.13);
-  color: rgba(255, 255, 255, 0.9);
+  background: #1E3A8A;
+  color: #FFFFFF;
   font-family: Archivo, sans-serif;
   font-weight: 800;
-  font-size: .82rem;
+  font-size: .88rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-top: 2px;
 }
-.hero-lista-step-body strong {
+.lista-passo strong {
   display: block;
   font-family: Archivo, sans-serif;
   font-weight: 700;
-  font-size: .93rem;
-  color: #FFFFFF;
-  margin: 0 0 3px;
+  font-size: .97rem;
+  color: #0F172A;
+  margin-bottom: 4px;
 }
-.hero-lista-step-body p {
-  font-size: .82rem;
-  color: rgba(255, 255, 255, 0.68);
+.lista-passo p {
+  font-size: .86rem;
+  color: #475569;
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.5;
 }
-@media (max-width: 900px) {
-  .hero-lista-v2 .internal-hero-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 28px;
+@media (max-width: 768px) {
+  .lista-passos { flex-direction: column; padding: 24px 0; gap: 0; }
+  .lista-passo {
+    padding: 18px 0;
+    border-right: none;
+    border-bottom: 1px solid #E2E8F0;
   }
-  .hero-lista-v2 .internal-hero-card { max-width: 100%; }
-  .hero-lista-steps { flex: none; width: 100%; max-width: 520px; }
-}
-@media (max-width: 640px) {
-  .hero-lista-steps { padding: 20px 18px 18px; }
+  .lista-passo:last-child { border-bottom: none; }
 }
 
 /* ======================== BOTÃO FLUTUANTE ======================== */
@@ -2044,8 +2021,7 @@ section { padding: 64px 0; }
   position: relative;
   overflow: hidden;
   background: #1E3A8A;
-  /* min-height definido por modificador ou default */
-  min-height: 520px;
+  min-height: 540px;
   display: flex;
   align-items: stretch;
 }
@@ -2177,17 +2153,16 @@ section { padding: 64px 0; }
 .internal-hero-btn-sec:hover { background: rgba(30, 58, 138, 0.07); color: var(--azul); }
 
 /* ---- Modificadores de imagem por página ---- */
-/* (usados como fallback se picture não carregar ou como bg-image) */
-.hero-produtos    .internal-hero-media img { object-position: right center; }
-.hero-lista-escolar .internal-hero-media img { object-position: right center; }
-.hero-escolas     .internal-hero-media img { object-position: right center; }
-.hero-empresas    .internal-hero-media img { object-position: right center; }
-.hero-copias      .internal-hero-media img { object-position: right center; }
+.hero-produtos      .internal-hero-media img { object-position: center center; }
+.hero-lista-escolar .internal-hero-media img { object-position: center center; }
+.hero-escolas       .internal-hero-media img { object-position: center center; }
+.hero-empresas      .internal-hero-media img { object-position: center center; }
+.hero-copias        .internal-hero-media img { object-position: center center; }
 
 /* ---- Responsividade mobile ---- */
 @media (max-width: 640px) {
   .internal-hero {
-    min-height: 640px;
+    min-height: 680px;
   }
   .internal-hero-media img {
     object-position: center bottom;
