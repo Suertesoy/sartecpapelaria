@@ -265,22 +265,23 @@ function initPageTransitions() {
    HOME — ANIMATED LIST PREVIEW
    ========================================================= */
 function initHomeListPreview() {
-  const panel      = document.getElementById('home-list-preview');
+  const panel       = document.getElementById('home-list-preview');
   if (!panel) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const qty0       = document.getElementById('hlp-qty-0');
-  const qty2       = document.getElementById('hlp-qty-2');
-  const pref1      = document.getElementById('hlp-pref-1');
-  const inc3       = document.getElementById('hlp-inc-3');
-  const exc3       = document.getElementById('hlp-exc-3');
-  const card3      = document.getElementById('hlpc-3');
-  const counter    = document.getElementById('hlp-footer-count');
-  const wppBtn     = document.getElementById('hlp-wpp-btn');
-  const popup      = document.getElementById('hlp-popup');
-  const popupSend  = document.getElementById('hlp-popup-send');
-  const uploadStep = document.getElementById('hlp-upload-step');
-  const allCards   = panel.querySelectorAll('.hlp-card');
+  const uploadArea  = document.getElementById('hlp-upload-area');
+  const analisarBtn = document.getElementById('hlp-analisar-btn');
+  const analysisRow = document.getElementById('hlp-analysis-row');
+  const itemsArea   = document.getElementById('hlp-items-area');
+  const footerEl    = document.getElementById('hlp-footer');
+  const qty0        = document.getElementById('hlp-qty-0');
+  const inc4        = document.getElementById('hlp-inc-4');
+  const exc4        = document.getElementById('hlp-exc-4');
+  const card4       = document.getElementById('hlpc-4');
+  const counter     = document.getElementById('hlp-footer-count');
+  const wppBtn      = document.getElementById('hlp-wpp-btn');
+  const confirmEl   = document.getElementById('hlp-confirm');
+  const allCards    = panel.querySelectorAll('.hlp-card');
 
   function clearActive() { allCards.forEach(c => c.classList.remove('hlp-is-active')); }
   function activate(id)  { clearActive(); const c = document.getElementById(id); if (c) c.classList.add('hlp-is-active'); }
@@ -307,124 +308,122 @@ function initHomeListPreview() {
     });
   }
 
-  function typeText(el, text, cb) {
-    if (!el) { if (cb) cb(); return; }
-    el.style.transition = 'max-height .3s ease, opacity .3s ease, margin-top .3s ease';
-    el.style.maxHeight  = '22px';
-    el.style.opacity    = '1';
-    el.style.marginTop  = '4px';
-    el.textContent = '';
-    let i = 0;
-    const iv = setInterval(() => {
-      el.textContent = text.slice(0, ++i);
-      if (i >= text.length) { clearInterval(iv); if (cb) setTimeout(cb, 400); }
-    }, 72);
-  }
-
-  function hidePref(el) {
-    if (!el) return;
-    el.style.transition = 'none';
-    el.style.maxHeight  = '0';
-    el.style.opacity    = '0';
-    el.style.marginTop  = '0';
-    el.textContent      = '';
-  }
-
   function reset() {
-    panel.classList.remove('hlp-show-upload');
-    clearActive();
+    if (uploadArea)  uploadArea.style.display  = '';
+    if (itemsArea)   itemsArea.style.display   = '';
+    if (footerEl)    footerEl.style.display    = '';
+    if (confirmEl)   confirmEl.classList.remove('hlp-confirm-visible');
+    if (analisarBtn) {
+      analisarBtn.textContent = 'Analisar lista';
+      analisarBtn.classList.remove('hlp-analisando');
+      analisarBtn.style.display = '';
+    }
+    if (analysisRow) analysisRow.style.display = '';
+    allCards.forEach(c => c.classList.remove('hlp-card-in', 'hlp-is-active', 'hlp-excluido'));
     if (qty0)    qty0.textContent = '4';
-    if (qty2)    qty2.textContent = '8';
-    hidePref(pref1);
-    if (card3)   card3.classList.remove('hlp-excluido');
-    if (inc3)    inc3.classList.add('hlp-ativo');
-    if (exc3)    exc3.classList.remove('hlp-ativo');
-    if (counter) counter.textContent = '4 itens para comprar';
-    if (popup)   popup.classList.remove('hlp-popup-visible');
+    if (inc4)    inc4.classList.add('hlp-ativo');
+    if (exc4)    exc4.classList.remove('hlp-ativo');
+    if (counter) counter.textContent = '5 itens para comprar';
   }
-
-  hidePref(pref1);
 
   let activeCycle = 0;
 
-  function startPhases(cycleId) {
-    if (cycleId !== activeCycle) return;
-
-    setTimeout(() => {
+  function cascadeCards(cycleId, cb) {
+    const cards = Array.from(allCards);
+    function addNext(i) {
       if (cycleId !== activeCycle) return;
-      activate('hlpc-0');
-      stepQty(qty0, 8, 380, () => {
-
-        setTimeout(() => {
-          if (cycleId !== activeCycle) return;
-          activate('hlpc-1');
-          typeText(pref1, 'Preferência: cor vermelha opaca', () => {
-
-            setTimeout(() => {
-              if (cycleId !== activeCycle) return;
-              activate('hlpc-2');
-              stepQty(qty2, 2, 320, () => {
-
-                setTimeout(() => {
-                  if (cycleId !== activeCycle) return;
-                  activate('hlpc-3');
-                  setTimeout(() => {
-                    if (cycleId !== activeCycle) return;
-                    clickFx(exc3, () => {
-                      if (card3)   card3.classList.add('hlp-excluido');
-                      if (inc3)    inc3.classList.remove('hlp-ativo');
-                      if (exc3)    exc3.classList.add('hlp-ativo');
-                      if (counter) counter.textContent = '3 itens para comprar';
-
-                      setTimeout(() => {
-                        if (cycleId !== activeCycle) return;
-                        clearActive();
-                        clickFx(wppBtn, () => {
-                          if (cycleId !== activeCycle) return;
-
-                          setTimeout(() => {
-                            if (cycleId !== activeCycle) return;
-                            if (popup) popup.classList.add('hlp-popup-visible');
-
-                            setTimeout(() => {
-                              if (cycleId !== activeCycle) return;
-                              clickFx(popupSend, () => {
-                                if (cycleId !== activeCycle) return;
-                                setTimeout(() => {
-                                  if (cycleId !== activeCycle) return;
-                                  if (popup) popup.classList.remove('hlp-popup-visible');
-                                  setTimeout(() => cycle(cycleId), 1800);
-                                }, 350);
-                              });
-                            }, 2200);
-                          }, 450);
-                        });
-                      }, 1000);
-                    });
-                  }, 700);
-                }, 700);
-              });
-            }, 700);
-          });
-        }, 700);
-      });
-    }, 900);
+      if (i >= cards.length) { if (cb) setTimeout(cb, 260); return; }
+      cards[i].classList.add('hlp-card-in');
+      setTimeout(() => addNext(i + 1), 155);
+    }
+    addNext(0);
   }
 
   function cycle(cycleId) {
     if (cycleId !== activeCycle) return;
     reset();
 
-    if (uploadStep) {
-      panel.classList.add('hlp-show-upload');
-      setTimeout(() => {
+    // Fase 0 — PDF selecionado visível (700ms antes do clique)
+    setTimeout(() => {
+      if (cycleId !== activeCycle) return;
+
+      // Fase 1 — simular clique em "Analisar lista"
+      clickFx(analisarBtn, () => {
         if (cycleId !== activeCycle) return;
-        panel.classList.remove('hlp-show-upload');
-        setTimeout(() => startPhases(cycleId), 350);
-      }, 1600);
-    } else {
-      startPhases(cycleId);
-    }
+        if (analisarBtn) {
+          analisarBtn.textContent = 'Analisando...';
+          analisarBtn.classList.add('hlp-analisando');
+        }
+
+        // Fase 2 — mostrar progresso de análise
+        setTimeout(() => {
+          if (cycleId !== activeCycle) return;
+          if (analisarBtn) analisarBtn.style.display = 'none';
+          if (analysisRow) analysisRow.style.display = 'flex';
+
+          // Aguardar ~1200ms simulando a análise
+          setTimeout(() => {
+            if (cycleId !== activeCycle) return;
+
+            // Fase 3 — revelar itens (upload area some, itens aparecem em cascata)
+            if (uploadArea) uploadArea.style.display = 'none';
+            if (itemsArea)  itemsArea.style.display  = 'block';
+            if (footerEl)   footerEl.style.display   = 'flex';
+
+            cascadeCards(cycleId, () => {
+              if (cycleId !== activeCycle) return;
+
+              // Fase 4 — editar quantidade: caderno 4 → 6
+              setTimeout(() => {
+                if (cycleId !== activeCycle) return;
+                activate('hlpc-0');
+                stepQty(qty0, 6, 260, () => {
+
+                  // Fase 5 — marcar tesoura como "Não quero" (vermelho)
+                  setTimeout(() => {
+                    if (cycleId !== activeCycle) return;
+                    clearActive();
+                    activate('hlpc-4');
+                    setTimeout(() => {
+                      if (cycleId !== activeCycle) return;
+                      clickFx(exc4, () => {
+                        if (cycleId !== activeCycle) return;
+                        if (card4) card4.classList.add('hlp-excluido');
+                        if (inc4)  inc4.classList.remove('hlp-ativo');
+                        if (exc4)  exc4.classList.add('hlp-ativo');
+                        if (counter) counter.textContent = '4 itens para comprar';
+
+                        // Fase 6 — clicar "Enviar para orçamento"
+                        setTimeout(() => {
+                          if (cycleId !== activeCycle) return;
+                          clearActive();
+                          clickFx(wppBtn, () => {
+                            if (cycleId !== activeCycle) return;
+
+                            // Fase 7 — confirmação final
+                            setTimeout(() => {
+                              if (cycleId !== activeCycle) return;
+                              if (confirmEl) confirmEl.classList.add('hlp-confirm-visible');
+
+                              // Reiniciar ciclo
+                              setTimeout(() => {
+                                if (cycleId !== activeCycle) return;
+                                setTimeout(() => cycle(cycleId), 400);
+                              }, 2600);
+                            }, 380);
+                          });
+                        }, 620);
+                      });
+                    }, 480);
+                  }, 380);
+                });
+              }, 280);
+            });
+
+          }, 1200);
+        }, 280);
+      });
+    }, 700);
   }
 
   const io = new IntersectionObserver((entries) => {

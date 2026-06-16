@@ -94,114 +94,133 @@
           <!-- Preview animado da ferramenta -->
           <div style="display: flex; justify-content: center;">
             <div class="hlp-panel" id="home-list-preview" aria-hidden="true">
+
               <div class="hlp-header">
                 <strong>Lista escolar — 3º ano</strong>
-                <span class="hlp-badge">Prévia da revisão</span>
+                <span class="hlp-badge">Prévia da ferramenta</span>
               </div>
 
-              <div class="hlp-upload-step" id="hlp-upload-step">
-                <div class="hlp-upload-ico">
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                </div>
-                <div>
-                  <span class="hlp-upload-nome">lista_3ano_Joao.pdf</span>
-                  <span class="hlp-upload-status"><span class="hlp-upload-spin"></span>Analisando lista...</span>
-                </div>
-              </div>
-
-              <div class="hlp-card" id="hlpc-0">
-                <div class="hlp-card-main">
-                  <p class="hlp-name">Caderno brochura 96 folhas</p>
-                  <span class="hlp-obs">Capa dura · Sugestão: Tilibra</span>
-                </div>
-                <div class="hlp-card-bottom">
-                  <div class="hlp-qty">
-                    <span class="hlp-qty-btn">−</span>
-                    <span class="hlp-qty-num" id="hlp-qty-0">4</span>
-                    <span class="hlp-qty-btn">+</span>
+              <!-- Fases 0–2: arquivo selecionado + análise -->
+              <div class="hlp-upload-area" id="hlp-upload-area">
+                <div class="hlp-file-card">
+                  <div class="hlp-file-ico">
+                    <svg width="18" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span class="hlp-file-ext">PDF</span>
                   </div>
-                  <div class="hlp-toggle">
-                    <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero comprar</span>
-                    <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                  <div class="hlp-file-info">
+                    <span class="hlp-file-name">lista_3ano_Joao.pdf</span>
+                    <span class="hlp-file-status">✓ Arquivo selecionado</span>
+                  </div>
+                </div>
+                <button class="hlp-analisar-btn" id="hlp-analisar-btn">Analisar lista</button>
+                <div class="hlp-analysis-row" id="hlp-analysis-row">
+                  <span class="hlp-upload-spin"></span>
+                  <div>
+                    <span class="hlp-analysis-l1">Analisando lista...</span>
+                    <span class="hlp-analysis-l2">Identificando os itens...</span>
                   </div>
                 </div>
               </div>
 
-              <div class="hlp-card" id="hlpc-1">
-                <div class="hlp-card-main">
-                  <p class="hlp-name">Pasta polionda com elástico</p>
-                  <span class="hlp-obs">Sugestão: não informada</span>
-                  <span class="hlp-pref" id="hlp-pref-1">✓ Preferência: cor vermelha</span>
-                </div>
-                <div class="hlp-card-bottom">
-                  <div class="hlp-qty">
-                    <span class="hlp-qty-btn">−</span>
-                    <span class="hlp-qty-num">1</span>
-                    <span class="hlp-qty-btn">+</span>
+              <!-- Fases 3–6: itens organizados -->
+              <div class="hlp-items-area" id="hlp-items-area">
+                <div class="hlp-card" id="hlpc-0">
+                  <div class="hlp-card-main">
+                    <p class="hlp-name">Caderno universitário 96 folhas</p>
                   </div>
-                  <div class="hlp-toggle">
-                    <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero comprar</span>
-                    <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                  <div class="hlp-card-bottom">
+                    <div class="hlp-qty">
+                      <span class="hlp-qty-btn">−</span>
+                      <span class="hlp-qty-num" id="hlp-qty-0">4</span>
+                      <span class="hlp-qty-btn">+</span>
+                    </div>
+                    <div class="hlp-toggle">
+                      <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero</span>
+                      <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="hlp-card" id="hlpc-1">
+                  <div class="hlp-card-main">
+                    <p class="hlp-name">Lápis grafite nº 2</p>
+                  </div>
+                  <div class="hlp-card-bottom">
+                    <div class="hlp-qty">
+                      <span class="hlp-qty-btn">−</span>
+                      <span class="hlp-qty-num">6</span>
+                      <span class="hlp-qty-btn">+</span>
+                    </div>
+                    <div class="hlp-toggle">
+                      <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero</span>
+                      <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="hlp-card" id="hlpc-2">
+                  <div class="hlp-card-main">
+                    <p class="hlp-name">Borracha branca</p>
+                  </div>
+                  <div class="hlp-card-bottom">
+                    <div class="hlp-qty">
+                      <span class="hlp-qty-btn">−</span>
+                      <span class="hlp-qty-num">2</span>
+                      <span class="hlp-qty-btn">+</span>
+                    </div>
+                    <div class="hlp-toggle">
+                      <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero</span>
+                      <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="hlp-card" id="hlpc-3">
+                  <div class="hlp-card-main">
+                    <p class="hlp-name">Caixa de lápis de cor</p>
+                  </div>
+                  <div class="hlp-card-bottom">
+                    <div class="hlp-qty">
+                      <span class="hlp-qty-btn">−</span>
+                      <span class="hlp-qty-num">1</span>
+                      <span class="hlp-qty-btn">+</span>
+                    </div>
+                    <div class="hlp-toggle">
+                      <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero</span>
+                      <span class="hlp-opt hlp-opt-exc">Não quero</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="hlp-card" id="hlpc-4">
+                  <div class="hlp-card-main">
+                    <p class="hlp-name">Tesoura sem ponta</p>
+                  </div>
+                  <div class="hlp-card-bottom">
+                    <div class="hlp-qty">
+                      <span class="hlp-qty-btn">−</span>
+                      <span class="hlp-qty-num">1</span>
+                      <span class="hlp-qty-btn">+</span>
+                    </div>
+                    <div class="hlp-toggle">
+                      <span class="hlp-opt hlp-opt-inc hlp-ativo" id="hlp-inc-4">Quero</span>
+                      <span class="hlp-opt hlp-opt-exc" id="hlp-exc-4">Não quero</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div class="hlp-card" id="hlpc-2">
-                <div class="hlp-card-main">
-                  <p class="hlp-name">Lápis preto nº 02</p>
-                  <span class="hlp-obs">Sugestão: Faber-Castell</span>
-                </div>
-                <div class="hlp-card-bottom">
-                  <div class="hlp-qty">
-                    <span class="hlp-qty-btn">−</span>
-                    <span class="hlp-qty-num" id="hlp-qty-2">8</span>
-                    <span class="hlp-qty-btn">+</span>
-                  </div>
-                  <div class="hlp-toggle">
-                    <span class="hlp-opt hlp-opt-inc hlp-ativo">Quero comprar</span>
-                    <span class="hlp-opt hlp-opt-exc">Não quero</span>
-                  </div>
+              <!-- Rodapé -->
+              <div class="hlp-footer" id="hlp-footer">
+                <span class="hlp-footer-count" id="hlp-footer-count">5 itens para comprar</span>
+                <span class="hlp-wpp-btn" id="hlp-wpp-btn">Enviar para orçamento</span>
+              </div>
+
+              <!-- Fase 7: confirmação -->
+              <div class="hlp-confirm" id="hlp-confirm">
+                <div class="hlp-confirm-inner">
+                  <div class="hlp-confirm-ico">✓</div>
+                  <strong class="hlp-confirm-title">Mensagem enviada.</strong>
+                  <span class="hlp-confirm-sub">Aguarde seu orçamento pelo WhatsApp.</span>
                 </div>
               </div>
 
-              <div class="hlp-card" id="hlpc-3">
-                <div class="hlp-card-main">
-                  <p class="hlp-name">Borracha branca macia</p>
-                  <span class="hlp-obs">2 unidades</span>
-                </div>
-                <div class="hlp-card-bottom">
-                  <div class="hlp-qty">
-                    <span class="hlp-qty-btn">−</span>
-                    <span class="hlp-qty-num">2</span>
-                    <span class="hlp-qty-btn">+</span>
-                  </div>
-                  <div class="hlp-toggle">
-                    <span class="hlp-opt hlp-opt-inc hlp-ativo" id="hlp-inc-3">Quero comprar</span>
-                    <span class="hlp-opt hlp-opt-exc" id="hlp-exc-3">Não quero</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="hlp-footer">
-                <span class="hlp-footer-count" id="hlp-footer-count">4 itens para comprar</span>
-                <span class="hlp-wpp-btn" id="hlp-wpp-btn">Enviar pelo WhatsApp</span>
-              </div>
-              <div class="hlp-popup" id="hlp-popup">
-                <div class="hlp-popup-inner">
-                  <div class="hlp-popup-header">
-                    <span class="hlp-popup-icon">💬</span>
-                    <strong>Mensagem para a Sartec</strong>
-                  </div>
-                  <div class="hlp-popup-body">
-                    <p>Olá, Sartec! Quero orçamento desta lista:</p>
-                    <p class="hlp-popup-item">8× Caderno brochura 96 folhas</p>
-                    <p class="hlp-popup-item">1× Pasta polionda — cor vermelha opaca</p>
-                    <p class="hlp-popup-item">2× Lápis preto nº 02</p>
-                    <p>Obrigado!</p>
-                  </div>
-                  <button class="hlp-popup-btn" id="hlp-popup-send">Enviar</button>
-                </div>
-              </div>
             </div>
           </div>
 
