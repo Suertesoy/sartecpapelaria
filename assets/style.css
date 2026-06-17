@@ -2006,6 +2006,9 @@ section { padding: 64px 0; }
     display: block;
     overflow: hidden;
     min-height: 680px;
+    /* remove o padding herdado de "section { padding: 64px 0; }" — sem isso, o card
+       é empurrado para baixo e cobre o topo da fachada na imagem mobile */
+    padding: 0;
   }
   .hero-fw-bg {
     position: absolute;
@@ -2027,6 +2030,7 @@ section { padding: 64px 0; }
     min-height: 0;
     padding: 32px 16px 24px;
     background: transparent;
+    align-items: flex-start;
   }
   .hero-fw-card {
     max-width: 100%;
