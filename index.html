@@ -43,7 +43,10 @@
     }
 
     /* --- Why override --- */
-    .why { padding: 72px 0; }
+    .why { padding: clamp(44px, 8vw, 72px) 0; }
+
+    /* --- Ênfase no hero (30+ anos) --- */
+    .hero-fw-card h1 strong { color: var(--vermelho); font-weight: 800; }
   </style>
 </head>
 <body>
@@ -73,8 +76,8 @@
       <div class="hero-fw-content">
         <div class="hero-fw-card">
           <span class="hero-fw-badge">São José dos Campos · Jardim Satélite</span>
-          <h1>Papelaria de bairro, atendimento fácil pelo WhatsApp.</h1>
-          <p>Há mais de 30 anos atendendo famílias, escolas e empresas com materiais, listas escolares, cópias e impressão.</p>
+          <h1>A papelaria tradicional de São José dos Campos, <strong>há mais de 30 anos</strong> com você.</h1>
+          <p>Atendimento de bairro, próximo e de confiança — agora também pelo site. Monte sua lista escolar, peça produtos, solicite cópias e fale com a nossa equipe direto pelo WhatsApp.</p>
           <div class="hero-fw-btns">
             <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec." target="_blank" rel="noopener" class="hero-btn-wpp">Falar no WhatsApp</a>
             <a href="lista-escolar.html" class="hero-btn-lista">Enviar lista escolar</a>
@@ -92,7 +95,7 @@
          3. SEÇÃO LISTA ESCOLAR
          ===================================================== -->
     <section style="background: #FFFFFF; padding: 0;">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 80px 20px;">
+      <div style="max-width: 1180px; margin: 0 auto; padding: clamp(48px, 9vw, 80px) 20px;">
         <div class="lista-grid">
 
           <!-- Copy esquerda -->
@@ -281,7 +284,7 @@
     <!-- =====================================================
          4. COMO FUNCIONA
          ===================================================== -->
-    <section id="como-funciona" class="como-funciona-azul" style="padding: 72px 0;">
+    <section id="como-funciona" class="como-funciona-azul" style="padding: clamp(44px, 8vw, 72px) 0;">
       <div style="max-width: 1180px; margin: 0 auto; padding: 0 20px;">
         <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; max-width: 560px;">
           <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 32px; margin: 0; letter-spacing: -0.01em;">Como funciona</h2>
@@ -310,7 +313,7 @@
     <!-- =====================================================
          5. O QUE OFERECEMOS
          ===================================================== -->
-    <section style="background: #FFFFFF; padding: 72px 0;">
+    <section style="background: #FFFFFF; padding: clamp(44px, 8vw, 72px) 0;">
       <div style="max-width: 1180px; margin: 0 auto; padding: 0 20px;">
         <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 44px; max-width: 640px;">
           <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 32px; margin: 0; letter-spacing: -0.01em;">O que oferecemos</h2>
@@ -402,9 +405,9 @@
     <!-- =====================================================
          7. FAIXA SARTEC DIGITAL
          ===================================================== -->
-    <section style="background: #FFFFFF; padding: 64px 20px;">
+    <section style="background: #FFFFFF; padding: clamp(40px, 8vw, 64px) 20px;">
       <div style="max-width: 1180px; margin: 0 auto;">
-        <div class="sartec-digital-faixa" style="background: linear-gradient(135deg, #0D1F4A 0%, #0F2660 55%, #141E3C 100%); border: 1px solid rgba(127,163,242,0.22); border-radius: 18px; box-shadow: 0 12px 40px rgba(14,26,74,0.18), 0 2px 8px rgba(0,0,0,0.06); padding: 28px 40px; position: relative; overflow: hidden;">
+        <div class="sartec-digital-faixa" style="background: linear-gradient(135deg, #0D1F4A 0%, #0F2660 55%, #141E3C 100%); border: 1px solid rgba(127,163,242,0.22); border-radius: 18px; box-shadow: 0 12px 40px rgba(14,26,74,0.18), 0 2px 8px rgba(0,0,0,0.06); padding: clamp(20px, 5vw, 28px) clamp(20px, 6vw, 40px); position: relative; overflow: hidden;">
           <div style="position: absolute; top: -60px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(59,130,246,0.15), transparent 65%); pointer-events: none;"></div>
           <div style="position: absolute; bottom: -50px; left: -20px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(220,38,38,0.08), transparent 65%); pointer-events: none;"></div>
 

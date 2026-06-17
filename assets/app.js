@@ -182,8 +182,9 @@ function renderFooter() {
             <p>${SARTEC.ENDERECO}</p>
             <p>CEP: ${SARTEC.CEP}</p>
             <p>${SARTEC.HORARIO}</p>
-            <p>${SARTEC.TELEFONE_DISPLAY}</p>
-            <p>${SARTEC.EMAIL}</p>
+            <a href="tel:+${SARTEC.WPP_PRINCIPAL}">${SARTEC.TELEFONE_DISPLAY}</a>
+            <a href="mailto:${SARTEC.EMAIL}">${SARTEC.EMAIL}</a>
+            <a href="${montarWpp(SARTEC.WPP_PRINCIPAL, 'Olá! Vim pelo site da Sartec.')}" target="_blank" rel="noopener" class="footer-wpp-btn">Falar no WhatsApp</a>
           </div>
         </div>
       </div>
