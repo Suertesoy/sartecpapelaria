@@ -65,7 +65,7 @@ p  { margin: 0 0 1em; color: var(--texto-suave); }
   background: #FFFFFF;
   height: var(--header-h);
   display: flex;
-  align-items: center;
+  align-items: stretch;
   border-bottom: 1px solid #E2E8F0;
   box-shadow: 0 1px 4px rgba(15,23,42,0.06);
 }
@@ -82,28 +82,33 @@ p  { margin: 0 0 1em; color: var(--texto-suave); }
 .brand-text strong { color: #0F172A; font-size: 1.15rem; letter-spacing: .01em; }
 .brand-text span { color: #475569; font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; }
 
-.main-nav { display: flex; gap: 26px; }
+/* align-self: stretch faz o .main-nav ocupar a altura cheia do header — assim o
+   indicador ativo (abaixo) pode ancorar com bottom:0 exatamente na borda inferior
+   do header, sem depender de um valor fixo calculado a partir da fonte/logo. */
+.main-nav { display: flex; gap: 26px; align-self: stretch; }
 .main-nav a {
+  display: flex;
+  align-items: center;
   color: #475569;
   font-size: .86rem;
   font-weight: 600;
   position: relative;
-  padding: 6px 2px;
+  padding: 0 2px;
   white-space: nowrap;
   transition: color .15s;
 }
 .main-nav a:hover { color: #1E3A8A; }
 .main-nav a.active { color: #1E3A8A; font-weight: 700; }
-/* Segmento que estende a barra degradê azul→vermelho do header (.hero-fw::before /
-   .internal-hero::before), trocando de tom conforme a posição do item no menu —
-   início mais azul, cópias mais vermelho, intermediários em tons de transição. */
+/* Saliência que nasce da borda inferior do header e invade alguns pixels para
+   cima — a cor acompanha a posição do item ao longo do degradê azul→vermelho. */
 .main-nav a.active::after {
   content: '';
   position: absolute;
-  bottom: -30px;
+  bottom: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 6px;
+  border-radius: 3px 3px 0 0;
   background: var(--azul);
 }
 .main-nav a:nth-child(1).active::after { background: #1E3A8A; }
