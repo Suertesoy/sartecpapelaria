@@ -1947,11 +1947,18 @@ section { padding: 64px 0; }
   letter-spacing: -0.02em;
   color: #0F172A;
 }
+.hero-fw-wpp {
+  color: var(--verde-wpp-escuro);
+}
 .hero-fw-card p {
   margin: 0;
   font-size: 17px;
   line-height: 1.6;
   color: #475569;
+}
+.hero-fw-soft {
+  color: var(--azul);
+  font-weight: 700;
 }
 .hero-fw-btns {
   display: flex;
