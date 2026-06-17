@@ -1948,6 +1948,7 @@ section { padding: 64px 0; }
   margin: 0;
   letter-spacing: -0.02em;
   color: #0F172A;
+  text-align: center;
 }
 .hero-fw-wpp {
   color: var(--verde-wpp-escuro);
@@ -1961,6 +1962,7 @@ section { padding: 64px 0; }
 .hero-fw-soft {
   color: var(--azul);
   font-weight: 700;
+  margin-top: 8px;
 }
 .hero-fw-btns {
   display: flex;
