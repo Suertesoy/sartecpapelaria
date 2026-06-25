@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <!-- GA4: inserir script oficial do Google Analytics aqui -->
+  <!-- Microsoft Clarity: inserir script oficial do projeto aqui -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Produtos — Sartec Papelaria</title>
@@ -301,7 +303,19 @@
         var match = cat === 'Todos' || card.getAttribute('data-cat') === cat;
         card.hidden = !match;
       });
+      trackEvent('product_category_filter', { category: cat });
     }
+
+    // Cliques em "Consultar no WhatsApp" dentro de cada card de produto
+    document.getElementById('produtos-grid')?.addEventListener('click', function (e) {
+      var link = e.target.closest('.wpp-btn');
+      if (!link) return;
+      var card = link.closest('.produto-card');
+      if (!card) return;
+      var nome = card.querySelector('strong')?.textContent.trim() || '';
+      var categoria = card.getAttribute('data-cat') || '';
+      trackEvent('product_whatsapp_click', { product_name: nome, category: categoria });
+    });
   </script>
 </body>
 </html>

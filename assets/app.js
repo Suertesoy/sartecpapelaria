@@ -20,11 +20,208 @@ function montarWpp(numero, mensagem) {
 }
 
 /* =========================================================
+   ANALYTICS — camada global de tracking
+   Compatível com GA4 (window.gtag) e Vercel Analytics (window.va).
+   Nunca lança erro caso nenhuma ferramenta esteja instalada e
+   nunca envia dados pessoais (nome, telefone, e-mail, arquivos etc.).
+   ========================================================= */
+
+/**
+ * Envia um evento de analytics para todas as ferramentas disponíveis.
+ * Sempre inclui page_path e page_title; o restante vem de `params`.
+ * Nunca lança erro, mesmo sem GA4/Clarity/Vercel Analytics instalados.
+ */
+function trackEvent(nome, params = {}) {
+  const payload = Object.assign(
+    {
+      page_path: window.location.pathname,
+      page_title: document.title,
+      origin_page: window.SARTEC_PAGE || document.title,
+    },
+    params
+  );
+
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', nome, payload);
+    }
+  } catch (_) { /* GA4 ausente ou com erro — ignorar silenciosamente */ }
+
+  try {
+    if (typeof window.va === 'function') {
+      window.va('event', { name: nome, data: payload });
+    } else if (window.va && typeof window.va.track === 'function') {
+      window.va.track(nome, payload);
+    }
+  } catch (_) { /* Vercel Analytics ausente ou com erro — ignorar silenciosamente */ }
+
+  try {
+    if (window.SARTEC_DEBUG_ANALYTICS) {
+      console.debug('[Sartec Analytics]', nome, payload);
+    }
+  } catch (_) { /* console indisponível — ignorar */ }
+}
+
+function trackWhatsappClick(origem, tipo, url) {
+  trackEvent('whatsapp_click', {
+    origin_page: origem,
+    event_category: 'whatsapp',
+    event_label: tipo,
+    target_url: url,
+  });
+}
+
+function trackCtaClick(origem, label, url) {
+  trackEvent('cta_click', {
+    origin_page: origem,
+    event_category: 'cta',
+    event_label: label,
+    target_url: url,
+  });
+}
+
+function trackFaqOpen(origem, pergunta) {
+  trackEvent('faq_open', {
+    origin_page: origem,
+    event_category: 'faq',
+    event_label: pergunta,
+    question_text: pergunta,
+  });
+}
+
+function trackExternalClick(origem, label, url) {
+  trackEvent('external_click', {
+    origin_page: origem,
+    event_category: 'external_link',
+    event_label: label,
+    target_url: url,
+  });
+}
+
+window.trackEvent = trackEvent;
+window.trackWhatsappClick = trackWhatsappClick;
+window.trackCtaClick = trackCtaClick;
+window.trackFaqOpen = trackFaqOpen;
+window.trackExternalClick = trackExternalClick;
+
+/* ---- Debounce simples por elemento, evita evento duplicado em cliques
+        repetidos muito rápidos (ex: duplo clique acidental). ---- */
+const _trackLastFired = new WeakMap();
+function _trackDebounced(el, windowMs = 800) {
+  const now = Date.now();
+  const last = _trackLastFired.get(el) || 0;
+  if (now - last < windowMs) return false;
+  _trackLastFired.set(el, now);
+  return true;
+}
+
+/* ---- Cliques: WhatsApp, Maps, Waze, Sartec Digital e CTAs internos ---- */
+function initAutoTracking() {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (!href) return;
+    if (!_trackDebounced(a)) return;
+
+    const origem = window.SARTEC_PAGE || document.title;
+
+    if (href.includes('wa.me/')) {
+      const tipo = href.includes(SARTEC.WPP_COPIAS) ? 'whatsapp_copias' : 'whatsapp_principal';
+      trackWhatsappClick(origem, tipo, href);
+      return;
+    }
+    if (href.includes('google.com/maps') || href.includes('goo.gl/maps')) {
+      trackExternalClick(origem, 'maps', href);
+      return;
+    }
+    if (href.includes('waze.com')) {
+      trackExternalClick(origem, 'waze', href);
+      return;
+    }
+    if (href.includes('sartec-digital.vercel.app')) {
+      trackExternalClick(origem, 'sartec_digital', href);
+      return;
+    }
+
+    const arquivo = href.split('?')[0].split('#')[0].split('/').pop();
+    const ctaPorArquivo = {
+      'lista-escolar.html': 'cta_lista_escolar',
+      'produtos.html': 'cta_produtos',
+      'empresas.html': 'cta_empresas',
+      'escolas.html': 'cta_escolas',
+      'copias.html': 'cta_copias',
+    };
+    if (ctaPorArquivo[arquivo]) {
+      trackCtaClick(origem, ctaPorArquivo[arquivo], href);
+    }
+  });
+}
+
+/* ---- FAQs (details.faq-item) — "toggle" não borbulha, por isso captura ---- */
+function initFaqTracking() {
+  document.addEventListener('toggle', (e) => {
+    const details = e.target;
+    if (!details || details.tagName !== 'DETAILS') return;
+    if (!details.classList.contains('faq-item')) return;
+    if (!details.open) return;
+    const pergunta = details.querySelector('summary')?.textContent.trim() || '';
+    trackFaqOpen(window.SARTEC_PAGE || document.title, pergunta);
+  }, true);
+}
+
+/* ---- Tempo de sessão por página ---- */
+function initPageEngagementTracking() {
+  const inicio = Date.now();
+  let enviado = false;
+  function enviar() {
+    if (enviado) return;
+    const segundos = Math.round((Date.now() - inicio) / 1000);
+    if (segundos < 3) return;
+    enviado = true;
+    trackEvent('page_engagement_time', { engagement_seconds: segundos });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') enviar();
+  });
+  window.addEventListener('pagehide', enviar);
+}
+
+/* ---- Profundidade de scroll (25/50/75/90%), uma vez por página ---- */
+function initScrollDepthTracking() {
+  const marcos = [25, 50, 75, 90];
+  const disparados = new Set();
+  let ticking = false;
+
+  function checar() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+    const alturaUtil = document.documentElement.scrollHeight - window.innerHeight;
+    if (alturaUtil <= 0) return;
+    const pct = (scrollTop / alturaUtil) * 100;
+    marcos.forEach((m) => {
+      if (pct >= m && !disparados.has(m)) {
+        disparados.add(m);
+        trackEvent('scroll_depth', { percent: m });
+      }
+    });
+  }
+
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { checar(); ticking = false; });
+  }, { passive: true });
+
+  checar();
+}
+
+/* =========================================================
    HEADER
    ========================================================= */
 let _menuListenersAdded = false;
 
 function renderHeader(active) {
+  window.SARTEC_PAGE = active || window.SARTEC_PAGE;
   const lk = (slug) => active === slug ? 'class="active"' : '';
   const wppSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`;
 
@@ -596,5 +793,11 @@ window.SartecInit = function ({ active, fab }) {
     renderFab(fab || 'principal');
     initPageTransitions();
     initHomeListPreview();
+
+    // Analytics — iniciado depois de header, footer e FAB estarem no DOM
+    initAutoTracking();
+    initFaqTracking();
+    initPageEngagementTracking();
+    initScrollDepthTracking();
   });
 };

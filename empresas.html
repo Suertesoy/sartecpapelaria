@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <!-- GA4: inserir script oficial do Google Analytics aqui -->
+  <!-- Microsoft Clarity: inserir script oficial do projeto aqui -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Empresas — Sartec Papelaria</title>
@@ -65,7 +67,7 @@
           <h1>Material de escritório com faturamento para empresas cadastradas.</h1>
           <p>Peça orçamento pelo WhatsApp, consulte condições especiais por volume e combine entrega com a equipe da Sartec.</p>
           <div class="internal-hero-btns">
-            <a href="#cadastro" class="internal-hero-btn-wpp" style="background: var(--azul);">Cadastrar minha empresa</a>
+            <a href="#cadastro" id="cta-cadastrar-empresa" class="internal-hero-btn-wpp" style="background: var(--azul);">Cadastrar minha empresa</a>
             <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Quero%20falar%20sobre%20compras%20para%20minha%20empresa." target="_blank" rel="noopener" class="internal-hero-btn-sec">Falar no WhatsApp</a>
           </div>
         </div>
@@ -203,7 +205,13 @@
   <script>
     SartecInit({ active: 'empresas', fab: 'principal' });
 
+    document.getElementById('cta-cadastrar-empresa')?.addEventListener('click', function () {
+      trackEvent('company_register_cta_click');
+    });
+
     function empEnviar() {
+      trackEvent('company_form_attempt');
+
       var empresa = document.getElementById('emp-empresa').value.trim();
       var cnpj    = document.getElementById('emp-cnpj').value.trim();
       var contato = document.getElementById('emp-contato').value.trim();
@@ -212,13 +220,15 @@
       var erro    = document.getElementById('emp-erro');
 
       var faltas = [];
-      if (!empresa) faltas.push('o nome da empresa');
-      if (!contato) faltas.push('o nome do contato');
-      if (!fone)    faltas.push('o WhatsApp do contato');
+      var camposFaltantes = [];
+      if (!empresa) { faltas.push('o nome da empresa'); camposFaltantes.push('empresa'); }
+      if (!contato) { faltas.push('o nome do contato'); camposFaltantes.push('contato'); }
+      if (!fone)    { faltas.push('o WhatsApp do contato'); camposFaltantes.push('fone'); }
 
       if (faltas.length) {
         erro.textContent = 'Falta preencher: ' + faltas.join(', ') + '.';
         erro.style.display = 'block';
+        trackEvent('company_form_error', { missing_fields: camposFaltantes.join(',') });
         return;
       }
       erro.style.display = 'none';
@@ -230,6 +240,7 @@
       msg += 'WhatsApp: ' + fone + '\n';
       msg += 'Necessidade: ' + tipo;
 
+      trackEvent('company_form_submit_whatsapp', { need_type: tipo });
       window.open('https://wa.me/5512981594959?text=' + encodeURIComponent(msg), '_blank');
     }
   </script>

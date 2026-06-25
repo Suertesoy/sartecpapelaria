@@ -165,6 +165,7 @@ function ocultarBannerSalvo() {
 }
 
 function limparTudoERecomecar() {
+  trackEvent('school_list_restart');
   limparProgresso();
   pedidoEnviado        = false;
   estado.listas        = [];
@@ -229,6 +230,8 @@ function onArquivoEscolhido() {
   const files = arquivoInput.files;
   if (!files || files.length === 0) return;
 
+  trackEvent('school_list_upload_file_selected', { file_count: files.length });
+
   clearTimeout(uploadFeedbackTimer);
   uploadArea.classList.remove('upload-ok');
   uploadArea.classList.add('upload-lendo');
@@ -261,16 +264,25 @@ formUpload.addEventListener('submit', async (e) => {
   const arquivos = arquivoInput.files;
 
   ocultarErro();
+  trackEvent('school_list_form_attempt');
 
   if (!estado.modoNovaLista) {
     const nome = document.getElementById('nome').value.trim();
     const whatsapp = inputWhatsapp.value.trim();
-    if (!nome || !whatsapp) { mostrarErro('Preencha nome e WhatsApp antes de continuar.'); return; }
+    if (!nome || !whatsapp) {
+      mostrarErro('Preencha nome e WhatsApp antes de continuar.');
+      trackEvent('school_list_form_error', { reason: 'nome_ou_whatsapp_ausente' });
+      return;
+    }
     estado.nome = nome;
     estado.whatsapp = whatsapp;
   }
 
-  if (!arquivos || arquivos.length === 0) { mostrarErro('Anexe a foto ou PDF da lista antes de continuar.'); return; }
+  if (!arquivos || arquivos.length === 0) {
+    mostrarErro('Anexe a foto ou PDF da lista antes de continuar.');
+    trackEvent('school_list_form_error', { reason: 'arquivo_ausente' });
+    return;
+  }
   if (arquivos.length > MAX_ARQUIVOS) {
     mostrarErro(`Você pode enviar até ${MAX_ARQUIVOS} arquivos por lista. Selecione os mais completos da mesma criança.`);
     return;
@@ -305,6 +317,7 @@ function aplicarDadosAnalisados(dados) {
   renderizarResultado();
   trocarEstado('estado-resultado');
   scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
+  trackEvent('school_list_analysis_completed', { item_count: estado.rascunho.itens.length });
 }
 
 function mostrarErroMultiArquivo() {
@@ -370,6 +383,8 @@ function mostrarConfirmacaoMultiArquivo() {
 }
 
 async function iniciarAnalise(arquivos) {
+  trackEvent('school_list_analysis_started', { file_count: arquivos.length });
+
   const btnAnalisar = document.getElementById('btn-analisar');
   if (btnAnalisar) { btnAnalisar.disabled = true; btnAnalisar.textContent = 'Analisando...'; }
 
@@ -581,6 +596,16 @@ function validarEEnviar(e) {
 
   // Validação passou — suprimir aviso de saída
   pedidoEnviado = true;
+
+  const itensInclusos  = todasListas.reduce((acc, l) => acc + l.itens.filter(x => x.incluso).length, 0);
+  const itensExcluidos = todasListas.reduce((acc, l) => acc + l.itens.filter(x => !x.incluso).length, 0);
+  trackEvent('school_list_submit_whatsapp', {
+    action: 'submit',
+    lists_count: todasListas.length,
+    items_included: itensInclusos,
+    items_excluded: itensExcluidos,
+    items_total: itensInclusos + itensExcluidos,
+  });
 }
 
 // =============== RESULTADO ===============
@@ -761,7 +786,11 @@ function renderizarResultado() {
     const item = estado.rascunho.itens.find(x => x.id === id);
 
     card.querySelectorAll('.item-choice-option').forEach(btn => {
-      btn.addEventListener('click', () => { item.incluso = btn.dataset.acao === 'incluir'; atualizarUI(); });
+      btn.addEventListener('click', () => {
+        item.incluso = btn.dataset.acao === 'incluir';
+        atualizarUI();
+        trackEvent('school_list_item_toggle', { action: btn.dataset.acao, item_id: item.id });
+      });
     });
 
     card.querySelectorAll('.qty-btn').forEach(b => {
@@ -769,6 +798,7 @@ function renderizarResultado() {
         if (b.dataset.acao === 'mais') item.qty += 1;
         else item.qty = Math.max(1, item.qty - 1);
         atualizarUI();
+        trackEvent('school_list_quantity_change', { action: b.dataset.acao, item_id: item.id, quantity: item.qty });
       });
     });
 
@@ -909,6 +939,7 @@ btnMarcarTodosTem.addEventListener('click', () => {
   estado.rascunho.itens.forEach(x => x.incluso = !algumIncluso);
   atualizarUI();
   btnMarcarTodosTem.textContent = algumIncluso ? 'Marcar todos como "Não quero"' : 'Marcar todos como "Quero comprar"';
+  trackEvent('school_list_mark_all_toggle', { new_state: algumIncluso ? 'nao_quero' : 'quero' });
 });
 
 btnAdicionarLista.addEventListener('click', () => {
