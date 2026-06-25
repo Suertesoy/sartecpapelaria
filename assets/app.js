@@ -128,7 +128,11 @@ function initAutoTracking() {
 
     if (href.includes('wa.me/')) {
       const tipo = href.includes(SARTEC.WPP_COPIAS) ? 'whatsapp_copias' : 'whatsapp_principal';
-      trackWhatsappClick(origem, tipo, href);
+      // remove a query string (?text=...) antes de enviar para analytics: em páginas como a
+      // lista escolar, a mensagem pode conter nome/WhatsApp digitados pelo usuário, e o valor
+      // também pode passar do limite de 255 caracteres aceito pela Vercel Analytics.
+      const targetUrl = href.split('?')[0];
+      trackWhatsappClick(origem, tipo, targetUrl);
       return;
     }
     if (href.includes('google.com/maps') || href.includes('goo.gl/maps')) {
