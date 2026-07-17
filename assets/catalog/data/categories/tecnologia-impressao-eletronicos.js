@@ -4,7 +4,8 @@ const v = createVariantCycler(10);
 const P = 'complementar';
 
 const informatica = makeItems('informatica', 'tecnologia', v, [
-  ['mouse', 'Mouse'],
+  ['mouse_com_fio', 'Mouse com fio'],
+  ['mouse_sem_fio', 'Mouse sem fio', { tags: ['mouse_sem_fio'] }],
   ['teclado', 'Teclado'],
   ['cabo_acessorio_eletronico', 'Cabo e acessório eletrônico'],
 ], P);
@@ -14,12 +15,13 @@ const armazenamento = makeItems('armazenamento', 'tecnologia', v, [
 ], P);
 
 const energia = makeItems('energia', 'simples', v, [
-  ['pilha', 'Pilha'],
+  ['pilha_aa', 'Pilha AA'],
+  ['pilha_aaa', 'Pilha AAA'],
   ['bateria', 'Bateria'],
 ], P);
 
 const impressao = makeItems('impressao', 'tecnologia', v, [
-  ['cartucho', 'Cartucho', { tags: ['cartucho'], syn: ['cartucho_impressora'] }],
+  ['cartucho', 'Cartucho de tinta', { tags: ['cartucho'], syn: ['cartucho_impressora'], desc: 'Informe o modelo da impressora para encontrarmos a opção adequada.' }],
   ['toner', 'Toner', { tags: ['toner'], syn: ['toner_impressora'] }],
   ['tinta_para_impressora', 'Tinta para impressora'],
   ['refil_tinta_impressora', 'Refil de tinta para impressora', { syn: ['refil_de_tinta'] }],

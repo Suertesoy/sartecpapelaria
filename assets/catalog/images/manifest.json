@@ -1,76 +1,172 @@
 {
-  "notaFormato": "Piloto validado em PNG com transparência (RGBA). Não há conversor WebP disponível neste ambiente de execução (sem ImageMagick/cwebp/PIL instalados) — recomenda-se converter para WebP 256x256/512x512 com uma ferramenta de imagem antes de escalar para o restante do catálogo.",
+  "notaFormato": "Piloto validado em PNG com transparência (RGBA), gerado via MCP do Magnific (images_generate + images_remove_background). Não há conversor WebP disponível neste ambiente (sem ImageMagick/cwebp/PIL instalados) — recomenda-se converter para WebP com uma ferramenta de imagem antes de escalar para o restante do catálogo.",
+  "rodadaAtual": "2026-07-17 — 10 imagens associadas: 7 geradas nesta rodada + 3 reaproveitadas do piloto anterior (já aprovadas, sem necessidade de regenerar).",
   "imagens": [
     {
-      "id": "caderno_universitario",
-      "itensQueUsam": ["caderno_universitario_1_materia", "caderno_universitario_10_materias", "caderno_universitario_outras_materias"],
-      "prompt": "Create one generic unbranded university spiral notebook with a plain solid deep-blue hard cover, a red elastic closure band, and visible white paper edges... (ver seção 20.4; variante sem a palavra 'Sartec' no prompt para evitar geração de logotipo)",
-      "arquivo": "assets/catalog/images/caderno_universitario.png",
-      "variante": "misto",
+      "id": "caderno_universitario_1_materia",
+      "itensQueUsam": ["caderno_universitario_1_materia"],
+      "rodada": "nova",
+      "prompt": "Create one generic unbranded university spiral notebook, single subject, product photography on a plain seamless light grey studio background, three-quarter view with a slight top-down angle, centered, square composition. The notebook is thin — for a single school subject — with a plain solid deep-blue (#1E3A8A) hard cover, a thin red (#DC2626) elastic closure band, a small visible metal spiral binding on the left edge, and a slim stack of white paper edges showing it has few pages. Clean soft studio lighting, realistic materials, no text, no logo, no brand name, no words or letters anywhere, no people, no hands, no price tags, no stickers.",
+      "arquivo": "assets/catalog/images/caderno_universitario_1_materia.png",
+      "variante": "azul",
+      "simboloLapisinhos": false,
       "status": "aprovado",
       "data": "2026-07-17",
-      "dimensoes": "1920x1920",
-      "tamanhoArquivo": "1.9 MB"
+      "dimensoes": "1024x1024",
+      "tamanhoArquivo": "364 KB",
+      "resumoVisual": "Caderno fino, capa azul lisa, espiral metálica visível, elástico vermelho, poucas folhas — silhueta compacta."
+    },
+    {
+      "id": "caderno_universitario_10_materias",
+      "itensQueUsam": ["caderno_universitario_10_materias"],
+      "rodada": "nova",
+      "prompt": "Create one generic unbranded university spiral notebook, single subject, product photography on a plain seamless light grey studio background, three-quarter view with a slight top-down angle, centered, square composition. The notebook is thick — for ten school subjects — with a noticeably larger and thicker metal spiral binding, a solid red (#DC2626) hard cover with a deep-blue (#1E3A8A) corner accent, a thick stack of white paper edges with a few thin colored divider tabs peeking out between the pages, showing clear volume. It must look visibly thicker and more robust than a single-subject notebook. Clean soft studio lighting, realistic materials, no text, no logo, no brand name, no words or letters anywhere, no numbers, no people, no hands.",
+      "arquivo": "assets/catalog/images/caderno_universitario_10_materias.png",
+      "variante": "vermelho",
+      "simboloLapisinhos": false,
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1024x1024",
+      "tamanhoArquivo": "496 KB",
+      "resumoVisual": "Caderno espesso, capa vermelha com detalhe azul no canto, espiral maior, divisórias coloridas visíveis entre as folhas — claramente mais volumoso que o de 1 matéria."
+    },
+    {
+      "id": "caderno_universitario_outras_materias",
+      "itensQueUsam": ["caderno_universitario_outras_materias"],
+      "rodada": "nova",
+      "prompt": "Create a product photography composition of three generic unbranded university spiral notebooks fanned out together, overlapping slightly, on a plain seamless light grey studio background, three-quarter view with a slight top-down angle, centered, square composition. Show clear variety: one thin notebook with a plain deep-blue (#1E3A8A) cover, one medium-thickness notebook with a plain white cover and a red (#DC2626) spine accent, and one thicker notebook with a mixed blue-and-red cover pattern. Each has a visible metal spiral binding and different paper thickness, conveying a sense of choice and variety. Clean soft studio lighting, realistic materials, no text, no logo, no brand name, no words, letters or numbers anywhere, no people, no hands, no kit box or packaging.",
+      "arquivo": "assets/catalog/images/caderno_universitario_outras_materias.png",
+      "variante": "misto",
+      "simboloLapisinhos": false,
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1024x1024",
+      "tamanhoArquivo": "553 KB",
+      "resumoVisual": "Composição com três cadernos diferentes (azul liso, branco com lombada vermelha, xadrez azul/vermelho), espessuras variadas, sem números ou texto — sensação de variedade sem parecer kit fechado."
+    },
+    {
+      "id": "cola_branca",
+      "itensQueUsam": ["cola_branca"],
+      "rodada": "nova",
+      "prompt": "Create one generic unbranded white glue bottle, single subject, product photography on a plain seamless light grey studio background, three-quarter view with a slight top-down angle, centered, square composition. White opaque plastic bottle body, a deep-blue (#1E3A8A) twist cap, a small red (#DC2626) accent ring near the nozzle, a soft translucent conical applicator tip, slightly squeezable rounded shape. Clean soft studio lighting, realistic plastic material with subtle highlights, no text, no logo, no brand name, no words or letters anywhere, no people, no hands.",
+      "arquivo": "assets/catalog/images/cola_branca.png",
+      "variante": "neutro",
+      "simboloLapisinhos": false,
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1024x1024",
+      "tamanhoArquivo": "139 KB",
+      "resumoVisual": "Frasco branco de cola, tampa azul com anel vermelho, bico aplicador translúcido — visualmente distinto da cola bastão já existente."
+    },
+    {
+      "id": "pasta_com_elastico",
+      "itensQueUsam": ["pasta_com_elastico"],
+      "rodada": "nova",
+      "prompt": "Create one generic unbranded document folder with an elastic closure band, single subject, product photography on a plain seamless light grey studio background, three-quarter view with a slight top-down angle, centered, square composition. The folder has a plain solid deep-blue (#1E3A8A) cardstock cover, rounded corners, and a red (#DC2626) elastic band stretched diagonally around it to hold it closed. In one bottom corner of the cover, include a small discreet abstract graphic symbol of two crossed pencils — one blue rectangular pencil shape and one red rectangular pencil shape crossing each other at a diagonal, simplified flat geometric icon style, no text near it. Clean soft studio lighting, realistic paper/cardstock material, no words, letters, numbers, logos or brand names anywhere, no people, no hands.",
+      "arquivo": "assets/catalog/images/pasta_com_elastico.png",
+      "variante": "azul",
+      "simboloLapisinhos": true,
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1024x1024",
+      "tamanhoArquivo": "394 KB",
+      "resumoVisual": "Pasta azul com elástico vermelho na diagonal; pequeno símbolo abstrato dos lapisinhos cruzados (azul/vermelho) no canto inferior, sem nenhuma palavra."
+    },
+    {
+      "id": "mouse_sem_fio",
+      "itensQueUsam": ["mouse_sem_fio"],
+      "rodada": "nova",
+      "prompt": "Create one generic unbranded wireless computer mouse, single subject, product photography on a plain seamless light grey studio background, three-quarter view with a slight top-down angle, centered, square composition. Ergonomic rounded shape, matte deep-blue (#1E3A8A) plastic body, a red (#DC2626) scroll wheel accent, smooth glossy top surface, no visible cable connecting to it (wireless), small USB receiver dongle resting next to it. Clean soft studio lighting, realistic plastic material with subtle reflections, no text, no logo, no brand name, no words or letters anywhere, no people, no hands.",
+      "arquivo": "assets/catalog/images/mouse_sem_fio.png",
+      "variante": "azul",
+      "simboloLapisinhos": false,
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1024x1024",
+      "tamanhoArquivo": "369 KB",
+      "resumoVisual": "Mouse azul sem fio, roda de rolagem vermelha, receptor USB ao lado — nenhum cabo visível."
+    },
+    {
+      "id": "estojo_triplo",
+      "itensQueUsam": ["estojo_triplo"],
+      "rodada": "nova",
+      "prompt": "Create one generic unbranded triple pencil case, single subject, product photography on a plain seamless light grey studio background, three-quarter view with a slight top-down angle, centered, square composition. Fabric pencil case partially unfolded/expanded to reveal three stacked compartment tiers with visible zippers, mixed deep-blue (#1E3A8A) and red (#DC2626) fabric panels, clearly showing it is bigger and has more compartments than a simple single pencil case. On the main zipper pull, include a tiny discreet charm shaped like two crossed pencils (one blue, one red), simplified flat geometric icon, no text on it. Clean soft studio lighting, realistic fabric and zipper materials, no words, letters, numbers, logos or brand names anywhere, no people, no hands.",
+      "arquivo": "assets/catalog/images/estojo_triplo.png",
+      "variante": "misto",
+      "simboloLapisinhos": true,
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1024x1024",
+      "tamanhoArquivo": "733 KB",
+      "resumoVisual": "Estojo de três compartimentos empilhados, painéis azul e vermelho, charme em formato de lápis cruzados no puxador do zíper."
     },
     {
       "id": "caneta_esferografica",
       "itensQueUsam": ["caneta_esferografica"],
-      "prompt": "Create one generic unbranded ballpoint pen with a sleek slim deep-blue barrel, a small red clip accent, and a clicker top... (ver seção 20.4)",
+      "rodada": "reaproveitada",
+      "prompt": "Create one generic unbranded ballpoint pen with a sleek slim deep-blue barrel, a small red clip accent, and a clicker top... (ver rodada anterior)",
       "arquivo": "assets/catalog/images/caneta_esferografica.png",
       "variante": "azul",
-      "status": "aprovado",
+      "simboloLapisinhos": false,
+      "status": "aprovado (piloto anterior, reaproveitada)",
       "data": "2026-07-17",
       "dimensoes": "1920x1920",
-      "tamanhoArquivo": "467 KB"
-    },
-    {
-      "id": "cola_bastao",
-      "itensQueUsam": ["cola_bastao"],
-      "prompt": "Create one generic unbranded glue stick with a white plastic body, a twist-up base, a blue cap, and a small red accent ring... (ver seção 20.4)",
-      "arquivo": "assets/catalog/images/cola_bastao.png",
-      "variante": "misto",
-      "status": "aprovado",
-      "data": "2026-07-17",
-      "dimensoes": "1920x1920",
-      "tamanhoArquivo": "737 KB"
+      "tamanhoArquivo": "467 KB",
+      "resumoVisual": "Já aprovada na rodada anterior — não foi regenerada por já atender a todos os critérios."
     },
     {
       "id": "papel_sulfite",
       "itensQueUsam": ["papel_sulfite"],
-      "prompt": "Create one small neat stack of plain white sulfite printer paper sheets, fanned slightly at one corner, with a thin deep-blue paper wrap band around the middle... (ver seção 20.4)",
+      "rodada": "reaproveitada",
+      "prompt": "Create one small neat stack of plain white sulfite printer paper sheets, fanned slightly at one corner, with a thin deep-blue paper wrap band around the middle... (ver rodada anterior)",
       "arquivo": "assets/catalog/images/papel_sulfite.png",
       "variante": "neutro",
-      "status": "aprovado",
+      "simboloLapisinhos": false,
+      "status": "aprovado (piloto anterior, reaproveitada)",
       "data": "2026-07-17",
       "dimensoes": "1920x1920",
-      "tamanhoArquivo": "1.2 MB"
+      "tamanhoArquivo": "1.2 MB",
+      "resumoVisual": "Já aprovada na rodada anterior — não foi regenerada por já atender a todos os critérios."
     },
     {
       "id": "tinta_guache",
       "itensQueUsam": ["tinta_guache"],
-      "prompt": "Create a small set of three generic unbranded guache paint pots with colorful paint (yellow, red, blue) visible through translucent tops... (ver seção 20.4)",
+      "rodada": "reaproveitada",
+      "prompt": "Create a small set of three generic unbranded guache paint pots with colorful paint (yellow, red, blue) visible through translucent tops... (ver rodada anterior)",
       "arquivo": "assets/catalog/images/tinta_guache.png",
       "variante": "neutro",
-      "status": "aprovado",
+      "simboloLapisinhos": false,
+      "status": "aprovado (piloto anterior, reaproveitada)",
       "data": "2026-07-17",
       "dimensoes": "1920x1920",
-      "tamanhoArquivo": "1.3 MB"
+      "tamanhoArquivo": "1.3 MB",
+      "resumoVisual": "Já aprovada na rodada anterior — não foi regenerada por já atender a todos os critérios."
+    }
+  ],
+  "imagensDeRodadaAnteriorNaoReaproveitadasNestaLista": [
+    {
+      "id": "cola_bastao",
+      "arquivo": "assets/catalog/images/cola_bastao.png",
+      "observacao": "Mantida no catálogo (item cola_bastao continua usando esta imagem), mas não faz parte da lista de 10 produtos desta rodada."
     },
     {
       "id": "mochila_escolar",
-      "itensQueUsam": ["mochila_escolar"],
-      "prompt": "Create one generic unbranded school backpack with two main compartments, a front pocket, adjustable shoulder straps, a deep-blue body and a red zipper pull accent... (ver seção 20.4)",
       "arquivo": "assets/catalog/images/mochila_escolar.png",
-      "variante": "azul",
-      "status": "aprovado",
-      "data": "2026-07-17",
-      "dimensoes": "1920x1920",
-      "tamanhoArquivo": "1.6 MB"
+      "observacao": "Mantida no catálogo (item mochila_escolar continua usando esta imagem), mas não faz parte da lista de 10 produtos desta rodada."
+    }
+  ],
+  "substituida": [
+    {
+      "id": "caderno_universitario",
+      "arquivo": "assets/catalog/images/caderno_universitario.png",
+      "observacao": "Removida nesta rodada. Era uma única imagem compartilhada pelos 3 itens de caderno universitário — substituída pelas 3 imagens distintas acima."
     }
   ],
   "observacoes": [
-    "Primeira leva de geração incluiu a palavra 'Sartec' no prompt (referência à paleta da marca) e o modelo imprimiu o texto/logo 'Sartec' em 4 dos 6 produtos — todas foram descartadas e regeneradas sem citar o nome da marca no prompt, apenas as cores.",
-    "A etapa images_resize (usada para redimensionar para 512x512) converte a imagem para JPEG e descarta o canal alfa, resultando em fundo preto sólido. Por isso o piloto foi mantido no tamanho nativo de geração (1920x1920) com fundo transparente, sem a etapa de resize.",
-    "Todas as imagens aprovadas foram verificadas visualmente: produto único, fundo transparente, ângulo de três quartos com leve vista superior, sem marcas/logos/texto/pessoas/mãos."
+    "As 7 imagens novas desta rodada foram geradas via mcp__claude_ai_Magnific__images_generate (text-to-image) seguido de images_remove_background para o recorte com transparência — sem uso de bancos de imagens externos.",
+    "As 3 reaproveitadas (caneta, papel sulfite, tinta guache) já haviam sido geradas e aprovadas numa rodada anterior; não foram regeneradas para não desperdiçar créditos em ativos já corretos.",
+    "Nenhuma imagem contém a palavra 'Sartec', texto ou logotipo. O símbolo dos lapisinhos (dois lápis cruzados, azul e vermelho, estilo geométrico simplificado) aparece apenas em 2 das 7 imagens novas (pasta com elástico e estojo triplo), de forma discreta e variada, conforme pedido.",
+    "Os três cadernos universitários (1 matéria, 10 matérias, outras matérias) têm capas, espessuras e composições visivelmente diferentes entre si.",
+    "Todas as imagens foram verificadas visualmente antes da associação aos cards: produto único (ou composição intencional, no caso de 'outras matérias'), sem marcas reais, sem pessoas/mãos, sem preços/etiquetas."
   ]
 }

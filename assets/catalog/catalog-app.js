@@ -1,13 +1,30 @@
 /* ======================================================
    SARTEC — Catálogo interativo de produtos
-   Navegação categoria → subcategoria → item, busca, gavetas
-   de personalização/manual, sugestões relacionadas, listas
-   rápidas e "Minha lista". Módulo de entrada da página
-   produtos.html — carregado como <script type="module">.
+   Vitrine contínua: categoria → todos os produtos da hora,
+   subcategoria funciona só como filtro da mesma grade.
+   Estado sincronizado com a URL (?categoria=&subcategoria=
+   ou ?q=), histórico do navegador e posição de scroll
+   preservados. Busca com sinônimos e tolerância a erros,
+   gavetas de personalização/manual, sugestões relacionadas,
+   listas rápidas, vistos recentemente e "Minha lista".
+   Módulo de entrada da página produtos.html — carregado
+   como <script type="module">.
    ====================================================== */
 
-import { CATALOG_CATEGORIES, getCategoryById, searchCatalog, getRelatedItems, getQuickLists } from './data/catalog-data.js';
+import {
+  CATALOG_CATEGORIES,
+  getCategoryById,
+  getItemById,
+  getItemContext,
+  getCategoryItemCount,
+  getSubcategoryCounts,
+  searchCatalog,
+  getRelatedItems,
+  getQuickLists,
+} from './data/catalog-data.js';
+import { getRelatedCategoryIds } from './data/relatedCategories.js';
 import { getList, subscribe, quickAddItem, updateItem, removeItem } from './catalog-list.js';
+import { registerRecentlyViewed, getRecentlyViewed } from './recently-viewed.js';
 import { openPersonalizeDrawer, openManualItemDrawer } from './catalog-item-drawer.js';
 import { openDrawer, closeDrawer } from './catalog-drawer.js';
 import { initListUI, openListDrawer } from './catalog-list-drawer.js';
@@ -26,29 +43,63 @@ const CATEGORY_ICONS = {
   'livros-atividades': '📚',
   'presentes-festas-embalagens': '🎁',
   'tecnologia-impressao-eletronicos': '🖨️',
-  'brinquedos-recreacao': '🧸',
-  'doces-conveniencia': '🍬',
   'utilidades-limpeza': '🧹',
 };
 
-// Piloto de 6 imagens (seção 20.1 do briefing). Formato PNG com transparência:
-// não há conversor WebP disponível neste ambiente (ver relatório final).
-const PILOT_IMAGE_MAP = {
-  caderno_universitario_1_materia: 'assets/catalog/images/caderno_universitario.png',
-  caderno_universitario_10_materias: 'assets/catalog/images/caderno_universitario.png',
-  caderno_universitario_outras_materias: 'assets/catalog/images/caderno_universitario.png',
+// As 10 imagens-piloto desta rodada (7 novas + 3 reaproveitadas do piloto
+// anterior, já aprovadas). Formato PNG com transparência — sem conversor
+// WebP disponível neste ambiente (ver relatório final).
+const IMAGE_MAP = {
+  caderno_universitario_1_materia: 'assets/catalog/images/caderno_universitario_1_materia.png',
+  caderno_universitario_10_materias: 'assets/catalog/images/caderno_universitario_10_materias.png',
+  caderno_universitario_outras_materias: 'assets/catalog/images/caderno_universitario_outras_materias.png',
   caneta_esferografica: 'assets/catalog/images/caneta_esferografica.png',
-  cola_bastao: 'assets/catalog/images/cola_bastao.png',
   papel_sulfite: 'assets/catalog/images/papel_sulfite.png',
+  cola_branca: 'assets/catalog/images/cola_branca.png',
   tinta_guache: 'assets/catalog/images/tinta_guache.png',
+  pasta_com_elastico: 'assets/catalog/images/pasta_com_elastico.png',
+  mouse_sem_fio: 'assets/catalog/images/mouse_sem_fio.png',
+  estojo_triplo: 'assets/catalog/images/estojo_triplo.png',
+  // Piloto anterior, mantido (não faz parte da lista de 10 desta rodada)
+  cola_bastao: 'assets/catalog/images/cola_bastao.png',
   mochila_escolar: 'assets/catalog/images/mochila_escolar.png',
 };
 
+// Amostra visual da vitrine inicial — um produto por categoria, escolhidos
+// manualmente entre os itens já mapeados. Não afirma "mais vendido",
+// "novidade" ou "disponível".
+const VITRINE_ITEM_IDS = [
+  'caderno_universitario_10_materias',
+  'caneta_esferografica',
+  'papel_sulfite',
+  'cola_bastao',
+  'tinta_guache',
+  'regua',
+  'pasta_com_elastico',
+  'mochila_escolar',
+  'livro_de_atividades',
+  'caixa_de_presente',
+  'mouse_sem_fio',
+  'produto_de_limpeza',
+];
+
 let state = { type: 'home' };
 let lastAddedItemId = null;
+let currentBackAction = null;
+let historyReady = false;
 
 function q(id) {
   return document.getElementById(id);
+}
+
+function reducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function hashStr(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return h;
 }
 
 function getListQuantityForItem(itemId) {
@@ -57,28 +108,50 @@ function getListQuantityForItem(itemId) {
     .reduce((acc, it) => acc + it.quantity, 0);
 }
 
+// ---- Fallback visual (sem imagem) ----
+
+function lapisinhosMarkHtml() {
+  return `<svg class="cat-lapisinhos-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <rect x="3" y="13" width="26" height="6" rx="2" fill="#1E3A8A" transform="rotate(-16 16 16)"/>
+    <rect x="3" y="13" width="26" height="6" rx="2" fill="#DC2626" transform="rotate(16 16 16)"/>
+  </svg>`;
+}
+
+function fallbackMediaHtml(item, category, bgClass) {
+  const icon = CATEGORY_ICONS[category?.id] || '🛍️';
+  const showMark = hashStr(item.id) % 3 === 0;
+  return `<div class="cat-card-media ${bgClass} cat-card-media-placeholder">
+    ${showMark ? lapisinhosMarkHtml() : ''}
+    <span class="cat-fallback-icon" aria-hidden="true">${icon}</span>
+    <span class="cat-fallback-name">${esc(item.name)}</span>
+  </div>`;
+}
+
 // ---- Cards ----
 
-function cardMediaHtml(item) {
+function cardMediaHtml(item, category) {
   const bgClass = variantBgClass(item.visualVariant);
-  const src = PILOT_IMAGE_MAP[item.id];
+  const src = IMAGE_MAP[item.id];
   if (src) {
     return `<div class="cat-card-media ${bgClass}">
       <img src="${esc(src)}" alt="${esc(item.name)}" width="256" height="256" loading="lazy"
         onerror="this.parentElement.classList.add('cat-card-media-placeholder'); this.remove();" />
     </div>`;
   }
-  return `<div class="cat-card-media ${bgClass} cat-card-media-placeholder"></div>`;
+  return fallbackMediaHtml(item, category, bgClass);
 }
 
 function renderItemCard(item, category, subcategory, opts = {}) {
   const qty = getListQuantityForItem(item.id);
   return `
   <article class="cat-card${qty > 0 ? ' cat-card-added' : ''}" data-item-id="${esc(item.id)}" data-category-id="${esc(category.id)}" data-subcategory-id="${esc(subcategory.id)}">
-    ${cardMediaHtml(item)}
+    ${cardMediaHtml(item, category)}
     <span class="cat-card-qty-badge" ${qty > 0 ? '' : 'hidden'}>${qty}</span>
     <div class="cat-card-body">
-      ${opts.showContextBadge ? `<span class="cat-card-context-badge">${esc(category.name)} · ${esc(subcategory.name)}</span>` : ''}
+      ${opts.showContextBadge ? `
+        <span class="cat-card-context-badge">${esc(category.name)} · ${esc(subcategory.name)}</span>
+        <button type="button" class="cat-card-category-link" data-action="open-category" data-goto-category="${esc(category.id)}">Ver categoria</button>
+      ` : ''}
       <button type="button" class="cat-card-name-btn" data-action="options">
         <strong>${esc(item.name)}</strong>
         ${item.shortDescription ? `<span class="cat-card-desc">${esc(item.shortDescription)}</span>` : ''}
@@ -106,7 +179,7 @@ function updateCardBadges() {
   });
 }
 
-// ---- Sugestões relacionadas ----
+// ---- Sugestões relacionadas ("Complete sua lista") ----
 
 function renderSuggestions() {
   const panel = q('cat-suggestions');
@@ -118,7 +191,7 @@ function renderSuggestions() {
     return;
   }
 
-  const ctx = findItemContext(lastAddedItemId);
+  const ctx = getItemContext(lastAddedItemId);
   if (!ctx) {
     panel.hidden = true;
     return;
@@ -134,7 +207,7 @@ function renderSuggestions() {
   panel.hidden = false;
   panel.innerHTML = `
     <div class="cat-suggestions-inner">
-      <p class="cat-suggestions-title">Talvez você também precise</p>
+      <p class="cat-suggestions-title">Complete sua lista</p>
       <div class="cat-suggestions-grid">
         ${related
           .map(
@@ -150,49 +223,57 @@ function renderSuggestions() {
   `;
 
   window.trackEvent?.('related_item_view', { related_source_item_id: lastAddedItemId, item_id: related.map((r) => r.id).join(',') });
-
-  panel.querySelectorAll('[data-related-add]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.relatedAdd;
-      const item = findItemById(id);
-      if (!item) return;
-      quickAddItem({ catalogItemId: item.id, name: item.name });
-      window.trackEvent?.('related_item_add', { item_id: id, related_source_item_id: btn.dataset.sourceItem });
-      lastAddedItemId = id;
-      showToast(`${item.name} adicionado à lista.`);
-      renderSuggestions();
-    });
-  });
 }
 
-function findItemById(id) {
-  for (const c of CATALOG_CATEGORIES) {
-    for (const s of c.subcategories) {
-      const found = s.items.find((it) => it.id === id);
-      if (found) return found;
-    }
+function onSuggestionsClick(e) {
+  const btn = e.target.closest('[data-related-add]');
+  if (!btn) return;
+  const id = btn.dataset.relatedAdd;
+  const item = getItemById(id);
+  if (!item) return;
+  quickAddItem({ catalogItemId: item.id, name: item.name });
+  window.trackEvent?.('related_item_add', { item_id: id, related_source_item_id: btn.dataset.sourceItem });
+  lastAddedItemId = id;
+  showToast(`${item.name} adicionado à lista.`);
+  renderSuggestions();
+  updateCardBadges();
+}
+
+// ---- Vistos recentemente ----
+
+function renderRecentlyViewed() {
+  const el = q('cat-recently-viewed');
+  if (!el) return;
+  const items = getRecentlyViewed((id) => getItemContext(id)?.item || null, 8);
+  if (items.length === 0) {
+    el.innerHTML = '';
+    el.hidden = true;
+    return;
   }
-  return null;
+  el.hidden = false;
+  el.innerHTML = `
+    <h2 class="cat-section-title">Vistos recentemente</h2>
+    <div class="cat-item-grid-scroll">
+      ${items
+        .map((item) => {
+          const ctx = getItemContext(item.id);
+          return renderItemCard(item, ctx.category, ctx.subcategory);
+        })
+        .join('')}
+    </div>
+  `;
+  window.trackEvent?.('catalog_recently_viewed_view', { item_count: items.length });
 }
 
-function findItemContext(id) {
-  for (const c of CATALOG_CATEGORIES) {
-    for (const s of c.subcategories) {
-      const found = s.items.find((it) => it.id === id);
-      if (found) return { item: found, category: c, subcategory: s };
-    }
-  }
-  return null;
-}
+// ---- Ações de card (delegação de evento única em #cat-view) ----
 
-// ---- Ações de card (delegação de evento) ----
-
-function handleQuickAdd(itemId) {
-  const ctx = findItemContext(itemId);
+function handleQuickAdd(itemId, sourceEl) {
+  const ctx = getItemContext(itemId);
   if (!ctx) return;
   const { item, category, subcategory } = ctx;
   const { instanceId, mergedIntoExisting } = quickAddItem({ catalogItemId: item.id, name: item.name });
   lastAddedItemId = item.id;
+  registerRecentlyViewed(item.id);
 
   window.trackEvent?.('item_quick_add', {
     item_id: item.id,
@@ -200,6 +281,9 @@ function handleQuickAdd(itemId) {
     subcategory_id: subcategory.id,
     source: state.type,
   });
+  if (sourceEl?.closest('#cat-recently-viewed')) {
+    window.trackEvent?.('catalog_recently_viewed_add', { item_id: item.id });
+  }
 
   showToast(`${item.name} adicionado à lista.`, {
     actionLabel: 'Desfazer',
@@ -218,87 +302,78 @@ function handleQuickAdd(itemId) {
 
   updateCardBadges();
   renderSuggestions();
+  renderRecentlyViewed();
 }
 
-function bindCardEvents(container) {
-  container.addEventListener('click', (e) => {
-    const addBtn = e.target.closest('[data-action="quick-add"]');
-    if (addBtn) {
-      const card = addBtn.closest('.cat-card');
-      handleQuickAdd(card.dataset.itemId);
-      return;
-    }
-    const optionsBtn = e.target.closest('[data-action="options"]');
-    if (optionsBtn) {
-      const card = optionsBtn.closest('.cat-card');
-      const ctx = findItemContext(card.dataset.itemId);
-      if (!ctx) return;
-      window.trackEvent?.('item_view', { item_id: ctx.item.id, category_id: ctx.category.id, subcategory_id: ctx.subcategory.id });
-      openPersonalizeDrawer(ctx.item, {
-        categoryId: ctx.category.id,
-        subcategoryId: ctx.subcategory.id,
-        source: state.type,
-        onAdded: () => {
-          lastAddedItemId = ctx.item.id;
-          updateCardBadges();
-          renderSuggestions();
-        },
-      });
-    }
+function handleOpenOptions(itemId) {
+  const ctx = getItemContext(itemId);
+  if (!ctx) return;
+  registerRecentlyViewed(ctx.item.id);
+  window.trackEvent?.('item_view', { item_id: ctx.item.id, category_id: ctx.category.id, subcategory_id: ctx.subcategory.id });
+  window.trackEvent?.('catalog_product_options_open', { item_id: ctx.item.id, category_id: ctx.category.id });
+  openPersonalizeDrawer(ctx.item, {
+    categoryId: ctx.category.id,
+    subcategoryId: ctx.subcategory.id,
+    source: state.type,
+    onAdded: () => {
+      lastAddedItemId = ctx.item.id;
+      updateCardBadges();
+      renderSuggestions();
+      renderRecentlyViewed();
+    },
   });
 }
 
-// ---- Views ----
-
-function setBreadcrumb() {
-  const el = q('cat-breadcrumb');
-  if (!el) return;
-  const partes = [`<button type="button" class="cat-crumb" data-crumb="home">Produtos</button>`];
-  if (state.type === 'category' || state.type === 'subcategory') {
-    const category = getCategoryById(state.categoryId);
-    if (category) partes.push(`<button type="button" class="cat-crumb" data-crumb="category" data-id="${esc(category.id)}">${esc(category.name)}</button>`);
+function onCatViewClick(e) {
+  const addBtn = e.target.closest('[data-action="quick-add"]');
+  if (addBtn) {
+    const card = addBtn.closest('[data-item-id]');
+    if (card) handleQuickAdd(card.dataset.itemId, card);
+    return;
   }
-  if (state.type === 'subcategory') {
-    const category = getCategoryById(state.categoryId);
-    const sub = category?.subcategories.find((s) => s.id === state.subcategoryId);
-    if (sub) partes.push(`<span class="cat-crumb cat-crumb-current">${esc(sub.name)}</span>`);
+  const optionsBtn = e.target.closest('[data-action="options"]');
+  if (optionsBtn) {
+    const card = optionsBtn.closest('[data-item-id]');
+    if (card) handleOpenOptions(card.dataset.itemId);
+    return;
   }
-  if (state.type === 'search') {
-    partes.push(`<span class="cat-crumb cat-crumb-current">Busca: "${esc(state.query)}"</span>`);
+  const gotoCategoryBtn = e.target.closest('[data-action="open-category"]');
+  if (gotoCategoryBtn) {
+    openCategory(gotoCategoryBtn.dataset.gotoCategory, 'search');
+    return;
   }
-  el.innerHTML = partes.join('<span class="cat-crumb-sep" aria-hidden="true">›</span>');
-  el.querySelectorAll('[data-crumb="home"]').forEach((b) => b.addEventListener('click', () => navigate({ type: 'home' })));
-  el.querySelectorAll('[data-crumb="category"]').forEach((b) => b.addEventListener('click', () => navigate({ type: 'category', categoryId: b.dataset.id })));
+  const combineBtn = e.target.closest('[data-combine-add]');
+  if (combineBtn) {
+    handleQuickAdd(combineBtn.dataset.combineAdd, combineBtn);
+    return;
+  }
+  const categoryTile = e.target.closest('[data-category-tile]');
+  if (categoryTile) {
+    const source = categoryTile.dataset.tileSource || 'home';
+    if (source === 'continue-explore') {
+      window.trackEvent?.('catalog_continue_exploring_click', { category_id: categoryTile.dataset.categoryTile, from_category_id: state.categoryId });
+    }
+    openCategory(categoryTile.dataset.categoryTile, source);
+    return;
+  }
+  const filterBtn = e.target.closest('[data-filter]');
+  if (filterBtn && state.type === 'category') {
+    selectSubcategoryFilter(state.categoryId, filterBtn.dataset.filter || null);
+    return;
+  }
+  const manualBtn = e.target.closest('[data-search-add-manual]');
+  if (manualBtn) {
+    openManualItemDrawer({ prefillName: manualBtn.dataset.searchAddManual, source: 'search_no_result' });
+  }
 }
 
-function renderHome(container) {
-  const featured = CATALOG_CATEGORIES.filter((c) => c.featured);
-  const others = CATALOG_CATEGORIES.filter((c) => !c.featured);
+// ---- Categorias ----
 
-  container.innerHTML = `
-    <div class="cat-category-grid cat-category-grid-featured">
-      ${featured.map(categoryTileHtml).join('')}
-    </div>
-    <h2 class="cat-section-title">Mais categorias</h2>
-    <div class="cat-category-grid cat-category-grid-secondary">
-      ${others.map(categoryTileHtml).join('')}
-    </div>
-  `;
-
-  container.querySelectorAll('[data-category-tile]').forEach((tile) => {
-    tile.addEventListener('click', () => {
-      const id = tile.dataset.categoryTile;
-      window.trackEvent?.('category_open', { category_id: id, source: 'home' });
-      navigate({ type: 'category', categoryId: id });
-    });
-  });
-}
-
-function categoryTileHtml(category) {
+function categoryTileHtml(category, opts = {}) {
   const icon = CATEGORY_ICONS[category.id] || '🛍️';
-  const itemCount = category.subcategories.reduce((acc, s) => acc + s.items.length, 0);
+  const itemCount = getCategoryItemCount(category);
   return `
-    <button type="button" class="cat-category-tile" data-category-tile="${esc(category.id)}">
+    <button type="button" class="cat-category-tile" data-category-tile="${esc(category.id)}" data-tile-source="${esc(opts.source || 'home')}">
       <span class="cat-category-tile-icon" aria-hidden="true">${icon}</span>
       <strong>${esc(category.name)}</strong>
       <span class="cat-category-tile-desc">${esc(category.description)}</span>
@@ -307,56 +382,149 @@ function categoryTileHtml(category) {
   `;
 }
 
-function renderCategory(container, categoryId) {
-  const category = getCategoryById(categoryId);
-  if (!category) {
-    container.innerHTML = `<p class="cat-empty-state">Categoria não encontrada. <button type="button" class="cat-link-btn" id="cat-back-home">Voltar para produtos</button></p>`;
-    container.querySelector('#cat-back-home')?.addEventListener('click', () => navigate({ type: 'home' }));
+function renderCategoryRail() {
+  const rail = q('cat-rail');
+  const context = q('cat-toolbar-context');
+  if (!rail || !context) return;
+  if (state.type !== 'category') {
+    context.hidden = true;
+    rail.innerHTML = '';
     return;
   }
+  context.hidden = false;
+  rail.innerHTML = CATALOG_CATEGORIES.map((c) => `
+    <button type="button" class="cat-rail-chip${c.id === state.categoryId ? ' cat-rail-chip-active' : ''}" data-category-tile="${esc(c.id)}" data-tile-source="rail">
+      <span aria-hidden="true">${CATEGORY_ICONS[c.id] || '🛍️'}</span> ${esc(c.name)}
+    </button>
+  `).join('');
+}
 
-  const subcats = [...category.subcategories].sort((a, b) => a.order - b.order);
-  container.innerHTML = `
-    <h1 class="cat-page-title">${esc(category.name)}</h1>
-    <p class="cat-page-desc">${esc(category.description)}</p>
-    <div class="cat-subcategory-grid">
-      ${subcats
-        .map(
-          (sub) => `
-        <button type="button" class="cat-subcategory-tile" data-subcategory-tile="${esc(sub.id)}">
-          <strong>${esc(sub.name)}</strong>
-          <span>${sub.items.length} ${sub.items.length === 1 ? 'tipo de produto' : 'tipos de produto'}</span>
-        </button>
-      `,
-        )
-        .join('')}
-    </div>
-  `;
-
-  container.querySelectorAll('[data-subcategory-tile]').forEach((tile) => {
-    tile.addEventListener('click', () => {
-      const id = tile.dataset.subcategoryTile;
-      window.trackEvent?.('subcategory_open', { category_id: category.id, subcategory_id: id });
-      navigate({ type: 'subcategory', categoryId: category.id, subcategoryId: id });
-    });
+function openAllCategoriesDrawer() {
+  window.trackEvent?.('catalog_all_categories_open', { source: state.type });
+  openDrawer({
+    id: 'all-categories',
+    title: 'Todas as categorias',
+    render(body) {
+      body.innerHTML = `<div class="cat-category-grid">${CATALOG_CATEGORIES.map((c) => categoryTileHtml(c, { source: 'all_categories_drawer' })).join('')}</div>`;
+      body.querySelectorAll('[data-category-tile]').forEach((tile) => {
+        tile.addEventListener('click', () => {
+          closeDrawer();
+          openCategory(tile.dataset.categoryTile, 'all_categories_drawer');
+        });
+      });
+    },
   });
 }
 
-function renderSubcategory(container, categoryId, subcategoryId) {
+// ---- Views ----
+
+function filterChipsHtml(category, activeSubcategoryId) {
+  const subCounts = getSubcategoryCounts(category);
+  if (subCounts.length <= 1) return '';
+  const total = getCategoryItemCount(category);
+  const chips = [
+    `<button type="button" class="cat-filter-chip${!activeSubcategoryId ? ' cat-filter-chip-active' : ''}" data-filter="">Todos <span class="cat-filter-count">${total}</span></button>`,
+    ...subCounts.map(
+      (s) => `<button type="button" class="cat-filter-chip${activeSubcategoryId === s.id ? ' cat-filter-chip-active' : ''}" data-filter="${esc(s.id)}">${esc(s.name)} <span class="cat-filter-count">${s.count}</span></button>`,
+    ),
+  ];
+  return `<div class="cat-filter-row" role="tablist" aria-label="Filtrar por subcategoria">${chips.join('')}</div>`;
+}
+
+function categoryGridHtml(category, activeSubcategoryId) {
+  const subCounts = getSubcategoryCounts(category);
+
+  if (activeSubcategoryId) {
+    const sub = category.subcategories.find((s) => s.id === activeSubcategoryId);
+    if (!sub) return '<p class="cat-empty-state">Filtro não encontrado.</p>';
+    const items = sub.items.filter((it) => it.active);
+    return `<div class="cat-item-grid">${items.map((item) => renderItemCard(item, category, sub)).join('')}</div>`;
+  }
+
+  if (subCounts.length <= 1) {
+    const sub = category.subcategories.find((s) => s.items.some((it) => it.active)) || category.subcategories[0];
+    const items = sub.items.filter((it) => it.active);
+    return `<div class="cat-item-grid">${items.map((item) => renderItemCard(item, category, sub)).join('')}</div>`;
+  }
+
+  // "Todos" com múltiplas subcategorias — divisores internos, nada escondido.
+  return subCounts
+    .map((s) => {
+      const sub = category.subcategories.find((c) => c.id === s.id);
+      const items = sub.items.filter((it) => it.active);
+      return `
+        <h3 class="cat-subcategory-divider">${esc(sub.name)}</h3>
+        <div class="cat-item-grid">${items.map((item) => renderItemCard(item, category, sub)).join('')}</div>
+      `;
+    })
+    .join('');
+}
+
+function combineComHtml(category, activeSubcategoryId) {
+  if (activeSubcategoryId) return '';
+  const total = getCategoryItemCount(category);
+  if (total <= 10) return '';
+  const firstItem = category.subcategories.flatMap((s) => s.items).find((it) => it.active);
+  if (!firstItem) return '';
+  const currentIds = new Set(getList().map((it) => it.catalogItemId).filter(Boolean));
+  const related = getRelatedItems(firstItem, currentIds, 4);
+  if (related.length === 0) return '';
+  return `
+    <div class="cat-combine-rail">
+      <p class="cat-combine-title">Combine com</p>
+      <div class="cat-combine-row">
+        ${related.map((it) => `<button type="button" class="cat-combine-chip" data-combine-add="${esc(it.id)}">+ ${esc(it.name)}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function continueExploringHtml(category) {
+  const related = getRelatedCategoryIds(category.id, 4).map(getCategoryById).filter(Boolean);
+  if (related.length === 0) return '';
+  window.trackEvent?.('catalog_continue_exploring_view', { category_id: category.id });
+  return `
+    <div class="cat-continue-explore">
+      <h2 class="cat-section-title">Continue explorando</h2>
+      <div class="cat-category-grid cat-category-grid-secondary">
+        ${related.map((c) => categoryTileHtml(c, { source: 'continue-explore' })).join('')}
+      </div>
+    </div>`;
+}
+
+function renderHome(container) {
+  const vitrineItems = VITRINE_ITEM_IDS.map((id) => getItemContext(id)).filter(Boolean);
+
+  container.innerHTML = `
+    ${vitrineItems.length > 0 ? `
+      <h2 class="cat-section-title">Explore alguns produtos</h2>
+      <div class="cat-item-grid-scroll">
+        ${vitrineItems.map((ctx) => renderItemCard(ctx.item, ctx.category, ctx.subcategory)).join('')}
+      </div>
+    ` : ''}
+    <h2 class="cat-section-title">Categorias</h2>
+    <div class="cat-category-grid">
+      ${CATALOG_CATEGORIES.map((c) => categoryTileHtml(c, { source: 'home' })).join('')}
+    </div>
+  `;
+}
+
+function renderCategory(container, categoryId, subcategoryId) {
   const category = getCategoryById(categoryId);
-  const sub = category?.subcategories.find((s) => s.id === subcategoryId);
-  if (!category || !sub) {
-    container.innerHTML = `<p class="cat-empty-state">Subcategoria não encontrada. <button type="button" class="cat-link-btn" id="cat-back-home">Voltar para produtos</button></p>`;
-    container.querySelector('#cat-back-home')?.addEventListener('click', () => navigate({ type: 'home' }));
+  if (!category) {
+    container.innerHTML = `<p class="cat-empty-state">Categoria não encontrada. <button type="button" class="cat-link-btn" id="cat-back-home-fallback">Voltar para produtos</button></p>`;
+    container.querySelector('#cat-back-home-fallback')?.addEventListener('click', () => goHome());
     return;
   }
 
+  const validSubcategoryId = subcategoryId && category.subcategories.some((s) => s.id === subcategoryId) ? subcategoryId : null;
+
   container.innerHTML = `
-    <h1 class="cat-page-title">${esc(sub.name)}</h1>
-    ${sub.description ? `<p class="cat-page-desc">${esc(sub.description)}</p>` : ''}
-    <div class="cat-item-grid">
-      ${sub.items.map((item) => renderItemCard(item, category, sub)).join('')}
-    </div>
+    <h1 class="cat-page-title">${esc(category.name)}</h1>
+    <p class="cat-page-desc">${esc(category.description)}</p>
+    ${filterChipsHtml(category, validSubcategoryId)}
+    ${categoryGridHtml(category, validSubcategoryId)}
+    ${combineComHtml(category, validSubcategoryId)}
+    ${continueExploringHtml(category)}
   `;
 }
 
@@ -370,12 +538,9 @@ function renderSearchResults(container, query) {
     container.innerHTML = `
       <div class="cat-empty-state cat-search-empty">
         <p>Não encontramos esse produto nas categorias. Deseja adicionar “${esc(query)}” manualmente?</p>
-        <button type="button" class="cat-drawer-btn-primary" id="cat-search-add-manual">Adicionar “${esc(query)}” manualmente</button>
+        <button type="button" class="cat-drawer-btn-primary" data-search-add-manual="${esc(query)}">Adicionar “${esc(query)}” manualmente</button>
       </div>
     `;
-    container.querySelector('#cat-search-add-manual')?.addEventListener('click', () => {
-      openManualItemDrawer({ prefillName: query, source: 'search_no_result' });
-    });
     return;
   }
 
@@ -387,34 +552,159 @@ function renderSearchResults(container, query) {
   `;
 }
 
-function renderView(opts = {}) {
+function renderView() {
   const container = q('cat-view');
   if (!container) return;
 
-  setBreadcrumb();
+  renderBreadcrumbBar();
+  renderCategoryRail();
+
+  const quicklistsWrap = q('cat-quicklists-wrap');
 
   if (state.type === 'home') {
+    if (quicklistsWrap) quicklistsWrap.hidden = false;
     renderHome(container);
     renderQuickLists();
-    q('cat-quicklists-wrap') && (q('cat-quicklists-wrap').hidden = false);
   } else {
-    q('cat-quicklists-wrap') && (q('cat-quicklists-wrap').hidden = true);
-    if (state.type === 'category') renderCategory(container, state.categoryId);
-    else if (state.type === 'subcategory') renderSubcategory(container, state.categoryId, state.subcategoryId);
+    if (quicklistsWrap) quicklistsWrap.hidden = true;
+    if (state.type === 'category') renderCategory(container, state.categoryId, state.subcategoryId);
     else if (state.type === 'search') renderSearchResults(container, state.query);
   }
 
-  if (opts.scroll) {
-    container.scrollIntoView?.({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+  renderRecentlyViewed();
+  updateCardBadges();
+}
+
+// ---- Breadcrumb + botão voltar contextual ----
+
+function renderBreadcrumbBar() {
+  const el = q('cat-breadcrumb');
+  if (!el) return;
+
+  const crumbs = [`<button type="button" class="cat-crumb" data-crumb="home">Produtos</button>`];
+  let backLabel = null;
+  currentBackAction = null;
+
+  if (state.type === 'category') {
+    const category = getCategoryById(state.categoryId);
+    if (category) {
+      crumbs.push(`<button type="button" class="cat-crumb" data-crumb="category" data-id="${esc(category.id)}">${esc(category.name)}</button>`);
+      const sub = state.subcategoryId && category.subcategories.find((s) => s.id === state.subcategoryId);
+      if (sub) {
+        crumbs.push(`<span class="cat-crumb cat-crumb-current">${esc(sub.name)}</span>`);
+        backLabel = 'Voltar para todos os produtos da categoria';
+        currentBackAction = () => selectSubcategoryFilter(category.id, null);
+      } else {
+        backLabel = 'Voltar para todas as categorias';
+        currentBackAction = () => goHome();
+      }
+    }
+  } else if (state.type === 'search') {
+    crumbs.push(`<span class="cat-crumb cat-crumb-current">Busca: "${esc(state.query)}"</span>`);
+    backLabel = 'Voltar para todas as categorias';
+    currentBackAction = () => goHome();
+  }
+
+  el.innerHTML = `
+    ${backLabel ? `<button type="button" class="cat-back-btn" id="cat-back-btn"><span aria-hidden="true">←</span> ${esc(backLabel)}</button>` : ''}
+    <div class="cat-breadcrumb-row">${crumbs.join('<span class="cat-crumb-sep" aria-hidden="true">›</span>')}</div>
+  `;
+}
+
+function onBreadcrumbClick(e) {
+  const homeBtn = e.target.closest('[data-crumb="home"]');
+  if (homeBtn) {
+    window.trackEvent?.('catalog_back', { from: state.type, to: 'home' });
+    goHome();
+    return;
+  }
+  const catBtn = e.target.closest('[data-crumb="category"]');
+  if (catBtn) {
+    openCategory(catBtn.dataset.id, 'breadcrumb');
+    return;
+  }
+  const backBtn = e.target.closest('#cat-back-btn');
+  if (backBtn && currentBackAction) {
+    window.trackEvent?.('catalog_back', { from: state.type, subcategory_id: state.subcategoryId || undefined });
+    currentBackAction();
   }
 }
 
-function navigate(next, opts = {}) {
-  state = next;
-  const searchInput = q('cat-search-input');
-  if (state.type !== 'search' && searchInput) searchInput.value = '';
-  renderView({ scroll: opts.scroll !== false });
+// ---- Roteamento / URL / histórico ----
+
+function stateFromLocation() {
+  const params = new URLSearchParams(window.location.search);
+  const categoria = params.get('categoria');
+  const query = params.get('q');
+  if (categoria && getCategoryById(categoria)) {
+    return { type: 'category', categoryId: categoria, subcategoryId: params.get('subcategoria') || null };
+  }
+  if (query) return { type: 'search', query };
+  return { type: 'home' };
 }
+
+function buildUrl(next) {
+  const params = new URLSearchParams();
+  if (next.type === 'category') {
+    params.set('categoria', next.categoryId);
+    if (next.subcategoryId) params.set('subcategoria', next.subcategoryId);
+  } else if (next.type === 'search') {
+    params.set('q', next.query);
+  }
+  const qs = params.toString();
+  return window.location.pathname + (qs ? `?${qs}` : '');
+}
+
+function scrollToTopOfState(next) {
+  if (next.type === 'home') {
+    window.scrollTo({ top: 0, behavior: reducedMotion() ? 'instant' : 'smooth' });
+    return;
+  }
+  q('cat-catalog-anchor')?.scrollIntoView({ behavior: reducedMotion() ? 'instant' : 'smooth', block: 'start' });
+}
+
+function go(next, { scrollToTop = false } = {}) {
+  if (historyReady) {
+    window.history.replaceState({ ...state, scrollY: window.scrollY }, '', buildUrl(state));
+  }
+  window.history.pushState({ ...next }, '', buildUrl(next));
+  historyReady = true;
+  state = next;
+  renderView();
+  if (scrollToTop) scrollToTopOfState(next);
+}
+
+function openCategory(categoryId, source) {
+  const prevType = state.type;
+  go({ type: 'category', categoryId, subcategoryId: null }, { scrollToTop: true });
+  window.trackEvent?.('catalog_category_switch', { category_id: categoryId, source: source || prevType });
+}
+
+function selectSubcategoryFilter(categoryId, subcategoryId) {
+  go({ type: 'category', categoryId, subcategoryId: subcategoryId || null }, { scrollToTop: false });
+  if (subcategoryId) {
+    window.trackEvent?.('catalog_subcategory_filter', { category_id: categoryId, subcategory_id: subcategoryId });
+  } else {
+    window.trackEvent?.('catalog_filter_all', { category_id: categoryId });
+  }
+}
+
+function goHome() {
+  go({ type: 'home' }, { scrollToTop: true });
+}
+
+function goSearch(query) {
+  go({ type: 'search', query }, { scrollToTop: true });
+}
+
+window.addEventListener('popstate', (e) => {
+  state = e.state || stateFromLocation();
+  const searchInput = q('cat-search-input');
+  if (searchInput) searchInput.value = state.type === 'search' ? state.query : '';
+  renderView();
+  const y = e.state?.scrollY;
+  requestAnimationFrame(() => window.scrollTo(0, typeof y === 'number' ? y : 0));
+});
 
 // ---- Busca ----
 
@@ -426,21 +716,21 @@ function initSearch() {
   const runSearch = debounce((value) => {
     const termo = value.trim();
     if (!termo) {
-      if (state.type === 'search') navigate({ type: 'home' });
+      if (state.type === 'search') goHome();
       return;
     }
-    navigate({ type: 'search', query: termo });
+    goSearch(termo);
   }, 260);
 
   input.addEventListener('input', () => runSearch(input.value));
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const termo = input.value.trim();
-    if (termo) navigate({ type: 'search', query: termo });
+    if (termo) goSearch(termo);
   });
 }
 
-// ---- Listas rápidas ----
+// ---- Listas rápidas (coleções visuais) ----
 
 function renderQuickLists() {
   const wrap = q('cat-quicklists');
@@ -452,21 +742,29 @@ function renderQuickLists() {
   }
   wrap.innerHTML = `
     <h2 class="cat-section-title">Listas rápidas</h2>
-    <div class="cat-quicklist-row">
+    <div class="cat-quicklist-grid">
       ${lists
         .map(
           (ql) => `
-        <button type="button" class="cat-quicklist-chip" data-quicklist="${esc(ql.id)}">
-          <span aria-hidden="true">${ql.icon}</span> ${esc(ql.label)}
-        </button>
+        <article class="cat-quicklist-card" data-quicklist="${esc(ql.id)}">
+          <span class="cat-quicklist-icon" aria-hidden="true">${ql.icon}</span>
+          <strong>${esc(ql.label)}</strong>
+          <span class="cat-quicklist-desc">${esc(ql.description || '')}</span>
+          <span class="cat-quicklist-count">${ql.items.length} ${ql.items.length === 1 ? 'tipo de produto' : 'tipos de produto'}</span>
+          <button type="button" class="cat-quicklist-cta" data-quicklist-open="${esc(ql.id)}">Explorar seleção</button>
+        </article>
       `,
         )
         .join('')}
     </div>
   `;
-  wrap.querySelectorAll('[data-quicklist]').forEach((btn) => {
-    btn.addEventListener('click', () => openQuickListDrawer(btn.dataset.quicklist));
-  });
+  window.trackEvent?.('catalog_quick_collection_view', { collection_count: lists.length });
+}
+
+function onQuickListsClick(e) {
+  const btn = e.target.closest('[data-quicklist-open]');
+  if (!btn) return;
+  openQuickListDrawer(btn.dataset.quicklistOpen);
 }
 
 function openQuickListDrawer(quickListId) {
@@ -474,13 +772,15 @@ function openQuickListDrawer(quickListId) {
   if (!list) return;
 
   window.trackEvent?.('quick_list_open', { quick_list_id: quickListId });
+  window.trackEvent?.('catalog_quick_collection_open', { quick_list_id: quickListId });
 
   openDrawer({
     id: 'quicklist-' + quickListId,
     title: list.label,
     render(body) {
       body.innerHTML = `
-        <p class="cat-drawer-desc">Marque os itens que você quer adicionar à sua lista.</p>
+        <p class="cat-drawer-desc">${esc(list.description || '')}</p>
+        <p class="cat-drawer-hint">Marque os itens que você quer adicionar à sua lista — nada é adicionado automaticamente.</p>
         <div class="cat-quicklist-options">
           ${list.items
             .map(
@@ -488,6 +788,7 @@ function openQuickListDrawer(quickListId) {
             <label class="cat-quicklist-option">
               <input type="checkbox" value="${esc(item.id)}" checked />
               <span>${esc(item.name)}</span>
+              <button type="button" class="cat-list-row-btn" data-quicklist-item-options="${esc(item.id)}">Ver opções</button>
             </label>
           `,
             )
@@ -499,10 +800,13 @@ function openQuickListDrawer(quickListId) {
         </div>
       `;
       body.querySelector('#cat-quicklist-cancel').addEventListener('click', () => closeDrawer());
+      body.querySelectorAll('[data-quicklist-item-options]').forEach((btn) => {
+        btn.addEventListener('click', () => handleOpenOptions(btn.dataset.quicklistItemOptions));
+      });
       body.querySelector('#cat-quicklist-confirm').addEventListener('click', () => {
         const checked = Array.from(body.querySelectorAll('input[type="checkbox"]:checked')).map((c) => c.value);
         checked.forEach((id) => {
-          const item = findItemById(id);
+          const item = getItemById(id);
           if (item) quickAddItem({ catalogItemId: item.id, name: item.name });
         });
         window.trackEvent?.('quick_list_add', { quick_list_id: quickListId, item_count: checked.length });
@@ -521,19 +825,31 @@ function openQuickListDrawer(quickListId) {
 // ---- Inicialização ----
 
 export function initCatalog() {
+  state = stateFromLocation();
+  window.history.replaceState({ ...state, scrollY: 0 }, '', buildUrl(state));
+  historyReady = true;
+
   initSearch();
   initListUI();
 
-  const view = q('cat-view');
-  if (view) bindCardEvents(view);
+  const searchInput = q('cat-search-input');
+  if (searchInput && state.type === 'search') searchInput.value = state.query;
+
+  q('cat-view')?.addEventListener('click', onCatViewClick);
+  q('cat-rail')?.addEventListener('click', onCatViewClick);
+  q('cat-breadcrumb')?.addEventListener('click', onBreadcrumbClick);
+  q('cat-suggestions')?.addEventListener('click', onSuggestionsClick);
+  q('cat-quicklists')?.addEventListener('click', onQuickListsClick);
+  q('cat-recently-viewed')?.addEventListener('click', onCatViewClick);
 
   q('cat-add-manual-btn')?.addEventListener('click', () => openManualItemDrawer({ source: 'manual_button' }));
+  q('cat-open-categories-btn')?.addEventListener('click', () => openAllCategoriesDrawer());
 
   subscribe(() => {
     updateCardBadges();
   });
 
-  navigate({ type: 'home' }, { scroll: false });
+  renderView();
   window.trackEvent?.('catalog_view', { viewport_type: window.innerWidth < 768 ? 'mobile' : 'desktop' });
 }
 

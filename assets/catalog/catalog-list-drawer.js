@@ -9,6 +9,7 @@ import {
   getList,
   getItemCount,
   getTotalQuantity,
+  quickAddItem,
   updateItem,
   removeItem,
   undoRemove,
@@ -16,7 +17,7 @@ import {
   reorderItems,
   clearList,
 } from './catalog-list.js';
-import { getItemById, getAttributeProfile } from './data/catalog-data.js';
+import { getItemById, getAttributeProfile, getRelatedItems } from './data/catalog-data.js';
 import { renderFieldGrid, wireQtySteppers, collectFieldValues } from './catalog-fields.js';
 import { openDrawer, closeDrawer, isDrawerOpen, refreshDrawerBody } from './catalog-drawer.js';
 import { showToast } from './catalog-toast.js';
@@ -50,6 +51,7 @@ function renderRow(entry, index, total) {
   const specs = specLines(entry);
   const editing = expandedInstanceId === entry.instanceId;
   const item = entry.catalogItemId ? getItemById(entry.catalogItemId) : null;
+  const isOrphan = !!entry.catalogItemId && !item;
 
   return `
     <li class="cat-list-row" data-instance-id="${esc(entry.instanceId)}">
@@ -57,6 +59,7 @@ function renderRow(entry, index, total) {
         <div class="cat-list-row-heading">
           <strong>${esc(entry.name)}</strong>
           ${entry.manual ? '<span class="cat-list-manual-badge">Adicionado manualmente</span>' : ''}
+          ${isOrphan ? '<span class="cat-list-manual-badge cat-list-orphan-badge">Fora do catálogo atual</span>' : ''}
         </div>
         ${specs.length ? `<div class="cat-list-row-specs">${specs.map(esc).join(' · ')}</div>` : ''}
         ${entry.notes ? `<div class="cat-list-row-notes">Obs: ${esc(entry.notes)}</div>` : ''}
@@ -108,6 +111,42 @@ function renderEditForm(entry, item) {
   `;
 }
 
+function complementaryItemsHtml(items) {
+  const inListIds = new Set(items.map((it) => it.catalogItemId).filter(Boolean));
+  const picked = [];
+  const pickedIds = new Set();
+  for (const entry of items) {
+    if (picked.length >= 4) break;
+    if (!entry.catalogItemId) continue;
+    const item = getItemById(entry.catalogItemId);
+    if (!item) continue;
+    const related = getRelatedItems(item, new Set([...inListIds, ...pickedIds]), 4 - picked.length);
+    related.forEach((r) => {
+      if (!pickedIds.has(r.id)) {
+        picked.push(r);
+        pickedIds.add(r.id);
+      }
+    });
+  }
+  if (picked.length === 0) return '';
+  return `
+    <div class="cat-list-complementary">
+      <p class="cat-suggestions-title">Talvez você também precise</p>
+      <div class="cat-suggestions-grid">
+        ${picked
+          .map(
+            (r) => `
+          <div class="cat-suggestion-chip" data-item-id="${esc(r.id)}">
+            <span>${esc(r.name)}</span>
+            <button type="button" class="cat-suggestion-add" data-complementary-add="${esc(r.id)}">+ Adicionar</button>
+          </div>`,
+          )
+          .join('')}
+      </div>
+    </div>
+  `;
+}
+
 function reviewSummaryHtml(items) {
   const catalogCount = items.filter((it) => !it.manual).length;
   const manualCount = items.filter((it) => it.manual).length;
@@ -135,6 +174,8 @@ function renderDrawerBody(body) {
       ${items.map((entry, i) => renderRow(entry, i, items.length)).join('')}
     </ul>
 
+    ${complementaryItemsHtml(items)}
+
     <div class="cat-list-review">
       <p class="cat-list-review-summary">${reviewSummaryHtml(items)}</p>
 
@@ -161,6 +202,21 @@ function renderDrawerBody(body) {
   wireQtySteppers(body);
   wireRows(body, items);
   wireReviewControls(body, items);
+  wireComplementary(body);
+}
+
+function wireComplementary(body) {
+  body.querySelectorAll('[data-complementary-add]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.complementaryAdd;
+      const item = getItemById(id);
+      if (!item) return;
+      quickAddItem({ catalogItemId: item.id, name: item.name });
+      window.trackEvent?.('related_item_add', { item_id: id, source: 'my_list_complementary' });
+      showToast(`${item.name} adicionado à lista.`);
+      refreshDrawerBody(renderDrawerBody);
+    });
+  });
 }
 
 function wireReviewControls(body, items) {

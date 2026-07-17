@@ -151,17 +151,6 @@ export const ATTRIBUTE_PROFILES = {
       { id: 'observacao', label: 'Observação', type: 'textarea' },
     ],
   },
-
-  brinquedo: {
-    label: 'Brinquedos',
-    fields: [
-      QTY,
-      { id: 'tipoBrinquedo', label: 'Tipo de brinquedo', type: 'text', placeholder: 'Ex: quebra-cabeça, boneca, carrinho' },
-      { id: 'faixaEtaria', label: 'Faixa etária', type: 'text', placeholder: 'Ex: 3 a 5 anos' },
-      { id: 'tema', label: 'Tema', type: 'text' },
-      { id: 'observacao', label: 'Observação', type: 'textarea' },
-    ],
-  },
 };
 
 export const ATTRIBUTE_PROFILE_IDS = Object.keys(ATTRIBUTE_PROFILES);

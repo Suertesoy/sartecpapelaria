@@ -5,7 +5,7 @@ const v = createVariantCycler(0);
 const cadernos = makeItems('caderno', 'cadernos', v, [
   ['caderno_universitario_1_materia', 'Caderno universitário 1 matéria', { syn: ['caderno_1_materia'] }],
   ['caderno_universitario_10_materias', 'Caderno universitário 10 matérias', { syn: ['caderno_10_materias'], desc: 'Para o ano letivo inteiro, com divisórias.' }],
-  ['caderno_universitario_outras_materias', 'Caderno universitário (outras quantidades de matérias)', { desc: '2, 3, 4, 5 ou outras quantidades de matérias.' }],
+  ['caderno_universitario_outras_materias', 'Caderno universitário: outras opções', { desc: '2, 3, 4, 5 ou outras quantidades de matérias.' }],
   ['caderno_brochura', 'Caderno brochura'],
   ['caderno_brochurao', 'Caderno brochurão'],
   ['caderno_espiral_14', 'Caderno espiral 1/4'],

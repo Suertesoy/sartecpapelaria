@@ -15,8 +15,6 @@ import { CATEGORY_MOCHILAS_ESTOJOS_LANCHEIRAS } from './categories/mochilas-esto
 import { CATEGORY_LIVROS_ATIVIDADES } from './categories/livros-atividades.js';
 import { CATEGORY_PRESENTES_FESTAS_EMBALAGENS } from './categories/presentes-festas-embalagens.js';
 import { CATEGORY_TECNOLOGIA_IMPRESSAO_ELETRONICOS } from './categories/tecnologia-impressao-eletronicos.js';
-import { CATEGORY_BRINQUEDOS_RECREACAO } from './categories/brinquedos-recreacao.js';
-import { CATEGORY_DOCES_CONVENIENCIA } from './categories/doces-conveniencia.js';
 import { CATEGORY_UTILIDADES_LIMPEZA } from './categories/utilidades-limpeza.js';
 
 import { RELATED_ITEMS_MATRIX } from './relatedItems.js';
@@ -36,10 +34,21 @@ export const CATALOG_CATEGORIES = [
   CATEGORY_LIVROS_ATIVIDADES,
   CATEGORY_PRESENTES_FESTAS_EMBALAGENS,
   CATEGORY_TECNOLOGIA_IMPRESSAO_ELETRONICOS,
-  CATEGORY_BRINQUEDOS_RECREACAO,
-  CATEGORY_DOCES_CONVENIENCIA,
   CATEGORY_UTILIDADES_LIMPEZA,
 ].sort((a, b) => a.order - b.order);
+
+/** Número de tipos de produto ativos numa categoria (soma das subcategorias). */
+export function getCategoryItemCount(category) {
+  return category.subcategories.reduce((acc, s) => acc + s.items.filter((it) => it.active).length, 0);
+}
+
+/** Subcategorias de uma categoria com a contagem de itens ativos, ordenadas, só as com itens. */
+export function getSubcategoryCounts(category) {
+  return [...category.subcategories]
+    .sort((a, b) => a.order - b.order)
+    .map((s) => ({ id: s.id, name: s.name, count: s.items.filter((it) => it.active).length }))
+    .filter((s) => s.count > 0);
+}
 
 // ---- Índices ----
 
