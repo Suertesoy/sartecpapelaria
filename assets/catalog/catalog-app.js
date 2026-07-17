@@ -46,24 +46,14 @@ const CATEGORY_ICONS = {
   'utilidades-limpeza': '🧹',
 };
 
-// As 10 imagens-piloto desta rodada (7 novas + 3 reaproveitadas do piloto
-// anterior, já aprovadas). Formato PNG com transparência — sem conversor
-// WebP disponível neste ambiente (ver relatório final).
-const IMAGE_MAP = {
-  caderno_universitario_1_materia: 'assets/catalog/images/caderno_universitario_1_materia.png',
-  caderno_universitario_10_materias: 'assets/catalog/images/caderno_universitario_10_materias.png',
-  caderno_universitario_outras_materias: 'assets/catalog/images/caderno_universitario_outras_materias.png',
-  caneta_esferografica: 'assets/catalog/images/caneta_esferografica.png',
-  papel_sulfite: 'assets/catalog/images/papel_sulfite.png',
-  cola_branca: 'assets/catalog/images/cola_branca.png',
-  tinta_guache: 'assets/catalog/images/tinta_guache.png',
-  pasta_com_elastico: 'assets/catalog/images/pasta_com_elastico.png',
-  mouse_sem_fio: 'assets/catalog/images/mouse_sem_fio.png',
-  estojo_triplo: 'assets/catalog/images/estojo_triplo.png',
-  // Piloto anterior, mantido (não faz parte da lista de 10 desta rodada)
-  cola_bastao: 'assets/catalog/images/cola_bastao.png',
-  mochila_escolar: 'assets/catalog/images/mochila_escolar.png',
-};
+// Convenção: toda imagem de produto gerada pelo MCP do Magnific fica em
+// assets/catalog/images/<id-do-item>.png. Não há mapa fixo — a cobertura é
+// de todos os produtos ativos (ver manifest.json). Caso um arquivo falhe ao
+// carregar (ausente ou corrompido), o onerror do <img> aciona o fallback
+// visual e o evento catalog_image_load_error é disparado.
+function getImagePath(item) {
+  return `assets/catalog/images/${item.id}.png`;
+}
 
 // Amostra visual da vitrine inicial — um produto por categoria, escolhidos
 // manualmente entre os itens já mapeados. Não afirma "mais vendido",
@@ -81,6 +71,16 @@ const VITRINE_ITEM_IDS = [
   'caixa_de_presente',
   'mouse_sem_fio',
   'produto_de_limpeza',
+];
+
+// Atalhos de categoria no hero — amostra pequena, a grade completa de
+// categorias já aparece logo abaixo.
+const HERO_SHORTCUT_CATEGORY_IDS = [
+  'cadernos-agendas-fichario',
+  'canetas-lapis-marcadores',
+  'mochilas-estojos-lancheiras',
+  'arte-pintura-artesanato',
+  'tecnologia-impressao-eletronicos',
 ];
 
 let state = { type: 'home' };
@@ -131,14 +131,11 @@ function fallbackMediaHtml(item, category, bgClass) {
 
 function cardMediaHtml(item, category) {
   const bgClass = variantBgClass(item.visualVariant);
-  const src = IMAGE_MAP[item.id];
-  if (src) {
-    return `<div class="cat-card-media ${bgClass}">
-      <img src="${esc(src)}" alt="${esc(item.name)}" width="256" height="256" loading="lazy"
-        onerror="this.parentElement.classList.add('cat-card-media-placeholder'); this.remove();" />
-    </div>`;
-  }
-  return fallbackMediaHtml(item, category, bgClass);
+  const src = getImagePath(item);
+  return `<div class="cat-card-media ${bgClass}">
+    <img src="${esc(src)}" alt="${esc(item.name)}" width="256" height="256" loading="lazy"
+      onerror="this.parentElement.classList.add('cat-card-media-placeholder'); this.remove(); window.trackEvent && window.trackEvent('catalog_image_load_error', { item_id: '${esc(item.id)}' });" />
+  </div>`;
 }
 
 function renderItemCard(item, category, subcategory, opts = {}) {
@@ -241,28 +238,23 @@ function onSuggestionsClick(e) {
 
 // ---- Vistos recentemente ----
 
-function renderRecentlyViewed() {
-  const el = q('cat-recently-viewed');
-  if (!el) return;
+function recentlyViewedHtml() {
   const items = getRecentlyViewed((id) => getItemContext(id)?.item || null, 8);
-  if (items.length === 0) {
-    el.innerHTML = '';
-    el.hidden = true;
-    return;
-  }
-  el.hidden = false;
-  el.innerHTML = `
-    <h2 class="cat-section-title">Vistos recentemente</h2>
-    <div class="cat-item-grid-scroll">
-      ${items
-        .map((item) => {
-          const ctx = getItemContext(item.id);
-          return renderItemCard(item, ctx.category, ctx.subcategory);
-        })
-        .join('')}
+  if (items.length === 0) return '';
+  window.trackEvent?.('catalog_recently_viewed_view', { item_count: items.length });
+  return `
+    <div id="cat-recently-viewed-section">
+      <h2 class="cat-section-title">Vistos recentemente</h2>
+      <div class="cat-item-grid-scroll">
+        ${items
+          .map((item) => {
+            const ctx = getItemContext(item.id);
+            return renderItemCard(item, ctx.category, ctx.subcategory);
+          })
+          .join('')}
+      </div>
     </div>
   `;
-  window.trackEvent?.('catalog_recently_viewed_view', { item_count: items.length });
 }
 
 // ---- Ações de card (delegação de evento única em #cat-view) ----
@@ -281,7 +273,8 @@ function handleQuickAdd(itemId, sourceEl) {
     subcategory_id: subcategory.id,
     source: state.type,
   });
-  if (sourceEl?.closest('#cat-recently-viewed')) {
+  window.trackEvent?.('catalog_item_quick_add', { item_id: item.id, category_id: category.id, source: state.type });
+  if (sourceEl?.closest('#cat-recently-viewed-section')) {
     window.trackEvent?.('catalog_recently_viewed_add', { item_id: item.id });
   }
 
@@ -310,6 +303,7 @@ function handleOpenOptions(itemId) {
   if (!ctx) return;
   registerRecentlyViewed(ctx.item.id);
   window.trackEvent?.('item_view', { item_id: ctx.item.id, category_id: ctx.category.id, subcategory_id: ctx.subcategory.id });
+  window.trackEvent?.('catalog_product_view', { item_id: ctx.item.id, category_id: ctx.category.id });
   window.trackEvent?.('catalog_product_options_open', { item_id: ctx.item.id, category_id: ctx.category.id });
   openPersonalizeDrawer(ctx.item, {
     categoryId: ctx.category.id,
@@ -363,8 +357,23 @@ function onCatViewClick(e) {
   }
   const manualBtn = e.target.closest('[data-search-add-manual]');
   if (manualBtn) {
-    openManualItemDrawer({ prefillName: manualBtn.dataset.searchAddManual, source: 'search_no_result' });
+    openManualDrawerTracked('search_no_result', { prefillName: manualBtn.dataset.searchAddManual });
+    return;
   }
+  const openManualBtn = e.target.closest('[data-open-manual]');
+  if (openManualBtn) {
+    openManualDrawerTracked(openManualBtn.dataset.openManual);
+    return;
+  }
+  const quicklistBtn = e.target.closest('[data-quicklist-open]');
+  if (quicklistBtn) {
+    openQuickListDrawer(quicklistBtn.dataset.quicklistOpen);
+  }
+}
+
+function openManualDrawerTracked(source, opts = {}) {
+  window.trackEvent?.('catalog_manual_item_open', { source });
+  openManualItemDrawer({ ...opts, source });
 }
 
 // ---- Categorias ----
@@ -397,6 +406,21 @@ function renderCategoryRail() {
       <span aria-hidden="true">${CATEGORY_ICONS[c.id] || '🛍️'}</span> ${esc(c.name)}
     </button>
   `).join('');
+}
+
+function renderHeroShortcuts() {
+  const wrap = q('cat-hero-shortcuts');
+  if (!wrap) return;
+  const cats = HERO_SHORTCUT_CATEGORY_IDS.map(getCategoryById).filter(Boolean);
+  wrap.innerHTML = cats
+    .map(
+      (c) => `
+    <button type="button" class="cat-hero-shortcut" data-category-tile="${esc(c.id)}" data-tile-source="hero_shortcut">
+      <span aria-hidden="true">${CATEGORY_ICONS[c.id] || '🛍️'}</span> ${esc(c.name)}
+    </button>
+  `,
+    )
+    .join('');
 }
 
 function openAllCategoriesDrawer() {
@@ -495,16 +519,23 @@ function renderHome(container) {
   const vitrineItems = VITRINE_ITEM_IDS.map((id) => getItemContext(id)).filter(Boolean);
 
   container.innerHTML = `
+    <h2 class="cat-section-title">Categorias</h2>
+    <div class="cat-category-grid">
+      ${CATALOG_CATEGORIES.map((c) => categoryTileHtml(c, { source: 'home' })).join('')}
+    </div>
+    <p class="cat-manual-inline"><button type="button" class="cat-link-btn" data-open-manual="home_after_categories">Não encontrou? Adicione outro item</button></p>
+
+    ${quickListsHtml()}
+
     ${vitrineItems.length > 0 ? `
       <h2 class="cat-section-title">Explore alguns produtos</h2>
       <div class="cat-item-grid-scroll">
         ${vitrineItems.map((ctx) => renderItemCard(ctx.item, ctx.category, ctx.subcategory)).join('')}
       </div>
+      <p class="cat-manual-inline cat-manual-inline-discreet"><button type="button" class="cat-link-btn" data-open-manual="vitrine_end">Não encontrou? Adicione outro item</button></p>
     ` : ''}
-    <h2 class="cat-section-title">Categorias</h2>
-    <div class="cat-category-grid">
-      ${CATALOG_CATEGORIES.map((c) => categoryTileHtml(c, { source: 'home' })).join('')}
-    </div>
+
+    ${recentlyViewedHtml()}
   `;
 }
 
@@ -524,6 +555,7 @@ function renderCategory(container, categoryId, subcategoryId) {
     ${filterChipsHtml(category, validSubcategoryId)}
     ${categoryGridHtml(category, validSubcategoryId)}
     ${combineComHtml(category, validSubcategoryId)}
+    ${recentlyViewedHtml()}
     ${continueExploringHtml(category)}
   `;
 }
@@ -559,19 +591,10 @@ function renderView() {
   renderBreadcrumbBar();
   renderCategoryRail();
 
-  const quicklistsWrap = q('cat-quicklists-wrap');
+  if (state.type === 'home') renderHome(container);
+  else if (state.type === 'category') renderCategory(container, state.categoryId, state.subcategoryId);
+  else if (state.type === 'search') renderSearchResults(container, state.query);
 
-  if (state.type === 'home') {
-    if (quicklistsWrap) quicklistsWrap.hidden = false;
-    renderHome(container);
-    renderQuickLists();
-  } else {
-    if (quicklistsWrap) quicklistsWrap.hidden = true;
-    if (state.type === 'category') renderCategory(container, state.categoryId, state.subcategoryId);
-    else if (state.type === 'search') renderSearchResults(container, state.query);
-  }
-
-  renderRecentlyViewed();
   updateCardBadges();
 }
 
@@ -697,21 +720,26 @@ function goSearch(query) {
   go({ type: 'search', query }, { scrollToTop: true });
 }
 
+function syncSearchInputs() {
+  const value = state.type === 'search' ? state.query : '';
+  document.querySelectorAll('.cat-search-input').forEach((el) => {
+    if (el.value !== value) el.value = value;
+  });
+}
+
 window.addEventListener('popstate', (e) => {
   state = e.state || stateFromLocation();
-  const searchInput = q('cat-search-input');
-  if (searchInput) searchInput.value = state.type === 'search' ? state.query : '';
+  syncSearchInputs();
   renderView();
   const y = e.state?.scrollY;
   requestAnimationFrame(() => window.scrollTo(0, typeof y === 'number' ? y : 0));
 });
 
-// ---- Busca ----
+// ---- Busca (elemento dominante do hero + espelho compacto na barra sticky) ----
 
 function initSearch() {
-  const form = q('cat-search-form');
-  const input = q('cat-search-input');
-  if (!form || !input) return;
+  const inputs = Array.from(document.querySelectorAll('.cat-search-input'));
+  if (inputs.length === 0) return;
 
   const runSearch = debounce((value) => {
     const termo = value.trim();
@@ -722,49 +750,51 @@ function initSearch() {
     goSearch(termo);
   }, 260);
 
-  input.addEventListener('input', () => runSearch(input.value));
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const termo = input.value.trim();
-    if (termo) goSearch(termo);
+  inputs.forEach((input) => {
+    input.addEventListener('focus', () => window.trackEvent?.('catalog_search_focus', { viewport_type: window.innerWidth < 768 ? 'mobile' : 'desktop' }), { once: true });
+    input.addEventListener('input', () => {
+      inputs.forEach((other) => { if (other !== input) other.value = input.value; });
+      runSearch(input.value);
+    });
+  });
+
+  document.querySelectorAll('.cat-search-form').forEach((form) => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = form.querySelector('.cat-search-input');
+      const termo = (input?.value || '').trim();
+      if (termo) {
+        window.trackEvent?.('catalog_search_submit', { search_term: termo });
+        goSearch(termo);
+      }
+    });
   });
 }
 
-// ---- Listas rápidas (coleções visuais) ----
+// ---- Listas rápidas (atalhos compactos) ----
 
-function renderQuickLists() {
-  const wrap = q('cat-quicklists');
-  if (!wrap) return;
+function quickListsHtml() {
   const lists = getQuickLists();
-  if (lists.length === 0) {
-    wrap.innerHTML = '';
-    return;
-  }
-  wrap.innerHTML = `
-    <h2 class="cat-section-title">Listas rápidas</h2>
-    <div class="cat-quicklist-grid">
+  if (lists.length === 0) return '';
+  window.trackEvent?.('catalog_quick_collection_view', { collection_count: lists.length });
+  return `
+    <h2 class="cat-section-title">Comece por uma necessidade</h2>
+    <div class="cat-quicklist-row">
       ${lists
         .map(
           (ql) => `
-        <article class="cat-quicklist-card" data-quicklist="${esc(ql.id)}">
-          <span class="cat-quicklist-icon" aria-hidden="true">${ql.icon}</span>
-          <strong>${esc(ql.label)}</strong>
-          <span class="cat-quicklist-desc">${esc(ql.description || '')}</span>
-          <span class="cat-quicklist-count">${ql.items.length} ${ql.items.length === 1 ? 'tipo de produto' : 'tipos de produto'}</span>
-          <button type="button" class="cat-quicklist-cta" data-quicklist-open="${esc(ql.id)}">Explorar seleção</button>
-        </article>
+        <button type="button" class="cat-quicklist-pill" data-quicklist-open="${esc(ql.id)}">
+          <span class="cat-quicklist-pill-icon" aria-hidden="true">${ql.icon}</span>
+          <span class="cat-quicklist-pill-text">
+            <strong>${esc(ql.label)}</strong>
+            <span>${ql.items.length} ${ql.items.length === 1 ? 'item' : 'itens'}</span>
+          </span>
+        </button>
       `,
         )
         .join('')}
     </div>
   `;
-  window.trackEvent?.('catalog_quick_collection_view', { collection_count: lists.length });
-}
-
-function onQuickListsClick(e) {
-  const btn = e.target.closest('[data-quicklist-open]');
-  if (!btn) return;
-  openQuickListDrawer(btn.dataset.quicklistOpen);
 }
 
 function openQuickListDrawer(quickListId) {
@@ -831,18 +861,15 @@ export function initCatalog() {
 
   initSearch();
   initListUI();
-
-  const searchInput = q('cat-search-input');
-  if (searchInput && state.type === 'search') searchInput.value = state.query;
+  syncSearchInputs();
+  renderHeroShortcuts();
 
   q('cat-view')?.addEventListener('click', onCatViewClick);
   q('cat-rail')?.addEventListener('click', onCatViewClick);
+  q('cat-hero-shortcuts')?.addEventListener('click', onCatViewClick);
   q('cat-breadcrumb')?.addEventListener('click', onBreadcrumbClick);
   q('cat-suggestions')?.addEventListener('click', onSuggestionsClick);
-  q('cat-quicklists')?.addEventListener('click', onQuickListsClick);
-  q('cat-recently-viewed')?.addEventListener('click', onCatViewClick);
 
-  q('cat-add-manual-btn')?.addEventListener('click', () => openManualItemDrawer({ source: 'manual_button' }));
   q('cat-open-categories-btn')?.addEventListener('click', () => openAllCategoriesDrawer());
 
   subscribe(() => {

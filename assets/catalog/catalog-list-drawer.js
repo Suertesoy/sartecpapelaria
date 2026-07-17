@@ -18,6 +18,7 @@ import {
   clearList,
 } from './catalog-list.js';
 import { getItemById, getAttributeProfile, getRelatedItems } from './data/catalog-data.js';
+import { openManualItemDrawer } from './catalog-item-drawer.js';
 import { renderFieldGrid, wireQtySteppers, collectFieldValues } from './catalog-fields.js';
 import { openDrawer, closeDrawer, isDrawerOpen, refreshDrawerBody } from './catalog-drawer.js';
 import { showToast } from './catalog-toast.js';
@@ -165,7 +166,12 @@ function renderDrawerBody(body) {
   if (items.length === 0) {
     body.innerHTML = `
       <p class="cat-list-empty">Sua lista está vazia por enquanto. Explore as categorias e adicione os produtos que você procura.</p>
+      <p class="cat-manual-inline"><button type="button" class="cat-link-btn" id="cat-list-open-manual">Não encontrou? Adicione outro item</button></p>
     `;
+    body.querySelector('#cat-list-open-manual')?.addEventListener('click', () => {
+      window.trackEvent?.('catalog_manual_item_open', { source: 'my_list_empty' });
+      openManualItemDrawer({ source: 'my_list_empty' });
+    });
     return;
   }
 
@@ -173,6 +179,8 @@ function renderDrawerBody(body) {
     <ul class="cat-list-rows" id="cat-list-rows">
       ${items.map((entry, i) => renderRow(entry, i, items.length)).join('')}
     </ul>
+
+    <p class="cat-manual-inline"><button type="button" class="cat-link-btn" id="cat-list-open-manual">Não encontrou? Adicione outro item</button></p>
 
     ${complementaryItemsHtml(items)}
 
@@ -203,6 +211,10 @@ function renderDrawerBody(body) {
   wireRows(body, items);
   wireReviewControls(body, items);
   wireComplementary(body);
+  body.querySelector('#cat-list-open-manual')?.addEventListener('click', () => {
+    window.trackEvent?.('catalog_manual_item_open', { source: 'my_list' });
+    openManualItemDrawer({ source: 'my_list' });
+  });
 }
 
 function wireComplementary(body) {

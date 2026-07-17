@@ -45,31 +45,54 @@
 
   <main>
 
-    <!-- Hero compacto — Produtos -->
-    <section class="cat-hero-compact">
-      <div class="cat-hero-compact-inner">
-        <span class="cat-hero-badge">Catálogo interativo</span>
-        <h1>Encontre o que precisa e monte sua lista</h1>
-        <p>Explore os produtos, adicione o que procura e envie sua lista para a equipe da Sartec confirmar opções e valores.</p>
+    <!-- Hero — Produtos: busca dominante à esquerda, composição visual à direita -->
+    <section class="cat-hero">
+      <div class="cat-hero-inner">
+        <div class="cat-hero-text">
+          <span class="cat-hero-badge">Catálogo interativo</span>
+          <h1>Encontre o que precisa e monte sua lista</h1>
+          <p>Explore os produtos, adicione o que procura e envie sua lista para a equipe da Sartec confirmar opções e valores.</p>
+
+          <form class="cat-search-form cat-search-form-hero" id="cat-search-form-hero" role="search">
+            <span class="cat-search-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <label for="cat-search-input-hero" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Buscar produto</label>
+            <input type="search" class="cat-search-input" id="cat-search-input-hero" name="q" placeholder="O que você está procurando?" autocomplete="off" />
+          </form>
+
+          <div class="cat-hero-shortcuts" id="cat-hero-shortcuts"></div>
+
+          <p class="cat-hero-disclaimer">
+            <span aria-hidden="true">ℹ️</span>
+            <span>Catálogo para solicitação de orçamento. Produtos, marcas e valores são confirmados pelo WhatsApp.</span>
+          </p>
+        </div>
+        <div class="cat-hero-visual" role="img" aria-label="Composição de produtos da papelaria: caderno, caneta, mochila, tinta guache e estojo">
+          <img class="cat-hero-visual-item cat-hero-visual-item-1" src="assets/catalog/images/caderno_universitario_10_materias.png" alt="" loading="lazy" width="256" height="256" />
+          <img class="cat-hero-visual-item cat-hero-visual-item-2" src="assets/catalog/images/mochila_escolar.png" alt="" loading="lazy" width="256" height="256" />
+          <img class="cat-hero-visual-item cat-hero-visual-item-3" src="assets/catalog/images/caneta_esferografica.png" alt="" loading="lazy" width="256" height="256" />
+          <img class="cat-hero-visual-item cat-hero-visual-item-4" src="assets/catalog/images/tinta_guache.png" alt="" loading="lazy" width="256" height="256" />
+          <img class="cat-hero-visual-item cat-hero-visual-item-5" src="assets/catalog/images/estojo_triplo.png" alt="" loading="lazy" width="256" height="256" />
+        </div>
       </div>
     </section>
 
     <!-- Barra de ferramentas — fica visível ao rolar a página -->
     <div class="cat-toolbar-sticky" id="cat-toolbar-sticky">
       <div class="cat-toolbar-inner">
-        <form class="cat-search-form" id="cat-search-form" role="search">
+        <form class="cat-search-form" id="cat-search-form-sticky" role="search">
           <span class="cat-search-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </span>
-          <label for="cat-search-input" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Buscar produto</label>
-          <input type="search" id="cat-search-input" name="q" placeholder="O que você está procurando?" autocomplete="off" />
+          <label for="cat-search-input-sticky" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Buscar produto</label>
+          <input type="search" class="cat-search-input" id="cat-search-input-sticky" name="q" placeholder="O que você está procurando?" autocomplete="off" />
         </form>
         <button type="button" class="cat-btn-list" data-cat-open-list>
           <span aria-hidden="true">🛒</span>
           Minha lista
           <span class="cat-btn-list-count" data-cat-list-count>0</span>
         </button>
-        <button type="button" class="cat-btn-manual" id="cat-add-manual-btn">+ Adicionar item manualmente</button>
       </div>
       <div class="cat-toolbar-context" id="cat-toolbar-context" hidden>
         <button type="button" class="cat-btn-categories" id="cat-open-categories-btn">
@@ -79,27 +102,15 @@
       </div>
     </div>
 
-    <div class="cat-hero-disclaimer-wrap">
-      <div class="cat-hero-disclaimer">
-        <span aria-hidden="true">ℹ️</span>
-        <span>Catálogo para solicitação de orçamento. Produtos, marcas e valores são confirmados pelo WhatsApp.</span>
-      </div>
-      <p class="cat-hero-steps">Escolha → monte sua lista → envie para orçamento</p>
-    </div>
+    <p class="cat-hero-steps">Escolha → monte sua lista → envie para orçamento</p>
 
     <!-- Catálogo -->
     <div class="cat-body-wrap">
       <div class="cat-body-inner">
-        <div id="cat-quicklists-wrap">
-          <div id="cat-quicklists"></div>
-        </div>
-
         <div id="cat-catalog-anchor"></div>
         <nav class="cat-breadcrumb" id="cat-breadcrumb" aria-label="Navegação do catálogo"></nav>
 
         <div id="cat-view"></div>
-
-        <div id="cat-recently-viewed" hidden></div>
 
         <div id="cat-suggestions" role="region" aria-live="polite" aria-label="Sugestões relacionadas" hidden></div>
 
