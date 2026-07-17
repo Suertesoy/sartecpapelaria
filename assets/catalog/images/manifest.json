@@ -1,0 +1,76 @@
+{
+  "notaFormato": "Piloto validado em PNG com transparência (RGBA). Não há conversor WebP disponível neste ambiente de execução (sem ImageMagick/cwebp/PIL instalados) — recomenda-se converter para WebP 256x256/512x512 com uma ferramenta de imagem antes de escalar para o restante do catálogo.",
+  "imagens": [
+    {
+      "id": "caderno_universitario",
+      "itensQueUsam": ["caderno_universitario_1_materia", "caderno_universitario_10_materias", "caderno_universitario_outras_materias"],
+      "prompt": "Create one generic unbranded university spiral notebook with a plain solid deep-blue hard cover, a red elastic closure band, and visible white paper edges... (ver seção 20.4; variante sem a palavra 'Sartec' no prompt para evitar geração de logotipo)",
+      "arquivo": "assets/catalog/images/caderno_universitario.png",
+      "variante": "misto",
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1920x1920",
+      "tamanhoArquivo": "1.9 MB"
+    },
+    {
+      "id": "caneta_esferografica",
+      "itensQueUsam": ["caneta_esferografica"],
+      "prompt": "Create one generic unbranded ballpoint pen with a sleek slim deep-blue barrel, a small red clip accent, and a clicker top... (ver seção 20.4)",
+      "arquivo": "assets/catalog/images/caneta_esferografica.png",
+      "variante": "azul",
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1920x1920",
+      "tamanhoArquivo": "467 KB"
+    },
+    {
+      "id": "cola_bastao",
+      "itensQueUsam": ["cola_bastao"],
+      "prompt": "Create one generic unbranded glue stick with a white plastic body, a twist-up base, a blue cap, and a small red accent ring... (ver seção 20.4)",
+      "arquivo": "assets/catalog/images/cola_bastao.png",
+      "variante": "misto",
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1920x1920",
+      "tamanhoArquivo": "737 KB"
+    },
+    {
+      "id": "papel_sulfite",
+      "itensQueUsam": ["papel_sulfite"],
+      "prompt": "Create one small neat stack of plain white sulfite printer paper sheets, fanned slightly at one corner, with a thin deep-blue paper wrap band around the middle... (ver seção 20.4)",
+      "arquivo": "assets/catalog/images/papel_sulfite.png",
+      "variante": "neutro",
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1920x1920",
+      "tamanhoArquivo": "1.2 MB"
+    },
+    {
+      "id": "tinta_guache",
+      "itensQueUsam": ["tinta_guache"],
+      "prompt": "Create a small set of three generic unbranded guache paint pots with colorful paint (yellow, red, blue) visible through translucent tops... (ver seção 20.4)",
+      "arquivo": "assets/catalog/images/tinta_guache.png",
+      "variante": "neutro",
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1920x1920",
+      "tamanhoArquivo": "1.3 MB"
+    },
+    {
+      "id": "mochila_escolar",
+      "itensQueUsam": ["mochila_escolar"],
+      "prompt": "Create one generic unbranded school backpack with two main compartments, a front pocket, adjustable shoulder straps, a deep-blue body and a red zipper pull accent... (ver seção 20.4)",
+      "arquivo": "assets/catalog/images/mochila_escolar.png",
+      "variante": "azul",
+      "status": "aprovado",
+      "data": "2026-07-17",
+      "dimensoes": "1920x1920",
+      "tamanhoArquivo": "1.6 MB"
+    }
+  ],
+  "observacoes": [
+    "Primeira leva de geração incluiu a palavra 'Sartec' no prompt (referência à paleta da marca) e o modelo imprimiu o texto/logo 'Sartec' em 4 dos 6 produtos — todas foram descartadas e regeneradas sem citar o nome da marca no prompt, apenas as cores.",
+    "A etapa images_resize (usada para redimensionar para 512x512) converte a imagem para JPEG e descarta o canal alfa, resultando em fundo preto sólido. Por isso o piloto foi mantido no tamanho nativo de geração (1920x1920) com fundo transparente, sem a etapa de resize.",
+    "Todas as imagens aprovadas foram verificadas visualmente: produto único, fundo transparente, ângulo de três quartos com leve vista superior, sem marcas/logos/texto/pessoas/mãos."
+  ]
+}
