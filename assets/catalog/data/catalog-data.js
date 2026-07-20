@@ -15,7 +15,6 @@ import { CATEGORY_MOCHILAS_ESTOJOS_LANCHEIRAS } from './categories/mochilas-esto
 import { CATEGORY_LIVROS_ATIVIDADES } from './categories/livros-atividades.js';
 import { CATEGORY_PRESENTES_FESTAS_EMBALAGENS } from './categories/presentes-festas-embalagens.js';
 import { CATEGORY_TECNOLOGIA_IMPRESSAO_ELETRONICOS } from './categories/tecnologia-impressao-eletronicos.js';
-import { CATEGORY_UTILIDADES_LIMPEZA } from './categories/utilidades-limpeza.js';
 
 import { RELATED_ITEMS_MATRIX } from './relatedItems.js';
 import { QUICK_LISTS } from './quickLists.js';
@@ -34,7 +33,6 @@ export const CATALOG_CATEGORIES = [
   CATEGORY_LIVROS_ATIVIDADES,
   CATEGORY_PRESENTES_FESTAS_EMBALAGENS,
   CATEGORY_TECNOLOGIA_IMPRESSAO_ELETRONICOS,
-  CATEGORY_UTILIDADES_LIMPEZA,
 ].sort((a, b) => a.order - b.order);
 
 /** Número de tipos de produto ativos numa categoria (soma das subcategorias). */

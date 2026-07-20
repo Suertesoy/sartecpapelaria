@@ -73,21 +73,14 @@ export const relatedCategories = {
     'colas-fitas-adesivos-correcao',
     'papeis-eva-materiais',
     'arte-pintura-artesanato',
-    'utilidades-limpeza',
+    'livros-atividades',
   ],
 
   'tecnologia-impressao-eletronicos': [
     'organizacao-escritorio',
     'papeis-eva-materiais',
     'canetas-lapis-marcadores',
-    'utilidades-limpeza',
-  ],
-
-  'utilidades-limpeza': [
-    'organizacao-escritorio',
-    'presentes-festas-embalagens',
-    'tecnologia-impressao-eletronicos',
-    'papeis-eva-materiais',
+    'acessorios-escolares-geometria',
   ],
 };
 

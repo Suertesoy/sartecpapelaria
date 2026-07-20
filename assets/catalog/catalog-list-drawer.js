@@ -19,6 +19,7 @@ import {
 } from './catalog-list.js';
 import { getItemById, getAttributeProfile, getRelatedItems } from './data/catalog-data.js';
 import { openManualItemDrawer } from './catalog-item-drawer.js';
+import { celebrateAdd } from './catalog-add-animation.js';
 import { renderFieldGrid, wireQtySteppers, collectFieldValues } from './catalog-fields.js';
 import { openDrawer, closeDrawer, isDrawerOpen, refreshDrawerBody } from './catalog-drawer.js';
 import { showToast } from './catalog-toast.js';
@@ -31,6 +32,7 @@ let expandedInstanceId = null;
 function specLines(entry) {
   if (entry.manual) {
     const lines = [];
+    if (entry.attributes?.categoria) lines.push(`Categoria: ${entry.attributes.categoria}`);
     if (entry.attributes?.cor) lines.push(`Cor: ${entry.attributes.cor}`);
     if (entry.attributes?.especificacao) lines.push(entry.attributes.especificacao);
     return lines;
@@ -225,6 +227,7 @@ function wireComplementary(body) {
       if (!item) return;
       quickAddItem({ catalogItemId: item.id, name: item.name });
       window.trackEvent?.('related_item_add', { item_id: id, source: 'my_list_complementary' });
+      celebrateAdd(btn, item.name);
       showToast(`${item.name} adicionado à lista.`);
       refreshDrawerBody(renderDrawerBody);
     });
@@ -396,7 +399,7 @@ function mountMobileBar() {
   bar.id = 'cat-mobile-bar';
   bar.className = 'cat-mobile-bar';
   bar.innerHTML = `
-    <span class="cat-mobile-bar-icon" aria-hidden="true">🛒</span>
+    <span class="cat-mobile-bar-icon" aria-hidden="true">📋</span>
     <span class="cat-mobile-bar-text" data-cat-list-count-label>Sua lista está vazia</span>
     <span class="cat-mobile-bar-cta">Ver minha lista</span>
   `;

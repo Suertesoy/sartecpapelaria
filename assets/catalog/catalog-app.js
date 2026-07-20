@@ -30,6 +30,7 @@ import { openDrawer, closeDrawer } from './catalog-drawer.js';
 import { initListUI, openListDrawer } from './catalog-list-drawer.js';
 import { showToast } from './catalog-toast.js';
 import { esc, debounce, variantBgClass } from './catalog-utils.js';
+import { celebrateAdd } from './catalog-add-animation.js';
 
 const CATEGORY_ICONS = {
   'cadernos-agendas-fichario': '📓',
@@ -43,8 +44,38 @@ const CATEGORY_ICONS = {
   'livros-atividades': '📚',
   'presentes-festas-embalagens': '🎁',
   'tecnologia-impressao-eletronicos': '🖨️',
-  'utilidades-limpeza': '🧹',
 };
+
+// Ícone da "Minha lista" em todo o catálogo — nunca um carrinho de compras,
+// já que a página monta uma lista para orçamento, não um checkout.
+export const LIST_ICON = '📋';
+
+// Produtos com imagem própria já gerada (ver assets/catalog/images/manifest.json).
+// Usado para priorizar produtos com foto real nas fileiras horizontais da home.
+const IMAGE_COVERED_IDS = new Set([
+  'caderno_universitario_1_materia', 'caderno_universitario_10_materias', 'caderno_universitario_outras_materias',
+  'caderno_brochura', 'caderno_brochurao', 'caderno_espiral_14', 'caderno_colegial', 'caderno_cartografia_desenho',
+  'caderno_caligrafia', 'caderno_argolado', 'agenda', 'planner', 'diario', 'calendario', 'caderneta',
+  'bloco_anotacoes', 'bloco_adesivo_notas', 'fichario', 'refil_fichario', 'acessorios_fichario',
+  'caneta_esferografica', 'caneta_gel', 'caneta_hidrografica', 'caneta_tecnica_fineliner', 'caneta_brush_lettering',
+  'caneta_especial', 'lapis_grafite', 'lapis_de_cor', 'lapiseira', 'grafite_lapiseira', 'marca_texto',
+  'marcador_quadro_branco', 'marcador_permanente', 'marcador_brush_lettering', 'marcador_especial',
+  'refil_marcador_quadro_branco', 'refil_marcador_permanente', 'giz_de_cera', 'giz_para_quadro',
+  'papel_sulfite', 'cartolina', 'papel_cartao', 'papel_crepom', 'papel_para_dobradura', 'papel_seda',
+  'papel_celofane', 'papel_carbono', 'papel_kraft', 'papel_vegetal', 'papel_fotografico', 'papel_couche',
+  'papel_adesivo', 'papel_colorido_criativo', 'bloco_de_desenho', 'bloco_trabalhos_escolares', 'eva_liso',
+  'eva_com_glitter', 'eva_atoalhado', 'eva_estampado', 'isopor', 'plastico_adesivo_contact',
+  'plastico_para_encapar', 'plastico_para_plastificar', 'folhas_capas_plasticas', 'tnt', 'feltro',
+  'cola_bastao', 'cola_branca', 'cola_instantanea', 'cola_quente', 'cola_de_silicone', 'cola_para_eva_isopor',
+  'cola_para_madeira', 'cola_para_tecido', 'cola_para_artesanato', 'fita_adesiva_transparente',
+  'fita_adesiva_colorida', 'fita_dupla_face', 'fita_crepe', 'fita_para_embalagem', 'fita_isolante',
+  'etiqueta_para_impressao', 'etiqueta_de_preco', 'etiqueta_escolar', 'adesivo_decorativo', 'etiquetas_em_geral',
+  'borracha', 'corretivo_em_fita', 'corretivo_liquido', 'caneta_corretiva', 'tinta_guache', 'tinta_para_tecido',
+  'tinta_acrilica', 'tinta_pva_artesanato', 'tinta_dimensional_relevo', 'aquarela', 'tinta_spray',
+  'tinta_metalica', 'tinta_nanquim', 'pincel_chato', 'pincel_redondo', 'pincel_artistico',
+  'acessorios_para_pintura', 'lapis_artistico', 'materiais_desenho_artistico', 'stencil', 'massa_de_modelar',
+  'kit_de_modelagem', 'pasta_com_elastico', 'mochila_escolar', 'estojo_triplo', 'mouse_sem_fio',
+]);
 
 // Convenção: toda imagem de produto gerada pelo MCP do Magnific fica em
 // assets/catalog/images/<id-do-item>.png. Não há mapa fixo — a cobertura é
@@ -55,33 +86,8 @@ function getImagePath(item) {
   return `assets/catalog/images/${item.id}.png`;
 }
 
-// Amostra visual da vitrine inicial — um produto por categoria, escolhidos
-// manualmente entre os itens já mapeados. Não afirma "mais vendido",
-// "novidade" ou "disponível".
-const VITRINE_ITEM_IDS = [
-  'caderno_universitario_10_materias',
-  'caneta_esferografica',
-  'papel_sulfite',
-  'cola_bastao',
-  'tinta_guache',
-  'regua',
-  'pasta_com_elastico',
-  'mochila_escolar',
-  'livro_de_atividades',
-  'caixa_de_presente',
-  'mouse_sem_fio',
-  'produto_de_limpeza',
-];
-
-// Atalhos de categoria no hero — amostra pequena, a grade completa de
-// categorias já aparece logo abaixo.
-const HERO_SHORTCUT_CATEGORY_IDS = [
-  'cadernos-agendas-fichario',
-  'canetas-lapis-marcadores',
-  'mochilas-estojos-lancheiras',
-  'arte-pintura-artesanato',
-  'tecnologia-impressao-eletronicos',
-];
+// Quantidade máxima de produtos em cada fileira horizontal da home.
+const SECTION_ITEM_LIMIT = 10;
 
 let state = { type: 'home' };
 let lastAddedItemId = null;
@@ -231,9 +237,85 @@ function onSuggestionsClick(e) {
   quickAddItem({ catalogItemId: item.id, name: item.name });
   window.trackEvent?.('related_item_add', { item_id: id, related_source_item_id: btn.dataset.sourceItem });
   lastAddedItemId = id;
+  celebrateAdd(btn, item.name);
   showToast(`${item.name} adicionado à lista.`);
   renderSuggestions();
   updateCardBadges();
+}
+
+// ---- Fileiras horizontais reutilizáveis (home, vistos recentemente) ----
+
+function scrollRowHtml(cardsHtml) {
+  return `
+    <div class="cat-row-wrap">
+      <button type="button" class="cat-row-nav cat-row-nav-prev" data-row-nav="prev" aria-label="Ver produtos anteriores" hidden>‹</button>
+      <div class="cat-item-grid-scroll" data-row-scroll>${cardsHtml}</div>
+      <button type="button" class="cat-row-nav cat-row-nav-next" data-row-nav="next" aria-label="Ver mais produtos" hidden>›</button>
+    </div>
+  `;
+}
+
+function initRowScroller(el) {
+  const wrap = el.closest('.cat-row-wrap');
+  const prevBtn = wrap?.querySelector('[data-row-nav="prev"]');
+  const nextBtn = wrap?.querySelector('[data-row-nav="next"]');
+
+  function updateArrows() {
+    const maxScroll = el.scrollWidth - el.clientWidth - 2;
+    const scrollable = el.scrollWidth > el.clientWidth + 4;
+    if (prevBtn) prevBtn.hidden = !scrollable || el.scrollLeft <= 4;
+    if (nextBtn) nextBtn.hidden = !scrollable || el.scrollLeft >= maxScroll;
+  }
+
+  el.addEventListener('scroll', debounce(updateArrows, 60), { passive: true });
+  window.addEventListener('resize', debounce(updateArrows, 150));
+  updateArrows();
+
+  prevBtn?.addEventListener('click', () => el.scrollBy({ left: -el.clientWidth * 0.85, behavior: reducedMotion() ? 'auto' : 'smooth' }));
+  nextBtn?.addEventListener('click', () => el.scrollBy({ left: el.clientWidth * 0.85, behavior: reducedMotion() ? 'auto' : 'smooth' }));
+
+  // Roda do mouse: converte scroll vertical em horizontal quando fizer sentido.
+  el.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && el.scrollWidth > el.clientWidth) {
+      el.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  // Arraste com o mouse (trackpad/touch já rolam nativamente).
+  let dragging = false;
+  let startX = 0;
+  let startScroll = 0;
+  let moved = false;
+  el.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    dragging = true;
+    moved = false;
+    startX = e.clientX;
+    startScroll = el.scrollLeft;
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 3) moved = true;
+    el.scrollLeft = startScroll - dx;
+  });
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    if (moved) {
+      const suppressClick = (ev) => ev.stopPropagation();
+      el.addEventListener('click', suppressClick, { capture: true, once: true });
+      setTimeout(() => el.removeEventListener('click', suppressClick, { capture: true }), 0);
+    }
+  }
+  el.addEventListener('pointerup', endDrag);
+  el.addEventListener('pointerleave', endDrag);
+}
+
+function initRowScrollers(container) {
+  container.querySelectorAll('[data-row-scroll]').forEach(initRowScroller);
 }
 
 // ---- Vistos recentemente ----
@@ -242,19 +324,26 @@ function recentlyViewedHtml() {
   const items = getRecentlyViewed((id) => getItemContext(id)?.item || null, 8);
   if (items.length === 0) return '';
   window.trackEvent?.('catalog_recently_viewed_view', { item_count: items.length });
+  const cardsHtml = items
+    .map((item) => {
+      const ctx = getItemContext(item.id);
+      return renderItemCard(item, ctx.category, ctx.subcategory);
+    })
+    .join('');
   return `
-    <div id="cat-recently-viewed-section">
-      <h2 class="cat-section-title">Vistos recentemente</h2>
-      <div class="cat-item-grid-scroll">
-        ${items
-          .map((item) => {
-            const ctx = getItemContext(item.id);
-            return renderItemCard(item, ctx.category, ctx.subcategory);
-          })
-          .join('')}
-      </div>
-    </div>
+    <section id="cat-recently-viewed-section" aria-labelledby="cat-recently-viewed-title">
+      <h2 class="cat-section-title" id="cat-recently-viewed-title">Vistos recentemente</h2>
+      ${scrollRowHtml(cardsHtml)}
+    </section>
   `;
+}
+
+/** Atualiza somente o bloco "Vistos recentemente" in-place (home e categoria), sem re-renderizar o resto da view. */
+function renderRecentlyViewed() {
+  const slot = document.getElementById('cat-recently-viewed-slot');
+  if (!slot) return;
+  slot.innerHTML = recentlyViewedHtml();
+  initRowScrollers(slot);
 }
 
 // ---- Ações de card (delegação de evento única em #cat-view) ----
@@ -277,6 +366,8 @@ function handleQuickAdd(itemId, sourceEl) {
   if (sourceEl?.closest('#cat-recently-viewed-section')) {
     window.trackEvent?.('catalog_recently_viewed_add', { item_id: item.id });
   }
+
+  celebrateAdd(sourceEl, item.name);
 
   showToast(`${item.name} adicionado à lista.`, {
     actionLabel: 'Desfazer',
@@ -322,7 +413,7 @@ function onCatViewClick(e) {
   const addBtn = e.target.closest('[data-action="quick-add"]');
   if (addBtn) {
     const card = addBtn.closest('[data-item-id]');
-    if (card) handleQuickAdd(card.dataset.itemId, card);
+    if (card) handleQuickAdd(card.dataset.itemId, addBtn);
     return;
   }
   const optionsBtn = e.target.closest('[data-action="options"]');
@@ -362,7 +453,12 @@ function onCatViewClick(e) {
   }
   const openManualBtn = e.target.closest('[data-open-manual]');
   if (openManualBtn) {
-    openManualDrawerTracked(openManualBtn.dataset.openManual);
+    const categoryId = openManualBtn.dataset.openManualCategory;
+    const category = categoryId ? getCategoryById(categoryId) : null;
+    openManualDrawerTracked(
+      openManualBtn.dataset.openManual,
+      category ? { categoryId: category.id, categoryName: category.name } : {},
+    );
     return;
   }
   const quicklistBtn = e.target.closest('[data-quicklist-open]');
@@ -374,6 +470,52 @@ function onCatViewClick(e) {
 function openManualDrawerTracked(source, opts = {}) {
   window.trackEvent?.('catalog_manual_item_open', { source });
   openManualItemDrawer({ ...opts, source });
+}
+
+// ---- Seleção determinística de produtos por fileira (home) ----
+
+const sectionItemsCache = new Map();
+
+/**
+ * Escolhe até SECTION_ITEM_LIMIT produtos de uma categoria para a fileira
+ * horizontal da home: sempre os mesmos a cada carregamento (sem sorteio),
+ * priorizando produtos com imagem própria e alternando entre subcategorias
+ * diferentes antes de repetir uma mesma subcategoria (evita encher a
+ * fileira com pequenas variações quase idênticas do mesmo item).
+ */
+function pickSectionItems(category) {
+  if (sectionItemsCache.has(category.id)) return sectionItemsCache.get(category.id);
+
+  const subcats = [...category.subcategories].sort((a, b) => a.order - b.order).map((s) => ({
+    sub: s,
+    items: s.items.filter((it) => it.active),
+  })).filter((s) => s.items.length > 0);
+
+  const diverse = [];
+  let round = 0;
+  let added = true;
+  while (added && diverse.length < subcats.reduce((acc, s) => acc + s.items.length, 0)) {
+    added = false;
+    for (const { sub, items } of subcats) {
+      if (items[round]) {
+        diverse.push({ item: items[round], sub });
+        added = true;
+      }
+    }
+    round++;
+  }
+
+  // Ordenação estável: produtos com imagem própria primeiro, preservando a
+  // diversidade de subcategorias já obtida pelo round-robin acima.
+  diverse.sort((a, b) => {
+    const aHas = IMAGE_COVERED_IDS.has(a.item.id) ? 0 : 1;
+    const bHas = IMAGE_COVERED_IDS.has(b.item.id) ? 0 : 1;
+    return aHas - bHas;
+  });
+
+  const picked = diverse.slice(0, SECTION_ITEM_LIMIT).map(({ item, sub }) => ({ item, category, subcategory: sub }));
+  sectionItemsCache.set(category.id, picked);
+  return picked;
 }
 
 // ---- Categorias ----
@@ -391,36 +533,17 @@ function categoryTileHtml(category, opts = {}) {
   `;
 }
 
-function renderCategoryRail() {
+// Navegação única e completa de categorias, sempre visível na barra de
+// ferramentas (nunca uma lista parcial) — as 11 categorias, sempre na
+// mesma ordem, com o item ativo destacado quando uma categoria está aberta.
+function renderCategoryNav() {
   const rail = q('cat-rail');
-  const context = q('cat-toolbar-context');
-  if (!rail || !context) return;
-  if (state.type !== 'category') {
-    context.hidden = true;
-    rail.innerHTML = '';
-    return;
-  }
-  context.hidden = false;
+  if (!rail) return;
   rail.innerHTML = CATALOG_CATEGORIES.map((c) => `
-    <button type="button" class="cat-rail-chip${c.id === state.categoryId ? ' cat-rail-chip-active' : ''}" data-category-tile="${esc(c.id)}" data-tile-source="rail">
+    <button type="button" class="cat-rail-chip${c.id === state.categoryId ? ' cat-rail-chip-active' : ''}" data-category-tile="${esc(c.id)}" data-tile-source="nav" aria-current="${c.id === state.categoryId ? 'true' : 'false'}">
       <span aria-hidden="true">${CATEGORY_ICONS[c.id] || '🛍️'}</span> ${esc(c.name)}
     </button>
   `).join('');
-}
-
-function renderHeroShortcuts() {
-  const wrap = q('cat-hero-shortcuts');
-  if (!wrap) return;
-  const cats = HERO_SHORTCUT_CATEGORY_IDS.map(getCategoryById).filter(Boolean);
-  wrap.innerHTML = cats
-    .map(
-      (c) => `
-    <button type="button" class="cat-hero-shortcut" data-category-tile="${esc(c.id)}" data-tile-source="hero_shortcut">
-      <span aria-hidden="true">${CATEGORY_ICONS[c.id] || '🛍️'}</span> ${esc(c.name)}
-    </button>
-  `,
-    )
-    .join('');
 }
 
 function openAllCategoriesDrawer() {
@@ -515,27 +638,27 @@ function continueExploringHtml(category) {
     </div>`;
 }
 
-function renderHome(container) {
-  const vitrineItems = VITRINE_ITEM_IDS.map((id) => getItemContext(id)).filter(Boolean);
-
-  container.innerHTML = `
-    <h2 class="cat-section-title">Categorias</h2>
-    <div class="cat-category-grid">
-      ${CATALOG_CATEGORIES.map((c) => categoryTileHtml(c, { source: 'home' })).join('')}
-    </div>
-    <p class="cat-manual-inline"><button type="button" class="cat-link-btn" data-open-manual="home_after_categories">Não encontrou? Adicione outro item</button></p>
-
-    ${quickListsHtml()}
-
-    ${vitrineItems.length > 0 ? `
-      <h2 class="cat-section-title">Explore alguns produtos</h2>
-      <div class="cat-item-grid-scroll">
-        ${vitrineItems.map((ctx) => renderItemCard(ctx.item, ctx.category, ctx.subcategory)).join('')}
+function categorySectionHtml(category) {
+  const picked = pickSectionItems(category);
+  if (picked.length === 0) return '';
+  const cardsHtml = picked.map(({ item, category: c, subcategory: s }) => renderItemCard(item, c, s)).join('');
+  return `
+    <section class="cat-home-section" aria-labelledby="cat-home-section-${esc(category.id)}">
+      <div class="cat-home-section-head">
+        <h2 id="cat-home-section-${esc(category.id)}">${esc(category.name)}</h2>
+        <button type="button" class="cat-see-all" data-category-tile="${esc(category.id)}" data-tile-source="home_see_all">Ver tudo</button>
       </div>
-      <p class="cat-manual-inline cat-manual-inline-discreet"><button type="button" class="cat-link-btn" data-open-manual="vitrine_end">Não encontrou? Adicione outro item</button></p>
-    ` : ''}
+      ${scrollRowHtml(cardsHtml)}
+      <p class="cat-manual-inline"><button type="button" class="cat-link-btn" data-open-manual="home_section_${esc(category.id)}" data-open-manual-category="${esc(category.id)}">Não encontrou? Adicione outro item</button></p>
+    </section>
+  `;
+}
 
-    ${recentlyViewedHtml()}
+function renderHome(container) {
+  container.innerHTML = `
+    ${CATALOG_CATEGORIES.map((c) => categorySectionHtml(c)).join('')}
+    ${quickListsHtml()}
+    <div id="cat-recently-viewed-slot">${recentlyViewedHtml()}</div>
   `;
 }
 
@@ -555,7 +678,7 @@ function renderCategory(container, categoryId, subcategoryId) {
     ${filterChipsHtml(category, validSubcategoryId)}
     ${categoryGridHtml(category, validSubcategoryId)}
     ${combineComHtml(category, validSubcategoryId)}
-    ${recentlyViewedHtml()}
+    <div id="cat-recently-viewed-slot">${recentlyViewedHtml()}</div>
     ${continueExploringHtml(category)}
   `;
 }
@@ -589,13 +712,14 @@ function renderView() {
   if (!container) return;
 
   renderBreadcrumbBar();
-  renderCategoryRail();
+  renderCategoryNav();
 
   if (state.type === 'home') renderHome(container);
   else if (state.type === 'category') renderCategory(container, state.categoryId, state.subcategoryId);
   else if (state.type === 'search') renderSearchResults(container, state.query);
 
   updateCardBadges();
+  initRowScrollers(container);
 }
 
 // ---- Breadcrumb + botão voltar contextual ----
@@ -833,11 +957,14 @@ function openQuickListDrawer(quickListId) {
       body.querySelectorAll('[data-quicklist-item-options]').forEach((btn) => {
         btn.addEventListener('click', () => handleOpenOptions(btn.dataset.quicklistItemOptions));
       });
-      body.querySelector('#cat-quicklist-confirm').addEventListener('click', () => {
+      body.querySelector('#cat-quicklist-confirm').addEventListener('click', (e) => {
         const checked = Array.from(body.querySelectorAll('input[type="checkbox"]:checked')).map((c) => c.value);
         checked.forEach((id) => {
           const item = getItemById(id);
-          if (item) quickAddItem({ catalogItemId: item.id, name: item.name });
+          if (item) {
+            quickAddItem({ catalogItemId: item.id, name: item.name });
+            celebrateAdd(e.currentTarget, item.name);
+          }
         });
         window.trackEvent?.('quick_list_add', { quick_list_id: quickListId, item_count: checked.length });
         closeDrawer();
@@ -852,6 +979,24 @@ function openQuickListDrawer(quickListId) {
   });
 }
 
+// ---- Busca sticky: só assume a função quando a busca do hero sai da viewport ----
+
+function initStickySearchReveal() {
+  const heroSearch = document.querySelector('.cat-search-form-hero');
+  const toolbar = q('cat-toolbar-sticky');
+  if (!toolbar) return;
+  if (!heroSearch || !('IntersectionObserver' in window)) {
+    toolbar.classList.add('cat-toolbar-search-active');
+    return;
+  }
+  const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 96;
+  const io = new IntersectionObserver(
+    ([entry]) => toolbar.classList.toggle('cat-toolbar-search-active', !entry.isIntersecting),
+    { rootMargin: `-${headerH + 8}px 0px 0px 0px` },
+  );
+  io.observe(heroSearch);
+}
+
 // ---- Inicialização ----
 
 export function initCatalog() {
@@ -862,11 +1007,10 @@ export function initCatalog() {
   initSearch();
   initListUI();
   syncSearchInputs();
-  renderHeroShortcuts();
+  initStickySearchReveal();
 
   q('cat-view')?.addEventListener('click', onCatViewClick);
   q('cat-rail')?.addEventListener('click', onCatViewClick);
-  q('cat-hero-shortcuts')?.addEventListener('click', onCatViewClick);
   q('cat-breadcrumb')?.addEventListener('click', onBreadcrumbClick);
   q('cat-suggestions')?.addEventListener('click', onSuggestionsClick);
 

@@ -11,6 +11,7 @@ import { openDrawer, closeDrawer } from './catalog-drawer.js';
 import { showToast } from './catalog-toast.js';
 import { esc } from './catalog-utils.js';
 import { renderFieldGrid, wireQtySteppers, collectFieldValues } from './catalog-fields.js';
+import { celebrateAdd } from './catalog-add-animation.js';
 
 /**
  * Abre a gaveta de personalização de um item do catálogo.
@@ -39,6 +40,7 @@ export function openPersonalizeDrawer(item, context = {}) {
       body.querySelector('#cat-personalize-cancel').addEventListener('click', () => closeDrawer());
       body.querySelector('#cat-personalize-form').addEventListener('submit', (e) => {
         e.preventDefault();
+        const submitBtn = e.submitter || document.querySelector('[form="cat-personalize-form"]');
         const { attributes, notes, quantity } = collectFieldValues(body, profile);
         const instanceId = addCustomItem({ catalogItemId: item.id, name: item.name, quantity, attributes, notes });
         window.trackEvent?.('item_custom_add', {
@@ -49,6 +51,7 @@ export function openPersonalizeDrawer(item, context = {}) {
           list_item_count: getItemCount(),
           total_quantity: getTotalQuantity(),
         });
+        celebrateAdd(submitBtn, item.name);
         closeDrawer();
         showToast(`${item.name} adicionado à lista.`);
         context.onAdded?.(instanceId);
@@ -58,11 +61,14 @@ export function openPersonalizeDrawer(item, context = {}) {
 }
 
 /**
- * Abre a gaveta de item adicionado manualmente.
- * @param {{ prefillName?: string, source?: string, onAdded?: (instanceId: string) => void }} [opts]
+ * Abre a gaveta de item adicionado manualmente — fluxo único reutilizado em
+ * todas as seções da home, na busca sem resultado e em Minha lista. Quando
+ * chamada a partir de uma seção de categoria, recebe o contexto de origem
+ * (categoryId/categoryName) e o formulário já indica essa categoria.
+ * @param {{ prefillName?: string, source?: string, categoryId?: string, categoryName?: string, onAdded?: (instanceId: string) => void }} [opts]
  */
 export function openManualItemDrawer(opts = {}) {
-  const { prefillName = '', source = 'manual_button' } = opts;
+  const { prefillName = '', source = 'manual_button', categoryId, categoryName } = opts;
 
   openDrawer({
     id: 'manual-item',
@@ -70,6 +76,7 @@ export function openManualItemDrawer(opts = {}) {
     render(body) {
       body.innerHTML = `
         <p class="cat-drawer-desc">Não encontrou o que procurava? Descreva o item — a equipe da Sartec confirma disponibilidade, marcas e valores pelo WhatsApp.</p>
+        ${categoryName ? `<p class="cat-drawer-hint">Categoria de origem: <strong>${esc(categoryName)}</strong></p>` : ''}
         <form class="cat-field-grid" id="cat-manual-form" novalidate>
           <label class="cat-field cat-field-full">Nome do produto <span class="cat-field-req" aria-hidden="true">*</span>
             <input type="text" id="cat-manual-nome" value="${esc(prefillName)}" placeholder="Ex: Pasta azul com divisórias" aria-describedby="cat-manual-nome-erro" />
@@ -99,6 +106,7 @@ export function openManualItemDrawer(opts = {}) {
       body.querySelector('#cat-manual-cancel').addEventListener('click', () => closeDrawer());
       body.querySelector('#cat-manual-form').addEventListener('submit', (e) => {
         e.preventDefault();
+        const submitBtn = e.submitter || document.querySelector('[form="cat-manual-form"]');
         const nome = nomeInput.value.trim();
         if (!nome) {
           nomeErro.hidden = false;
@@ -113,9 +121,12 @@ export function openManualItemDrawer(opts = {}) {
         const cor = body.querySelector('#cat-manual-cor').value.trim();
         const especificacao = body.querySelector('#cat-manual-especificacao').value.trim();
         const notes = body.querySelector('#cat-manual-obs').value.trim();
+        const attributes = { cor, especificacao };
+        if (categoryName) attributes.categoria = categoryName;
 
-        const instanceId = addCustomItem({ manual: true, name: nome, quantity, attributes: { cor, especificacao }, notes });
-        window.trackEvent?.('manual_item_add', { source, list_item_count: getItemCount(), total_quantity: getTotalQuantity() });
+        const instanceId = addCustomItem({ manual: true, name: nome, quantity, attributes, notes });
+        window.trackEvent?.('manual_item_add', { source, category_id: categoryId, list_item_count: getItemCount(), total_quantity: getTotalQuantity() });
+        celebrateAdd(submitBtn, nome);
         closeDrawer();
         showToast(`${nome} adicionado à lista.`);
         opts.onAdded?.(instanceId);

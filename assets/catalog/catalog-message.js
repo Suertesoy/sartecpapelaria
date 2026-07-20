@@ -32,6 +32,7 @@ function formatAttributeLines(catalogItemId, attributes) {
 
 function formatManualLines(entry) {
   const lines = [];
+  if (entry.attributes?.categoria) lines.push(`Categoria de origem: ${entry.attributes.categoria}`);
   if (entry.attributes?.cor) lines.push(`Cor: ${entry.attributes.cor}`);
   if (entry.attributes?.especificacao) lines.push(`Tamanho ou especificação: ${entry.attributes.especificacao}`);
   return lines;

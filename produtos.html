@@ -32,7 +32,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css" />
   <link rel="stylesheet" href="assets/catalog/catalog.css" />
   <style>
@@ -61,8 +61,6 @@
             <input type="search" class="cat-search-input" id="cat-search-input-hero" name="q" placeholder="O que você está procurando?" autocomplete="off" />
           </form>
 
-          <div class="cat-hero-shortcuts" id="cat-hero-shortcuts"></div>
-
           <p class="cat-hero-disclaimer">
             <span aria-hidden="true">ℹ️</span>
             <span>Catálogo para solicitação de orçamento. Produtos, marcas e valores são confirmados pelo WhatsApp.</span>
@@ -78,10 +76,10 @@
       </div>
     </section>
 
-    <!-- Barra de ferramentas — fica visível ao rolar a página -->
+    <!-- Barra de ferramentas — busca única (o espelho só aparece quando a busca do hero sai da tela), Minha lista e navegação completa de categorias -->
     <div class="cat-toolbar-sticky" id="cat-toolbar-sticky">
       <div class="cat-toolbar-inner">
-        <form class="cat-search-form" id="cat-search-form-sticky" role="search">
+        <form class="cat-search-form cat-search-form-sticky-mirror" id="cat-search-form-sticky" role="search">
           <span class="cat-search-icon" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </span>
@@ -89,12 +87,12 @@
           <input type="search" class="cat-search-input" id="cat-search-input-sticky" name="q" placeholder="O que você está procurando?" autocomplete="off" />
         </form>
         <button type="button" class="cat-btn-list" data-cat-open-list>
-          <span aria-hidden="true">🛒</span>
+          <span aria-hidden="true">📋</span>
           Minha lista
           <span class="cat-btn-list-count" data-cat-list-count>0</span>
         </button>
       </div>
-      <div class="cat-toolbar-context" id="cat-toolbar-context" hidden>
+      <div class="cat-toolbar-context" id="cat-toolbar-context">
         <button type="button" class="cat-btn-categories" id="cat-open-categories-btn">
           <span aria-hidden="true">☰</span> Categorias
         </button>

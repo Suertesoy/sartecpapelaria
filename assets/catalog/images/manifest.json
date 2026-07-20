@@ -1,9 +1,9 @@
 {
   "notaFormato": "PNG com transparência (RGBA), gerado via MCP do Magnific (images_generate + images_remove_background). Sem conversor WebP disponível neste ambiente (sem ImageMagick/cwebp/PIL instalados).",
-  "notaRodadaAtual": "Rodada de vitrine visual — geração em massa interrompida por esgotamento de créditos Magnific (saldo caiu a 84 créditos, insuficiente para novas gerações). Cobertura parcial: ver contagens abaixo.",
-  "totalProdutosAtivos": 258,
+  "notaRodadaAtual": "Rodada de vitrine visual — geração em massa interrompida por esgotamento de créditos Magnific (saldo caiu a 84 créditos, insuficiente para novas gerações). Cobertura parcial: ver contagens abaixo. Categoria Utilidades e limpeza removida do catálogo nesta rodada (10 produtos a menos).",
+  "totalProdutosAtivos": 248,
   "totalComImagem": 112,
-  "totalSemImagem": 146,
+  "totalSemImagem": 136,
   "dataAtualizacao": "2026-07-17",
   "imagens": [
     {
@@ -3351,76 +3351,6 @@
       "nome": "Caixa de som",
       "categoria": "Tecnologia, impressão e eletrônicos",
       "subcategoria": "Equipamentos",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "copo_descartavel",
-      "nome": "Copo descartável",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Descartáveis",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "guardanapo",
-      "nome": "Guardanapo",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Descartáveis",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "canudo",
-      "nome": "Canudo",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Descartáveis",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "produto_de_limpeza",
-      "nome": "Produto de limpeza",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Limpeza",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "acessorio_de_limpeza",
-      "nome": "Acessório de limpeza",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Limpeza",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "saco_de_lixo",
-      "nome": "Saco de lixo",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Limpeza",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "pote",
-      "nome": "Pote",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Organização doméstica",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "cesto",
-      "nome": "Cesto",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Organização doméstica",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "capa_de_chuva",
-      "nome": "Capa de chuva",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Utilidades",
-      "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
-    },
-    {
-      "id": "utilidade_diversa",
-      "nome": "Utilidade diversa",
-      "categoria": "Utilidades e limpeza",
-      "subcategoria": "Utilidades",
       "motivo": "Geração interrompida por esgotamento de créditos da conta Magnific nesta rodada (ver relatório)."
     }
   ]
