@@ -58,10 +58,18 @@ p  { margin: 0 0 1em; color: var(--texto-suave); }
 }
 
 /* ======================== HEADER ======================== */
-.site-header {
+/* O sticky vive no #header-mount (injetado antes de <main> em cada página), não
+   no .site-header em si: um position:sticky só consegue "andar" com o scroll
+   dentro dos limites do próprio contêiner pai. Como #header-mount só continha
+   o header (altura igual à do header, sem sobra), o sticky no filho ficava
+   preso e saía de tela após ~96px de rolagem. Aplicando sticky no mount (cujo
+   pai é <body>, do tamanho da página inteira) o header acompanha o scroll. */
+#header-mount {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+.site-header {
   background: #FFFFFF;
   height: var(--header-h);
   display: flex;

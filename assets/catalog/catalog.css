@@ -36,16 +36,6 @@
 .cat-hero-text h1 { font-size: clamp(1.6rem, 2.8vw, 2.15rem); margin-bottom: .28em; }
 .cat-hero-text > p { max-width: 480px; font-size: .98rem; margin-bottom: 20px; }
 
-.cat-search-form-hero { max-width: 480px; }
-.cat-search-form-hero input[type="search"] {
-  padding: 16px 18px 16px 46px;
-  font-size: 1rem;
-  border-radius: 999px;
-  border: 2px solid var(--azul);
-  box-shadow: var(--shadow);
-}
-.cat-search-form-hero .cat-search-icon { left: 18px; color: var(--azul); }
-
 p.cat-hero-disclaimer {
   display: flex;
   gap: 8px;
@@ -124,7 +114,7 @@ p.cat-hero-disclaimer {
   margin: 0 auto;
   padding: 14px 24px;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 12px;
   align-items: center;
 }
@@ -149,17 +139,28 @@ p.cat-hero-disclaimer {
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  min-height: 44px;
 }
 .cat-btn-categories:hover { border-color: var(--azul); color: var(--azul); }
+/* min-width: 0 é essencial aqui: sem ele, um item flex com filhos "nowrap"
+   nunca encolhe abaixo do conteúdo (min-width:auto padrão), então em vez de
+   rolar dentro de si mesmo ele empurra o contêiner pai e corta as últimas
+   categorias sem possibilidade de rolagem. */
+.cat-row-wrap-rail { flex: 1; min-width: 0; }
 .cat-rail {
   display: flex;
   gap: 8px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
-  padding-bottom: 2px;
-  flex: 1;
+  padding: 2px 2px 10px;
+  width: 100%;
+  min-width: 0;
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
 }
 .cat-rail::-webkit-scrollbar { display: none; }
+.cat-rail::after { content: ''; flex: 0 0 2px; }
 .cat-rail-chip {
   display: inline-flex;
   align-items: center;
@@ -173,25 +174,24 @@ p.cat-hero-disclaimer {
   white-space: nowrap;
   cursor: pointer;
   flex-shrink: 0;
+  min-height: 44px;
 }
 .cat-rail-chip:hover { border-color: var(--azul); }
 .cat-rail-chip-active { background: var(--azul); border-color: var(--azul); color: var(--branco); }
+.cat-rail-chip:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
 
-.cat-search-form { position: relative; flex: 1 1 320px; min-width: 240px; }
+.cat-search-form { position: relative; flex: 1 1 320px; min-width: 0; }
 
-/* A busca da barra fixa é uma cópia da mesma fonte de verdade (mesma classe
-   .cat-search-input, sincronizada em JS) — só aparece quando a busca do
-   hero sai da viewport, nunca simultaneamente com ela. */
-.cat-search-form-sticky-mirror { display: none; }
-.cat-toolbar-search-active .cat-search-form-sticky-mirror { display: block; }
 .cat-search-form input[type="search"] {
   width: 100%;
+  min-height: 44px;
   padding: 13px 16px 13px 42px;
   border-radius: 999px;
   border: 1px solid var(--cinza-borda);
   background: var(--branco);
   font-size: .95rem;
   font-family: inherit;
+  box-sizing: border-box;
 }
 .cat-search-form input[type="search"]:focus-visible {
   outline: 2px solid var(--azul);
@@ -219,6 +219,8 @@ p.cat-hero-disclaimer {
   font-size: .92rem;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 44px;
 }
 .cat-btn-list:hover { background: #1A317A; }
 .cat-btn-list-count {
@@ -239,6 +241,13 @@ p.cat-hero-disclaimer {
   .cat-toolbar-context { padding: 0 16px 10px; }
   #cat-catalog-anchor { scroll-margin-top: calc(var(--header-h) + 100px); }
   .cat-item-grid-scroll .cat-card { flex-basis: 72vw; max-width: 300px; }
+}
+
+/* Em telas bem estreitas, "Minha lista" encolhe para ícone + contador para
+   garantir que busca e lista continuem na mesma linha, sem quebrar. */
+@media (max-width: 420px) {
+  .cat-btn-list { padding: 12px 14px; gap: 4px; }
+  .cat-btn-list-label { display: none; }
 }
 
 .cat-breadcrumb { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
@@ -347,6 +356,10 @@ p.cat-hero-disclaimer {
 .cat-row-nav-next { right: -6px; }
 @media (min-width: 901px) {
   .cat-row-nav { display: flex; align-items: center; justify-content: center; }
+  /* Uma regra de autor com "display" sempre vence a regra nativa [hidden]{display:none}
+     do navegador, independente de especificidade — sem isto, os botões "só aparecem
+     quando há conteúdo" ficariam sempre visíveis no desktop mesmo com hidden setado. */
+  .cat-row-nav[hidden] { display: none; }
 }
 
 /* ---------- Seções de categoria da home ---------- */

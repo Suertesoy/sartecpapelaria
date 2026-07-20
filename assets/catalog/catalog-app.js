@@ -283,22 +283,31 @@ function initRowScroller(el) {
   }, { passive: false });
 
   // Arraste com o mouse (trackpad/touch já rolam nativamente).
+  // A captura de ponteiro só é ativada depois que um arraste real é confirmado
+  // (>3px): chamá-la já no pointerdown redireciona o "click" sintético de
+  // compatibilidade para este container em VEZ do botão clicado (comportamento
+  // de captura de ponteiro da spec), quebrando a delegação de evento em
+  // qualquer clique simples dentro da fileira.
   let dragging = false;
   let startX = 0;
   let startScroll = 0;
   let moved = false;
+  let activePointerId = null;
   el.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse') return;
     dragging = true;
     moved = false;
     startX = e.clientX;
     startScroll = el.scrollLeft;
-    el.setPointerCapture(e.pointerId);
+    activePointerId = e.pointerId;
   });
   el.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     const dx = e.clientX - startX;
-    if (Math.abs(dx) > 3) moved = true;
+    if (!moved && Math.abs(dx) > 3) {
+      moved = true;
+      try { el.setPointerCapture(e.pointerId); } catch { /* ignora se o ponteiro já não estiver ativo */ }
+    }
     el.scrollLeft = startScroll - dx;
   });
   function endDrag() {
@@ -309,6 +318,10 @@ function initRowScroller(el) {
       el.addEventListener('click', suppressClick, { capture: true, once: true });
       setTimeout(() => el.removeEventListener('click', suppressClick, { capture: true }), 0);
     }
+    if (activePointerId !== null && el.hasPointerCapture?.(activePointerId)) {
+      try { el.releasePointerCapture(activePointerId); } catch { /* já liberado */ }
+    }
+    activePointerId = null;
   }
   el.addEventListener('pointerup', endDrag);
   el.addEventListener('pointerleave', endDrag);
@@ -435,10 +448,23 @@ function onCatViewClick(e) {
   const categoryTile = e.target.closest('[data-category-tile]');
   if (categoryTile) {
     const source = categoryTile.dataset.tileSource || 'home';
+    const categoryId = categoryTile.dataset.categoryTile;
     if (source === 'continue-explore') {
-      window.trackEvent?.('catalog_continue_exploring_click', { category_id: categoryTile.dataset.categoryTile, from_category_id: state.categoryId });
+      window.trackEvent?.('catalog_continue_exploring_click', { category_id: categoryId, from_category_id: state.categoryId });
     }
-    openCategory(categoryTile.dataset.categoryTile, source);
+    // Chip da barra de navegação: na home, rola até a seção em vez de abrir a
+    // categoria completa (evita a tela intermediária). "Ver tudo" continua
+    // abrindo a visualização completa normalmente (source diferente de "nav").
+    if (source === 'nav' && state.type === 'home') {
+      document.querySelectorAll('.cat-rail-chip').forEach((chip) => {
+        const active = chip === categoryTile;
+        chip.classList.toggle('cat-rail-chip-active', active);
+        chip.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+      scrollToHomeSection(categoryId);
+      return;
+    }
+    openCategory(categoryId, source);
     return;
   }
   const filterBtn = e.target.closest('[data-filter]');
@@ -979,22 +1005,22 @@ function openQuickListDrawer(quickListId) {
   });
 }
 
-// ---- Busca sticky: só assume a função quando a busca do hero sai da viewport ----
+// ---- Navegação por chip de categoria: rola até a seção da home ----
 
-function initStickySearchReveal() {
-  const heroSearch = document.querySelector('.cat-search-form-hero');
-  const toolbar = q('cat-toolbar-sticky');
-  if (!toolbar) return;
-  if (!heroSearch || !('IntersectionObserver' in window)) {
-    toolbar.classList.add('cat-toolbar-search-active');
-    return;
-  }
+/** Mede a altura real da navbar + barra do catálogo (ambas sticky) para não esconder o título atrás delas. */
+function fixedHeaderOffset() {
   const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 96;
-  const io = new IntersectionObserver(
-    ([entry]) => toolbar.classList.toggle('cat-toolbar-search-active', !entry.isIntersecting),
-    { rootMargin: `-${headerH + 8}px 0px 0px 0px` },
-  );
-  io.observe(heroSearch);
+  const toolbar = q('cat-toolbar-sticky');
+  const toolbarH = toolbar ? toolbar.getBoundingClientRect().height : 0;
+  return headerH + toolbarH + 16;
+}
+
+function scrollToHomeSection(categoryId) {
+  const heading = document.getElementById(`cat-home-section-${categoryId}`);
+  if (!heading) return;
+  const top = heading.getBoundingClientRect().top + window.scrollY - fixedHeaderOffset();
+  window.scrollTo({ top, behavior: reducedMotion() ? 'auto' : 'smooth' });
+  window.trackEvent?.('catalog_nav_scroll_to_section', { category_id: categoryId });
 }
 
 // ---- Inicialização ----
@@ -1007,7 +1033,6 @@ export function initCatalog() {
   initSearch();
   initListUI();
   syncSearchInputs();
-  initStickySearchReveal();
 
   q('cat-view')?.addEventListener('click', onCatViewClick);
   q('cat-rail')?.addEventListener('click', onCatViewClick);
@@ -1021,6 +1046,8 @@ export function initCatalog() {
   });
 
   renderView();
+  const rail = q('cat-rail');
+  if (rail) initRowScroller(rail);
   window.trackEvent?.('catalog_view', { viewport_type: window.innerWidth < 768 ? 'mobile' : 'desktop' });
 }
 

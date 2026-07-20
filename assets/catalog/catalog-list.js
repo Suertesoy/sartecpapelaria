@@ -18,6 +18,8 @@
  * @property {string} createdAt
  */
 
+import { getItemById } from './data/catalog-data.js';
+
 const STORAGE_KEY = 'sartec_catalog_list_v1';
 const STORAGE_VERSION = 1;
 
@@ -50,13 +52,20 @@ function sanitize(raw) {
   };
 }
 
+/** Itens de catálogo (não manuais) só sobrevivem à carga se ainda existirem e
+ * estiverem ativos — evita que uma categoria removida (ex.: Utilidades e
+ * limpeza) ressurja na lista de quem já tinha itens salvos de antes. */
+function referencesRemovedItem(item) {
+  return !item.manual && !getItemById(item.catalogItemId);
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!parsed || parsed.v !== STORAGE_VERSION || !Array.isArray(parsed.items)) return [];
-    return parsed.items.filter(isValidStoredItem).map(sanitize);
+    return parsed.items.filter(isValidStoredItem).map(sanitize).filter((item) => !referencesRemovedItem(item));
   } catch (_) {
     return [];
   }

@@ -43,27 +43,48 @@
 
   <div id="header-mount"></div>
 
+  <!-- Barra do catálogo — busca única, Minha lista e navegação completa de categorias.
+       Sticky logo abaixo da navbar, desde o carregamento (sem busca duplicada no hero). -->
+  <div class="cat-toolbar-sticky" id="cat-toolbar-sticky">
+    <div class="cat-toolbar-inner">
+      <form class="cat-search-form" id="cat-search-form" role="search">
+        <span class="cat-search-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <label for="cat-search-input" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Buscar produto</label>
+        <input type="search" class="cat-search-input" id="cat-search-input" name="q" placeholder="O que você está procurando?" autocomplete="off" />
+      </form>
+      <button type="button" class="cat-btn-list" data-cat-open-list>
+        <span aria-hidden="true">📋</span>
+        <span class="cat-btn-list-label">Minha lista</span>
+        <span class="cat-btn-list-count" data-cat-list-count>0</span>
+      </button>
+    </div>
+    <div class="cat-toolbar-context" id="cat-toolbar-context">
+      <button type="button" class="cat-btn-categories" id="cat-open-categories-btn">
+        <span aria-hidden="true">☰</span> Categorias
+      </button>
+      <div class="cat-row-wrap cat-row-wrap-rail">
+        <button type="button" class="cat-row-nav cat-row-nav-prev" data-row-nav="prev" aria-label="Ver categorias anteriores" hidden>‹</button>
+        <div class="cat-rail" id="cat-rail" data-row-scroll></div>
+        <button type="button" class="cat-row-nav cat-row-nav-next" data-row-nav="next" aria-label="Ver mais categorias" hidden>›</button>
+      </div>
+    </div>
+  </div>
+
   <main>
 
-    <!-- Hero — Produtos: busca dominante à esquerda, composição visual à direita -->
+    <!-- Hero — compacto: badge, título, texto, informação complementar e composição visual -->
     <section class="cat-hero">
       <div class="cat-hero-inner">
         <div class="cat-hero-text">
-          <span class="cat-hero-badge">Catálogo interativo</span>
-          <h1>Encontre o que precisa e monte sua lista</h1>
+          <span class="cat-hero-badge">CATÁLOGO INTERATIVO</span>
+          <h1>Um jeito prático de pedir orçamento</h1>
           <p>Explore os produtos, adicione o que procura e envie sua lista para a equipe da Sartec confirmar opções e valores.</p>
-
-          <form class="cat-search-form cat-search-form-hero" id="cat-search-form-hero" role="search">
-            <span class="cat-search-icon" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </span>
-            <label for="cat-search-input-hero" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Buscar produto</label>
-            <input type="search" class="cat-search-input" id="cat-search-input-hero" name="q" placeholder="O que você está procurando?" autocomplete="off" />
-          </form>
 
           <p class="cat-hero-disclaimer">
             <span aria-hidden="true">ℹ️</span>
-            <span>Catálogo para solicitação de orçamento. Produtos, marcas e valores são confirmados pelo WhatsApp.</span>
+            <span>Catálogo para solicitação de orçamento. Produtos, marcas e valores são confirmados pelo WhatsApp. As imagens dos produtos são meramente ilustrativas.</span>
           </p>
         </div>
         <div class="cat-hero-visual" role="img" aria-label="Composição de produtos da papelaria: caderno, caneta, mochila, tinta guache e estojo">
@@ -75,30 +96,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Barra de ferramentas — busca única (o espelho só aparece quando a busca do hero sai da tela), Minha lista e navegação completa de categorias -->
-    <div class="cat-toolbar-sticky" id="cat-toolbar-sticky">
-      <div class="cat-toolbar-inner">
-        <form class="cat-search-form cat-search-form-sticky-mirror" id="cat-search-form-sticky" role="search">
-          <span class="cat-search-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </span>
-          <label for="cat-search-input-sticky" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Buscar produto</label>
-          <input type="search" class="cat-search-input" id="cat-search-input-sticky" name="q" placeholder="O que você está procurando?" autocomplete="off" />
-        </form>
-        <button type="button" class="cat-btn-list" data-cat-open-list>
-          <span aria-hidden="true">📋</span>
-          Minha lista
-          <span class="cat-btn-list-count" data-cat-list-count>0</span>
-        </button>
-      </div>
-      <div class="cat-toolbar-context" id="cat-toolbar-context">
-        <button type="button" class="cat-btn-categories" id="cat-open-categories-btn">
-          <span aria-hidden="true">☰</span> Categorias
-        </button>
-        <div class="cat-rail" id="cat-rail"></div>
-      </div>
-    </div>
 
     <p class="cat-hero-steps">Escolha → monte sua lista → envie para orçamento</p>
 
