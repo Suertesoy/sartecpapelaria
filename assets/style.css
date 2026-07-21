@@ -580,6 +580,12 @@ section { padding: 64px 0; }
   color: #FFFFFF;
   margin-top: 80px;
 }
+/* Na Home a última seção antes do footer já é a foto full-bleed .loja-fw —
+   o margin-top acima cria uma faixa branca entre ela e a barra do footer.
+   Nas demais páginas o footer pode vir depois de conteúdo mais "solto"
+   (texto, cards), onde os 80px continuam fazendo sentido — por isso a
+   correção é isolada à Home, não global. */
+body[data-page="home"] .site-footer { margin-top: 0; }
 .footer-accent-bar {
   height: 4px;
   background: linear-gradient(90deg, var(--azul) 0%, var(--vermelho) 100%);
@@ -1744,6 +1750,160 @@ section { padding: 64px 0; }
   .lista-grid { grid-template-columns: 1fr; gap: 36px; }
 }
 
+/* ======================== HOME — PRÉVIA DO CATÁLOGO ======================== */
+/* Demonstração estática (aria-hidden na marcação): a experiência real de busca,
+   categorias e "Minha lista" vive só em produtos.html/catalog-app.js — aqui é
+   só ilustração, por isso os elementos internos são spans/divs, nunca button/input. */
+.hcp-section { background: var(--cinza-fundo); }
+.hcp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 52px;
+  align-items: center;
+}
+.hcp-copy { display: flex; flex-direction: column; gap: 16px; max-width: 520px; }
+.hcp-copy h2 {
+  font-size: clamp(26px, 3.5vw, 38px);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #0F172A;
+}
+.hcp-copy > p { margin: 0; font-size: 17px; line-height: 1.6; color: var(--texto-suave); }
+.hcp-flow {
+  align-self: flex-start;
+  margin: 0;
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--azul);
+  background: var(--branco);
+  border: 1px solid var(--cinza-borda);
+  border-radius: 999px;
+  padding: 8px 16px;
+}
+.hcp-cta {
+  display: inline-block;
+  background: var(--azul);
+  color: var(--branco);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 26px;
+  border-radius: 13px;
+  box-shadow: 0 4px 14px rgba(30,58,138,0.25);
+  transition: background .15s;
+}
+.hcp-cta:hover { background: #1A317A; color: var(--branco); }
+.hcp-cta:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.hcp-cta-note { margin: 0; font-size: 13.5px; color: #94A3B8; }
+
+.hcp-preview-card {
+  background: var(--branco);
+  border-radius: 18px;
+  box-shadow: 0 20px 56px rgba(30,58,138,0.12), 0 4px 16px rgba(0,0,0,0.06);
+  border-top: 3px solid var(--azul);
+  overflow: hidden;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.hcp-preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--cinza-borda);
+}
+.hcp-preview-search {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cinza-fundo);
+  border: 1px solid var(--cinza-borda);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--texto-suave);
+}
+.hcp-preview-search svg { flex-shrink: 0; }
+.hcp-preview-search span { font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hcp-preview-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--azul);
+  color: var(--branco);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: .78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.hcp-preview-list-count { background: rgba(255,255,255,0.22); border-radius: 999px; padding: 1px 7px; }
+.hcp-preview-products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+.hcp-preview-product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: var(--cinza-fundo);
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--radius-sm);
+  padding: 10px 6px 12px;
+  text-align: center;
+}
+.hcp-preview-product-media { width: 100%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; }
+.hcp-preview-product-media img { width: 70%; height: 70%; object-fit: contain; }
+.hcp-preview-product-name { font-size: .74rem; font-weight: 600; color: var(--texto); line-height: 1.25; }
+.hcp-preview-product-add {
+  font-size: .66rem;
+  font-weight: 700;
+  color: var(--azul);
+  background: var(--azul-suave);
+  border-radius: 999px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+.hcp-preview-ready {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px 16px;
+  padding: 10px 12px;
+  background: var(--azul-suave);
+  border-radius: var(--radius-sm);
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--azul);
+}
+.hcp-preview-ready-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--verde-wpp-escuro);
+  color: var(--branco);
+  font-size: .66rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 860px) {
+  .hcp-grid { grid-template-columns: 1fr; gap: 32px; }
+  .hcp-copy { order: -1; max-width: none; }
+}
+@media (max-width: 420px) {
+  .hcp-preview-product-name { font-size: .68rem; }
+  .hcp-preview-product-add { font-size: .62rem; padding: 3px 6px; }
+}
+
 /* ======================== HOME — LISTA PREVIEW ANIMADA ======================== */
 .hlp-panel {
   background: #FFFFFF;
@@ -1971,9 +2131,6 @@ section { padding: 64px 0; }
   color: #0F172A;
   text-align: center;
 }
-.hero-fw-wpp {
-  color: var(--verde-wpp-escuro);
-}
 .hero-fw-subtitle {
   text-align: center;
 }
@@ -1983,33 +2140,32 @@ section { padding: 64px 0; }
   line-height: 1.6;
   color: #475569;
 }
-.hero-fw-soft {
-  color: var(--azul);
-  font-weight: 700;
-  margin-top: 8px;
-}
 .hero-fw-btns {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
 }
-.hero-btn-wpp {
+/* CTA principal do hero — leva a produtos.html, por isso usa o azul
+   institucional (cor de maior destaque) em vez do verde do WhatsApp. */
+.hero-btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #25D366;
+  background: var(--azul);
   color: #FFFFFF;
   text-decoration: none;
   font-weight: 700;
   font-size: 16px;
   padding: 14px 24px;
   border-radius: 13px;
-  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.28);
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.28);
   transition: background .15s;
 }
-.hero-btn-wpp:hover { background: #1FB858; color: #FFFFFF; }
-.hero-btn-lista {
+.hero-btn-primary:hover { background: #16296B; color: #FFFFFF; }
+.hero-btn-primary:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+/* CTA secundário — leva a lista-escolar.html: contorno, ainda claramente clicável. */
+.hero-btn-secondary {
   display: inline-flex;
   align-items: center;
   background: transparent;
@@ -2022,7 +2178,21 @@ section { padding: 64px 0; }
   border-radius: 13px;
   transition: background .15s;
 }
-.hero-btn-lista:hover { background: rgba(30, 58, 138, 0.07); }
+.hero-btn-secondary:hover { background: rgba(30, 58, 138, 0.07); }
+.hero-btn-secondary:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+/* Alternativa de atendimento direto — discreta, abaixo dos dois CTAs principais. */
+.hero-fw-support {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--texto-suave);
+}
+.hero-fw-support a {
+  color: var(--verde-wpp-escuro);
+  font-weight: 700;
+  text-decoration: underline;
+}
+.hero-fw-support a:hover { color: #17974A; }
 
 @media (max-width: 640px) {
   .hero-fw {
@@ -2069,10 +2239,15 @@ section { padding: 64px 0; }
   .hero-fw-card h1 {
     font-size: clamp(19px, 5vw, 24px);
   }
-  .hero-fw-btns .hero-btn-wpp,
-  .hero-fw-btns .hero-btn-lista {
+  .hero-fw-btns .hero-btn-primary,
+  .hero-fw-btns .hero-btn-secondary {
     font-size: 14px;
     padding: 11px 18px;
+  }
+  .hero-fw-btns { flex-direction: column; align-items: stretch; }
+  .hero-fw-btns .hero-btn-primary,
+  .hero-fw-btns .hero-btn-secondary {
+    justify-content: center;
   }
 }
 

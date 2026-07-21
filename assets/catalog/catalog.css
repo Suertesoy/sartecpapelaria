@@ -346,21 +346,23 @@ p.cat-hero-disclaimer {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  border: 1px solid var(--cinza-borda);
+  border: 1.5px solid var(--cinza-borda);
   background: var(--branco);
   color: var(--azul);
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   line-height: 1;
   cursor: pointer;
   z-index: 5;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
 }
-.cat-row-nav:hover { border-color: var(--azul); }
-.cat-row-nav-prev { left: -6px; }
-.cat-row-nav-next { right: -6px; }
+.cat-row-nav:hover { border-color: var(--azul); background: var(--azul-suave); box-shadow: var(--shadow-lg); }
+.cat-row-nav:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.cat-row-nav-prev { left: -8px; }
+.cat-row-nav-next { right: -8px; }
 @media (min-width: 901px) {
   .cat-row-nav { display: flex; align-items: center; justify-content: center; }
   /* Uma regra de autor com "display" sempre vence a regra nativa [hidden]{display:none}

@@ -274,13 +274,11 @@ function initRowScroller(el) {
   prevBtn?.addEventListener('click', () => el.scrollBy({ left: -el.clientWidth * 0.85, behavior: reducedMotion() ? 'auto' : 'smooth' }));
   nextBtn?.addEventListener('click', () => el.scrollBy({ left: el.clientWidth * 0.85, behavior: reducedMotion() ? 'auto' : 'smooth' }));
 
-  // Roda do mouse: converte scroll vertical em horizontal quando fizer sentido.
-  el.addEventListener('wheel', (e) => {
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && el.scrollWidth > el.clientWidth) {
-      el.scrollLeft += e.deltaY;
-      e.preventDefault();
-    }
-  }, { passive: false });
+  // Sem listener de "wheel" aqui de propósito: a roda do mouse deve sempre
+  // rolar a página verticalmente, mesmo com o cursor sobre a fileira. Gestos
+  // horizontais reais (deltaX de trackpad) já são tratados nativamente pelo
+  // navegador neste container (overflow-x:auto), sem precisar de JS. A
+  // navegação horizontal no desktop fica a cargo dos botões de seta acima.
 
   // Arraste com o mouse (trackpad/touch já rolam nativamente).
   // A captura de ponteiro só é ativada depois que um arraste real é confirmado
