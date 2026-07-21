@@ -68,14 +68,16 @@ p.cat-hero-disclaimer {
 .cat-hero-visual-item-5 { width: 130px; height: 130px; bottom: -10px; left: 38%; z-index: 4; transform: rotate(-4deg); }
 
 .cat-hero-steps {
+  background: var(--vermelho);
+  border-bottom: 1px solid var(--vermelho-escuro);
+}
+.cat-hero-steps-inner {
   max-width: var(--container);
   margin: 0 auto;
   padding: 10px 24px;
   font-size: .8rem;
   font-weight: 700;
-  color: var(--azul);
-  background: var(--cinza-fundo);
-  border-bottom: 1px solid var(--cinza-borda);
+  color: var(--branco);
 }
 
 .cat-manual-inline { margin: 6px 0 0; }
@@ -153,7 +155,11 @@ p.cat-hero-disclaimer {
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
-  padding: 2px 2px 10px;
+  /* padding simétrico (topo = base): o trilho é o item mais alto da linha em
+     .cat-toolbar-context (align-items:center), então qualquer assimetria aqui
+     desloca visualmente o botão "Categorias" para baixo em relação aos chips,
+     que ficam ancorados ao padding-top do próprio trilho. */
+  padding: 6px 2px;
   width: 100%;
   min-width: 0;
   touch-action: pan-x;
@@ -251,6 +257,7 @@ p.cat-hero-disclaimer {
 }
 
 .cat-breadcrumb { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.cat-breadcrumb-empty { display: none; margin: 0; }
 .cat-breadcrumb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .88rem; }
 .cat-crumb {
   background: none;
@@ -363,7 +370,10 @@ p.cat-hero-disclaimer {
 }
 
 /* ---------- Seções de categoria da home ---------- */
-.cat-home-section { margin-bottom: 30px; }
+/* .cat-home-section é uma <section>: neutraliza o `section { padding: 64px 0; }`
+   global de assets/style.css, que somado ao margin-bottom abaixo criava um vão
+   enorme (até ~158px) entre uma categoria e a próxima. */
+.cat-home-section { padding: 0; margin-bottom: 28px; }
 .cat-home-section-head {
   display: flex;
   align-items: baseline;
@@ -540,9 +550,9 @@ p.cat-hero-disclaimer {
   overflow: hidden;
 }
 
-.cat-card-footer { display: flex; gap: 8px; padding: 12px 16px 16px; }
+.cat-card-footer { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px 16px; }
 .cat-card-add {
-  flex: 1;
+  width: 100%;
   background: var(--azul);
   color: var(--branco);
   border: none;
@@ -556,6 +566,7 @@ p.cat-hero-disclaimer {
 .cat-card-added .cat-card-add { background: var(--verde-wpp-escuro); }
 .cat-card-added .cat-card-add:hover { background: var(--verde-wpp); }
 .cat-card-options-btn {
+  width: 100%;
   background: var(--branco);
   border: 1px solid var(--cinza-borda);
   border-radius: 10px;
@@ -759,21 +770,32 @@ p.cat-hero-disclaimer {
   color: var(--azul);
   margin-bottom: 4px;
 }
-.cat-list-paper-text {
-  display: block;
-  font-family: 'Caveat', cursive;
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: #1F2937;
-  min-height: 1.3em;
-  word-break: break-word;
+.cat-list-paper-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
-.cat-list-paper-check {
-  display: inline-block;
-  margin-top: 6px;
+.cat-list-paper-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.cat-list-paper-line-text {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Caveat', cursive;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1F2937;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.cat-list-paper-line-check {
+  flex-shrink: 0;
   color: var(--verde-wpp-escuro);
   font-weight: 700;
+  font-size: .85em;
   opacity: 0;
   transform: scale(.6);
   transition: opacity .2s ease, transform .2s ease;
@@ -781,13 +803,15 @@ p.cat-hero-disclaimer {
 .cat-list-paper-check-show { opacity: 1; transform: scale(1); }
 
 @media (max-width: 480px) {
-  .cat-list-paper { width: min(220px, calc(100vw - 24px)); }
+  .cat-list-paper { width: min(230px, calc(100vw - 24px)); padding: 12px 14px 14px; }
+  .cat-list-paper-line-text { font-size: .98rem; line-height: 1.25; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cat-fly-chip { display: none; }
   .cat-list-btn-bump { animation: none; }
   .cat-list-paper, .cat-list-paper-exit { transition: opacity .15s linear; transform: none; }
+  .cat-list-paper-line-check { transition: none; }
 }
 
 /* ---------- Barra fixa "Minha lista" (mobile) ---------- */

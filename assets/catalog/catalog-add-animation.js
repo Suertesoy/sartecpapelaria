@@ -1,23 +1,28 @@
 /* ======================================================
    SARTEC — Catálogo — Animação de confirmação ao adicionar
    Chip circular que voa do botão clicado até "Minha lista",
-   seguido de um bump no botão e um bloquinho de papel com o
-   nome do produto. Só feedback visual — a lista e os
-   contadores continuam sendo a fonte de verdade, atualizados
-   antes desta animação sequer começar. Sem carrinho, sem
-   emoji 🛒: usa o mesmo ícone de "Minha lista" (📋).
+   seguido de um bump no botão. Nas três primeiras adições da
+   sessão (contador em memória, não persistido — reinicia só
+   ao recarregar a página), um bloquinho de papel acumula os
+   nomes em linhas, escritas uma de cada vez por uma fila
+   segura. Da quarta adição em diante, só fly + bump + toast.
+   Sem carrinho, sem emoji 🛒: usa o ícone de "Minha lista" (📋).
    ====================================================== */
 
 const FLIGHT_MS = 550;
 const FLIGHT_FALLBACK_MS = FLIGHT_MS + 120;
 const WRITE_MS = 850;
 const HOLD_MS = 1000;
+const REDUCED_HOLD_MS = 600;
 const EXIT_MS = 280;
-const BATCH_WINDOW_MS = 180;
+const MAX_PAPER_LINES = 3;
 
 let paperEl = null;
-let pendingNames = [];
-let batchTimer = null;
+let linesContainerEl = null;
+let sessionAddCount = 0;
+let writtenNames = [];
+let lineQueue = [];
+let isWriting = false;
 let writeTimer = null;
 let hideTimer = null;
 let exitTimer = null;
@@ -99,11 +104,16 @@ function ensurePaperEl() {
   paperEl = document.createElement('div');
   paperEl.className = 'cat-list-paper';
   paperEl.hidden = true;
-  paperEl.innerHTML = `
-    <span class="cat-list-paper-label">Minha lista</span>
-    <span class="cat-list-paper-text" id="cat-list-paper-text"></span>
-    <span class="cat-list-paper-check" aria-hidden="true">✓</span>
-  `;
+
+  const label = document.createElement('span');
+  label.className = 'cat-list-paper-label';
+  label.textContent = 'Minha lista';
+
+  linesContainerEl = document.createElement('div');
+  linesContainerEl.className = 'cat-list-paper-lines';
+
+  paperEl.appendChild(label);
+  paperEl.appendChild(linesContainerEl);
   document.body.appendChild(paperEl);
 
   if (!repositionBound) {
@@ -138,6 +148,32 @@ function positionPaper() {
   paperEl.style.top = `${top}px`;
 }
 
+function createLineEl() {
+  const line = document.createElement('div');
+  line.className = 'cat-list-paper-line';
+  const text = document.createElement('span');
+  text.className = 'cat-list-paper-line-text';
+  const check = document.createElement('span');
+  check.className = 'cat-list-paper-line-check';
+  check.setAttribute('aria-hidden', 'true');
+  check.textContent = '✓';
+  line.appendChild(text);
+  line.appendChild(check);
+  return { line, text, check };
+}
+
+/** Garante que as linhas já escritas nesta sessão estejam no DOM (o papel pode ter sido esvaziado ao esconder). */
+function syncStaticLines() {
+  if (linesContainerEl.children.length === writtenNames.length) return;
+  linesContainerEl.innerHTML = '';
+  writtenNames.forEach((name) => {
+    const { line, text, check } = createLineEl();
+    text.textContent = name;
+    check.classList.add('cat-list-paper-check-show');
+    linesContainerEl.appendChild(line);
+  });
+}
+
 function writeText(el, text, duration, onDone) {
   el.textContent = '';
   const chars = Array.from(text);
@@ -154,77 +190,99 @@ function writeText(el, text, duration, onDone) {
   }, stepTime);
 }
 
-function flushBatch() {
-  const names = pendingNames;
-  pendingNames = [];
-  if (names.length === 0) return;
-  const text = names.length > 1 ? `${names.length} itens adicionados à lista` : names[names.length - 1];
-  showPaper(text);
-}
-
-function showPaper(text) {
+function ensureVisible() {
   const paper = ensurePaperEl();
-  const textEl = paper.querySelector('#cat-list-paper-text');
-  const checkEl = paper.querySelector('.cat-list-paper-check');
-
   clearTimeout(hideTimer);
   clearTimeout(exitTimer);
-  clearInterval(writeTimer);
-
   paper.hidden = false;
   paper.classList.remove('cat-list-paper-exit');
   // reflow para permitir reiniciar a transição de entrada mesmo se já visível
   void paper.offsetWidth;
   paper.classList.add('cat-list-paper-visible');
-  checkEl.classList.remove('cat-list-paper-check-show');
-  positionPaper();
-
-  const reduce = reducedMotion();
-  if (reduce) {
-    textEl.textContent = text;
-    checkEl.classList.add('cat-list-paper-check-show');
-  } else {
-    writeText(textEl, text, WRITE_MS, () => checkEl.classList.add('cat-list-paper-check-show'));
-  }
-
-  const holdStart = reduce ? 250 : WRITE_MS;
-  hideTimer = window.setTimeout(() => {
-    paper.classList.add('cat-list-paper-exit');
-    paper.classList.remove('cat-list-paper-visible');
-    exitTimer = window.setTimeout(() => {
-      paper.hidden = true;
-    }, reduce ? 150 : EXIT_MS);
-  }, holdStart + HOLD_MS);
+  return paper;
 }
 
-function queuePaper(name) {
-  pendingNames.push(name || 'Item');
-  clearTimeout(batchTimer);
-  batchTimer = window.setTimeout(flushBatch, BATCH_WINDOW_MS);
+function scheduleHide() {
+  clearTimeout(hideTimer);
+  const reduce = reducedMotion();
+  hideTimer = window.setTimeout(() => {
+    if (!paperEl || paperEl.hidden) return;
+    paperEl.classList.add('cat-list-paper-exit');
+    paperEl.classList.remove('cat-list-paper-visible');
+    exitTimer = window.setTimeout(() => {
+      paperEl.hidden = true;
+      linesContainerEl.innerHTML = '';
+    }, reduce ? 150 : EXIT_MS);
+  }, reduce ? REDUCED_HOLD_MS : HOLD_MS);
+}
+
+function writeNextLine(name) {
+  ensureVisible();
+  syncStaticLines();
+
+  const { line, text, check } = createLineEl();
+  linesContainerEl.appendChild(line);
+  positionPaper();
+
+  const finish = () => {
+    writtenNames.push(name);
+    check.classList.add('cat-list-paper-check-show');
+    positionPaper();
+    isWriting = false;
+    processQueue();
+  };
+
+  if (reducedMotion()) {
+    text.textContent = name;
+    finish();
+  } else {
+    writeText(text, name, WRITE_MS, finish);
+  }
+}
+
+function processQueue() {
+  if (isWriting) return;
+  if (lineQueue.length === 0) {
+    scheduleHide();
+    return;
+  }
+  isWriting = true;
+  writeNextLine(lineQueue.shift());
+}
+
+function enqueueLine(name) {
+  lineQueue.push(name || 'Item');
+  processQueue();
 }
 
 /**
  * Dispara a animação de confirmação de uma adição bem-sucedida à lista.
  * A lista já foi atualizada antes desta chamada — isto é só feedback visual.
- * @param {HTMLElement|null} originEl botão que originou a adição (Adicionar, Adicionar mais, opção confirmada...)
+ * Conta toda chamada bem-sucedida (rápida, personalizada, manual, sugestão,
+ * complementar ou lista rápida); só as três primeiras da sessão mostram o
+ * papel — o fly + bump acontece sempre.
+ * @param {HTMLElement|null} originEl botão que originou a adição (Adicionar, Adicionar com detalhes, opção confirmada...)
  * @param {string} productName nome do produto adicionado
  */
 export function celebrateAdd(originEl, productName) {
   const targetEl = getListTargetEl();
+  const showPaperForThisAdd = sessionAddCount < MAX_PAPER_LINES;
+  sessionAddCount++;
+
+  const afterArrive = () => {
+    bump(targetEl);
+    if (showPaperForThisAdd) enqueueLine(productName);
+  };
 
   if (reducedMotion()) {
-    bump(targetEl);
-    queuePaper(productName);
+    afterArrive();
     return;
   }
 
   if (!originEl || !targetEl || !isVisible(originEl) || !isVisible(targetEl)) {
-    queuePaper(productName);
+    afterArrive();
     return;
   }
 
-  flyChip(originEl, targetEl, () => {
-    bump(targetEl);
-    queuePaper(productName);
-  });
+  flyChip(originEl, targetEl, afterArrive);
 }

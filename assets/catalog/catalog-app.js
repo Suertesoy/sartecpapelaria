@@ -162,7 +162,7 @@ function renderItemCard(item, category, subcategory, opts = {}) {
     </div>
     <div class="cat-card-footer">
       <button type="button" class="cat-card-add" data-action="quick-add">${qty > 0 ? 'Adicionar mais' : 'Adicionar'}</button>
-      <button type="button" class="cat-card-options-btn" data-action="options">Ver opções</button>
+      <button type="button" class="cat-card-options-btn" data-action="options">Adicionar com detalhes</button>
     </div>
   </article>`;
 }
@@ -753,6 +753,16 @@ function renderView() {
 function renderBreadcrumbBar() {
   const el = q('cat-breadcrumb');
   if (!el) return;
+
+  // Na home o breadcrumb "Produtos" não agrega valor — nem o conteúdo, nem a
+  // altura reservada por ele (margin-bottom) devem aparecer nessa tela.
+  if (state.type === 'home') {
+    el.innerHTML = '';
+    el.classList.add('cat-breadcrumb-empty');
+    currentBackAction = null;
+    return;
+  }
+  el.classList.remove('cat-breadcrumb-empty');
 
   const crumbs = [`<button type="button" class="cat-crumb" data-crumb="home">Produtos</button>`];
   let backLabel = null;
