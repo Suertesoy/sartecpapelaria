@@ -1,0 +1,113 @@
+/* ======================================================
+   SARTEC — Animação de confirmação ao adicionar à lista
+   Extraído de catalog.css para ser reaproveitado também
+   pela demonstração da home (ver assets/home-catalog-demo.js),
+   sem duplicar as regras. catalog.css importa este arquivo.
+   ====================================================== */
+.cat-fly-chip {
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  margin-top: -15px;
+  border-radius: 50%;
+  background: var(--azul);
+  color: var(--branco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 9700;
+  pointer-events: none;
+  box-shadow: var(--shadow);
+  opacity: 1;
+  transform: scale(1);
+  transition: left .55s cubic-bezier(.32,.72,.35,1), top .55s cubic-bezier(.32,.72,.35,1), transform .55s ease, opacity .3s ease .25s;
+}
+.cat-fly-chip-flying { transform: scale(.35); opacity: 0; }
+
+@keyframes catListBtnBump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.16); }
+  100% { transform: scale(1); }
+}
+.cat-list-btn-bump { animation: catListBtnBump .28s ease; }
+
+.cat-list-paper {
+  position: fixed;
+  z-index: 9650;
+  width: 200px;
+  padding: 14px 16px 16px;
+  background: #FDF6D8;
+  background-image: repeating-linear-gradient(180deg, transparent, transparent 21px, rgba(30,58,138,0.08) 22px);
+  border-radius: 4px 4px 10px 10px;
+  box-shadow: var(--shadow-lg);
+  transform: rotate(-2deg) translateY(-8px);
+  opacity: 0;
+  transition: opacity .28s ease, transform .28s ease;
+  pointer-events: none;
+}
+.cat-list-paper::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 14px; right: 14px;
+  height: 3px;
+  background: var(--vermelho);
+  opacity: .55;
+  border-radius: 0 0 3px 3px;
+}
+.cat-list-paper-visible { opacity: 1; transform: rotate(-2deg) translateY(0); }
+.cat-list-paper-exit { opacity: 0; transform: rotate(-2deg) translateY(-6px); transition: opacity .28s ease, transform .28s ease; }
+.cat-list-paper-label {
+  display: block;
+  font-family: Archivo, sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--azul);
+  margin-bottom: 4px;
+}
+.cat-list-paper-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cat-list-paper-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.cat-list-paper-line-text {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Caveat', cursive;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1F2937;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.cat-list-paper-line-check {
+  flex-shrink: 0;
+  color: var(--verde-wpp-escuro);
+  font-weight: 700;
+  font-size: .85em;
+  opacity: 0;
+  transform: scale(.6);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.cat-list-paper-check-show { opacity: 1; transform: scale(1); }
+
+@media (max-width: 480px) {
+  .cat-list-paper { width: min(230px, calc(100vw - 24px)); padding: 12px 14px 14px; }
+  .cat-list-paper-line-text { font-size: .98rem; line-height: 1.25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-fly-chip { display: none; }
+  .cat-list-btn-bump { animation: none; }
+  .cat-list-paper, .cat-list-paper-exit { transition: opacity .15s linear; transform: none; }
+  .cat-list-paper-line-check { transition: none; }
+}

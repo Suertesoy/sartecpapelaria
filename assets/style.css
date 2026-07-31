@@ -320,43 +320,6 @@ section { padding: 64px 0; }
 }
 .kicker.vermelho { background: var(--vermelho-suave); color: var(--vermelho); }
 
-/* "Como funciona" - 3 passos */
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-.step {
-  background: white;
-  border: 1px solid var(--cinza-borda);
-  border-radius: var(--radius);
-  padding: 28px;
-  position: relative;
-  transition: transform .2s, box-shadow .2s;
-}
-.step:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-.step-num {
-  width: 40px; height: 40px;
-  background: var(--azul);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  margin-bottom: 16px;
-}
-.step h3 { margin-bottom: 8px; }
-.step p { margin: 0; font-size: .98rem; }
-
-@media (max-width: 800px) {
-  .steps { grid-template-columns: 1fr; }
-}
-@media (max-width: 480px) {
-  .steps { gap: 14px; }
-  .step { padding: 22px; }
-}
-
 /* Cards de serviços (4) */
 .services {
   display: grid;
@@ -578,14 +541,12 @@ section { padding: 64px 0; }
 .site-footer {
   background: linear-gradient(135deg, #0D1B42 0%, #1C3580 52%, #4A1010 100%);
   color: #FFFFFF;
-  margin-top: 80px;
+  margin-top: 0;
 }
-/* Na Home a última seção antes do footer já é a foto full-bleed .loja-fw —
-   o margin-top acima cria uma faixa branca entre ela e a barra do footer.
-   Nas demais páginas o footer pode vir depois de conteúdo mais "solto"
-   (texto, cards), onde os 80px continuam fazendo sentido — por isso a
-   correção é isolada à Home, não global. */
-body[data-page="home"] .site-footer { margin-top: 0; }
+/* Em todas as páginas a última seção antes do footer é a foto full-bleed
+   .loja-fw — sem margin-top aqui, o footer encosta direto nela, sem faixa
+   branca. #footer-mount não recebe padding/margin próprios, então isso
+   também cobre o espaço entre </main> e a barra do footer. */
 .footer-accent-bar {
   height: 4px;
   background: linear-gradient(90deg, var(--azul) 0%, var(--vermelho) 100%);
@@ -1805,6 +1766,7 @@ body[data-page="home"] .site-footer { margin-top: 0; }
   overflow: hidden;
   max-width: 440px;
   margin: 0 auto;
+  position: relative;
 }
 .hcp-preview-bar {
   display: flex;
@@ -1869,7 +1831,10 @@ body[data-page="home"] .site-footer { margin-top: 0; }
   border-radius: 999px;
   padding: 3px 8px;
   white-space: nowrap;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
 }
+.hcp-preview-product-add-pulse { transform: scale(1.14); }
+.hcp-preview-product-add-done { background: var(--verde-wpp-escuro); color: var(--branco); }
 .hcp-preview-ready {
   display: flex;
   align-items: center;
@@ -1881,7 +1846,9 @@ body[data-page="home"] .site-footer { margin-top: 0; }
   font-size: .8rem;
   font-weight: 600;
   color: var(--azul);
+  transition: opacity .4s ease, transform .4s ease;
 }
+.hcp-preview-ready-hide { opacity: 0; transform: translateY(6px); pointer-events: none; }
 .hcp-preview-ready-dot {
   display: inline-flex;
   align-items: center;
@@ -1895,6 +1862,26 @@ body[data-page="home"] .site-footer { margin-top: 0; }
   flex-shrink: 0;
 }
 
+/* ---- Cursor demonstrativo (clica em "Adicionar" e some) ---- */
+.hcp-demo-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(30,58,138,0.85);
+  border: 2px solid var(--branco);
+  box-shadow: 0 2px 8px rgba(15,23,42,0.35);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+  transform: translate(-50%, -50%) scale(1);
+  transition: left .5s cubic-bezier(.32,.72,.35,1), top .5s cubic-bezier(.32,.72,.35,1), opacity .25s ease, transform .18s ease;
+}
+.hcp-demo-cursor-show { opacity: 1; }
+.hcp-demo-cursor-click { transform: translate(-50%, -50%) scale(0.72); }
+
 @media (max-width: 860px) {
   .hcp-grid { grid-template-columns: 1fr; gap: 32px; }
   .hcp-copy { order: -1; max-width: none; }
@@ -1902,6 +1889,9 @@ body[data-page="home"] .site-footer { margin-top: 0; }
 @media (max-width: 420px) {
   .hcp-preview-product-name { font-size: .68rem; }
   .hcp-preview-product-add { font-size: .62rem; padding: 3px 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hcp-demo-cursor, .hcp-preview-product-add, .hcp-preview-ready { transition: none !important; }
 }
 
 /* ======================== HOME — LISTA PREVIEW ANIMADA ======================== */
@@ -2029,14 +2019,16 @@ body[data-page="home"] .site-footer { margin-top: 0; }
   .hlp-popup-btn { transition: none !important; }
 }
 
-/* ======================== COMO FUNCIONA — GRADIENTE AZUL ======================== */
-.como-funciona-azul {
+/* ======================== LISTA ESCOLAR (HOME) — GRADIENTE AZUL ======================== */
+/* Mesmos tons de azul usados nas demais faixas de destaque do site (ver
+   .sartec-digital-faixa acima e o antigo bloco "Como funciona"). */
+.lista-escolar-azul {
   background: linear-gradient(135deg, #1B3A8A 0%, #2049B0 55%, #1D3F9E 100%);
   border-top: none !important;
   border-bottom: none !important;
   position: relative;
 }
-.como-funciona-azul::before {
+.lista-escolar-azul::before {
   content: '';
   position: absolute;
   top: 0;
@@ -2046,14 +2038,9 @@ body[data-page="home"] .site-footer { margin-top: 0; }
   height: 0;
   border-left: 56px solid transparent;
   border-right: 56px solid transparent;
-  border-top: 34px solid #FFFFFF;
+  border-top: 34px solid var(--cinza-fundo);
   z-index: 2;
   pointer-events: none;
-}
-.como-funciona-azul h2 { color: #FFFFFF; }
-.como-funciona-azul .step {
-  background: rgba(255, 255, 255, 0.97);
-  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* ======================== HERO FULL WIDTH ======================== */

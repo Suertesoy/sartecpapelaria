@@ -32,8 +32,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/catalog/catalog-add-animation.css" />
   <style>
     html { scroll-behavior: smooth; }
 
@@ -105,36 +106,37 @@
     <section class="hcp-section" aria-labelledby="hcp-title">
       <div class="container hcp-grid">
 
-        <div class="hcp-preview" aria-hidden="true">
+        <div class="hcp-preview" id="hcp-demo" aria-hidden="true">
           <div class="hcp-preview-card">
             <div class="hcp-preview-bar">
               <span class="hcp-preview-search">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <span>Buscar produto</span>
               </span>
-              <span class="hcp-preview-list">📋 Minha lista <span class="hcp-preview-list-count">3</span></span>
+              <span class="hcp-preview-list" id="hcp-list-pill">📋 Minha lista <span class="hcp-preview-list-count" id="hcp-list-count">0</span></span>
             </div>
             <div class="hcp-preview-products">
               <div class="hcp-preview-product">
                 <div class="hcp-preview-product-media"><img src="assets/catalog/images/caderno_universitario_10_materias.png" alt="" loading="lazy" width="120" height="120" /></div>
                 <span class="hcp-preview-product-name">Caderno</span>
-                <span class="hcp-preview-product-add">+ Adicionar</span>
+                <span class="hcp-preview-product-add" id="hcp-add-caderno">+ Adicionar</span>
               </div>
               <div class="hcp-preview-product">
                 <div class="hcp-preview-product-media"><img src="assets/catalog/images/caneta_esferografica.png" alt="" loading="lazy" width="120" height="120" /></div>
                 <span class="hcp-preview-product-name">Caneta</span>
-                <span class="hcp-preview-product-add">+ Adicionar</span>
+                <span class="hcp-preview-product-add" id="hcp-add-caneta">+ Adicionar</span>
               </div>
               <div class="hcp-preview-product">
                 <div class="hcp-preview-product-media"><img src="assets/catalog/images/estojo_triplo.png" alt="" loading="lazy" width="120" height="120" /></div>
                 <span class="hcp-preview-product-name">Estojo</span>
-                <span class="hcp-preview-product-add">+ Adicionar</span>
+                <span class="hcp-preview-product-add" id="hcp-add-estojo">+ Adicionar</span>
               </div>
             </div>
-            <div class="hcp-preview-ready">
+            <div class="hcp-preview-ready" id="hcp-preview-ready">
               <span class="hcp-preview-ready-dot">✓</span>
               <span>Lista pronta para enviar ao orçamento</span>
             </div>
+            <div class="hcp-demo-cursor" id="hcp-demo-cursor" aria-hidden="true"></div>
           </div>
         </div>
 
@@ -155,19 +157,19 @@
     <!-- =====================================================
          3. SEÇÃO LISTA ESCOLAR
          ===================================================== -->
-    <section style="background: #FFFFFF; padding: 0;">
+    <section class="lista-escolar-azul" style="padding: 0;">
       <div style="max-width: 1180px; margin: 0 auto; padding: clamp(48px, 9vw, 80px) 20px;">
         <div class="lista-grid">
 
           <!-- Copy esquerda -->
           <div style="display: flex; flex-direction: column; gap: 20px; max-width: 520px;">
             <span class="kicker">Lista Escolar</span>
-            <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(26px, 3.5vw, 38px); margin: 0; letter-spacing: -0.02em; line-height: 1.15; color: #0F172A;">Tire foto da lista. A gente organiza o pedido com você.</h2>
-            <p style="margin: 0; font-size: 17px; line-height: 1.6; color: #475569;">Envie a foto ou o PDF, revise os itens encontrados, ajuste quantidades, marque o que já tem em casa e receba o orçamento pelo WhatsApp.</p>
+            <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(26px, 3.5vw, 38px); margin: 0; letter-spacing: -0.02em; line-height: 1.15; color: #FFFFFF;">Tire foto da lista. A gente organiza o pedido com você.</h2>
+            <p style="margin: 0; font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.86);">Envie a foto ou o PDF, revise os itens encontrados, ajuste quantidades, marque o que já tem em casa e receba o orçamento pelo WhatsApp.</p>
             <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px;">
               <a href="lista-escolar.html" style="background: #DC2626; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 16px; padding: 14px 24px; border-radius: 13px; box-shadow: 0 4px 14px rgba(220,38,38,0.25);">Enviar minha lista</a>
             </div>
-            <p style="margin: 4px 0 0; font-size: 13.5px; color: #94A3B8;">Sem cadastro e sem pagamento no site. A equipe confirma tudo com você antes do orçamento.</p>
+            <p style="margin: 4px 0 0; font-size: 13.5px; color: rgba(255,255,255,0.68);">Sem cadastro e sem pagamento no site. A equipe confirma tudo com você antes do orçamento.</p>
           </div>
 
           <!-- Preview animado da ferramenta -->
@@ -343,36 +345,7 @@
     </section>
 
     <!-- =====================================================
-         4. COMO FUNCIONA
-         ===================================================== -->
-    <section id="como-funciona" class="como-funciona-azul" style="padding: clamp(44px, 8vw, 72px) 0;">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 0 20px;">
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; max-width: 560px;">
-          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 32px; margin: 0; letter-spacing: -0.01em;">Como funciona</h2>
-          <p style="margin: 0; font-size: 18px; color: rgba(255,255,255,0.80); line-height: 1.5;">Três passos e a lista sai da sua frente.</p>
-        </div>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <h3>Envie a lista</h3>
-            <p>Foto ou PDF, direto do celular. Não precisa digitar nada.</p>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <h3>Marque o que já tem</h3>
-            <p>Você ajusta quantidades e manda só o que realmente precisa.</p>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <h3>Receba pelo WhatsApp</h3>
-            <p>A equipe confere item por item e fecha o orçamento com você.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =====================================================
-         5. O QUE OFERECEMOS
+         4. O QUE OFERECEMOS
          ===================================================== -->
     <section style="background: #FFFFFF; padding: clamp(44px, 8vw, 72px) 0;">
       <div style="max-width: 1180px; margin: 0 auto; padding: 0 20px;">
@@ -423,13 +396,13 @@
     </section>
 
     <!-- =====================================================
-         5B. FAIXA PARCERIA ESCOLAS
+         4B. FAIXA PARCERIA ESCOLAS
          TODO: substituir quando escolas parceiras forem confirmadas
          ===================================================== -->
     <div id="escolas-faixa-mount"></div>
 
     <!-- =====================================================
-         6. POR QUE ESCOLHER A SARTEC
+         5. POR QUE ESCOLHER A SARTEC
          ===================================================== -->
     <section class="why">
       <div class="container">
@@ -464,7 +437,7 @@
     </section>
 
     <!-- =====================================================
-         7. FAIXA SARTEC DIGITAL
+         6. FAIXA SARTEC DIGITAL
          ===================================================== -->
     <section style="background: #FFFFFF; padding: clamp(40px, 8vw, 64px) 20px;">
       <div style="max-width: 1180px; margin: 0 auto;">
@@ -492,7 +465,7 @@
     </section>
 
     <!-- =====================================================
-         8. VISITE A SARTEC — FULL WIDTH
+         7. VISITE A SARTEC — FULL WIDTH
          Desktop: assets/images/fachada-loja-desktop.png
          Mobile:  assets/images/fachada-loja-mobile.png
          ===================================================== -->
@@ -531,5 +504,6 @@
   <script>
     SartecInit({ active: 'home', fab: 'principal' });
   </script>
+  <script type="module" src="assets/home-catalog-demo.js"></script>
 </body>
 </html>

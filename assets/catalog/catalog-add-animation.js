@@ -27,6 +27,7 @@ let writeTimer = null;
 let hideTimer = null;
 let exitTimer = null;
 let repositionBound = false;
+let currentGetTarget = getListTargetEl;
 
 function reducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -128,7 +129,7 @@ function ensurePaperEl() {
 }
 
 function positionPaper() {
-  const target = getListTargetEl();
+  const target = currentGetTarget();
   if (!target || !paperEl) return;
   const rect = target.getBoundingClientRect();
   const margin = 12;
@@ -263,9 +264,12 @@ function enqueueLine(name) {
  * papel — o fly + bump acontece sempre.
  * @param {HTMLElement|null} originEl botão que originou a adição (Adicionar, Adicionar com detalhes, opção confirmada...)
  * @param {string} productName nome do produto adicionado
+ * @param {{ getTarget?: () => HTMLElement|null }} [opts] permite apontar para um "Minha lista" diferente do
+ *   catálogo real (ex.: a demonstração da home, ver assets/home-catalog-demo.js). Sem opts, comportamento inalterado.
  */
-export function celebrateAdd(originEl, productName) {
-  const targetEl = getListTargetEl();
+export function celebrateAdd(originEl, productName, opts = {}) {
+  currentGetTarget = opts.getTarget || getListTargetEl;
+  const targetEl = currentGetTarget();
   const showPaperForThisAdd = sessionAddCount < MAX_PAPER_LINES;
   sessionAddCount++;
 
@@ -285,4 +289,24 @@ export function celebrateAdd(originEl, productName) {
   }
 
   flyChip(originEl, targetEl, afterArrive);
+}
+
+/**
+ * Zera o estado do papel de confirmação (contador de sessão, linhas escritas e
+ * fila pendente) e esconde o papel imediatamente. Usado pela demonstração em
+ * loop da home para reiniciar cada ciclo como se fosse uma nova sessão.
+ */
+export function resetCelebrateState() {
+  sessionAddCount = 0;
+  writtenNames = [];
+  lineQueue = [];
+  isWriting = false;
+  clearInterval(writeTimer);
+  clearTimeout(hideTimer);
+  clearTimeout(exitTimer);
+  if (paperEl) {
+    paperEl.hidden = true;
+    paperEl.classList.remove('cat-list-paper-visible', 'cat-list-paper-exit');
+    if (linesContainerEl) linesContainerEl.innerHTML = '';
+  }
 }
