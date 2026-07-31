@@ -145,6 +145,10 @@
             </label>
           </div>
           <label style="display: flex; flex-direction: column; gap: 7px">
+            <span style="font-weight: 600; font-size: 14.5px">E-mail do contato</span>
+            <input id="emp-email" type="email" class="form-input" placeholder="contato@empresa.com.br" autocomplete="email" />
+          </label>
+          <label style="display: flex; flex-direction: column; gap: 7px">
             <span style="font-weight: 600; font-size: 14.5px">O que sua empresa precisa?</span>
             <select id="emp-tipo" class="form-input" style="cursor: pointer; background: #FFFFFF">
               <option value="Material de escritório">Material de escritório</option>
@@ -224,14 +228,23 @@
       var cnpj    = document.getElementById('emp-cnpj').value.trim();
       var contato = document.getElementById('emp-contato').value.trim();
       var fone    = document.getElementById('emp-fone').value.trim();
+      var email   = document.getElementById('emp-email').value.trim();
       var tipo    = document.getElementById('emp-tipo').value;
       var erro    = document.getElementById('emp-erro');
+      var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       var faltas = [];
       var camposFaltantes = [];
       if (!empresa) { faltas.push('o nome da empresa'); camposFaltantes.push('empresa'); }
       if (!contato) { faltas.push('o nome do contato'); camposFaltantes.push('contato'); }
       if (!fone)    { faltas.push('o WhatsApp do contato'); camposFaltantes.push('fone'); }
+      if (!email) {
+        faltas.push('o e-mail do contato');
+        camposFaltantes.push('email');
+      } else if (!emailRegex.test(email)) {
+        faltas.push('um e-mail válido');
+        camposFaltantes.push('email_invalido');
+      }
 
       if (faltas.length) {
         erro.textContent = 'Falta preencher: ' + faltas.join(', ') + '.';
@@ -246,6 +259,7 @@
       if (cnpj) msg += 'CNPJ: ' + cnpj + '\n';
       msg += 'Contato: ' + contato + '\n';
       msg += 'WhatsApp: ' + fone + '\n';
+      msg += 'E-mail: ' + email + '\n';
       msg += 'Necessidade: ' + tipo;
 
       trackEvent('company_form_submit_whatsapp', { need_type: tipo });

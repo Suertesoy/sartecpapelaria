@@ -11,6 +11,8 @@ window.SARTEC = {
   CNPJ: '06.241.041/0001-56',
   HORARIO:  'Seg a Sex: 8h30 às 18h30 • Sáb: 9h às 14h',
   TELEFONE_DISPLAY: '(12) 98159-4959',
+  TELEFONE_FIXO: '551239341666',
+  TELEFONE_FIXO_DISPLAY: '(12) 3934-1666',
   EMAIL: 'sartecpapelaria@uol.com.br'
 };
 
@@ -384,6 +386,7 @@ function renderFooter() {
             <p>CEP: ${SARTEC.CEP}</p>
             <p>${SARTEC.HORARIO}</p>
             <a href="tel:+${SARTEC.WPP_PRINCIPAL}">${SARTEC.TELEFONE_DISPLAY}</a>
+            <a href="tel:+${SARTEC.TELEFONE_FIXO}">${SARTEC.TELEFONE_FIXO_DISPLAY}</a>
             <a href="mailto:${SARTEC.EMAIL}">${SARTEC.EMAIL}</a>
           </div>
         </div>
