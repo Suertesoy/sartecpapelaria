@@ -50,33 +50,6 @@ const CATEGORY_ICONS = {
 // já que a página monta uma lista para orçamento, não um checkout.
 export const LIST_ICON = '📋';
 
-// Produtos com imagem própria já gerada (ver assets/catalog/images/manifest.json).
-// Usado para priorizar produtos com foto real nas fileiras horizontais da home.
-const IMAGE_COVERED_IDS = new Set([
-  'caderno_universitario_1_materia', 'caderno_universitario_10_materias', 'caderno_universitario_outras_materias',
-  'caderno_brochura', 'caderno_brochurao', 'caderno_espiral_14', 'caderno_colegial', 'caderno_cartografia_desenho',
-  'caderno_caligrafia', 'caderno_argolado', 'agenda', 'planner', 'diario', 'calendario', 'caderneta',
-  'bloco_anotacoes', 'bloco_adesivo_notas', 'fichario', 'refil_fichario', 'acessorios_fichario',
-  'caneta_esferografica', 'caneta_gel', 'caneta_hidrografica', 'caneta_tecnica_fineliner', 'caneta_brush_lettering',
-  'caneta_especial', 'lapis_grafite', 'lapis_de_cor', 'lapiseira', 'grafite_lapiseira', 'marca_texto',
-  'marcador_quadro_branco', 'marcador_permanente', 'marcador_brush_lettering', 'marcador_especial',
-  'refil_marcador_quadro_branco', 'refil_marcador_permanente', 'giz_de_cera', 'giz_para_quadro',
-  'papel_sulfite', 'cartolina', 'papel_cartao', 'papel_crepom', 'papel_para_dobradura', 'papel_seda',
-  'papel_celofane', 'papel_carbono', 'papel_kraft', 'papel_vegetal', 'papel_fotografico', 'papel_couche',
-  'papel_adesivo', 'papel_colorido_criativo', 'bloco_de_desenho', 'bloco_trabalhos_escolares', 'eva_liso',
-  'eva_com_glitter', 'eva_atoalhado', 'eva_estampado', 'isopor', 'plastico_adesivo_contact',
-  'plastico_para_encapar', 'plastico_para_plastificar', 'folhas_capas_plasticas', 'tnt', 'feltro',
-  'cola_bastao', 'cola_branca', 'cola_instantanea', 'cola_quente', 'cola_de_silicone', 'cola_para_eva_isopor',
-  'cola_para_madeira', 'cola_para_tecido', 'cola_para_artesanato', 'fita_adesiva_transparente',
-  'fita_adesiva_colorida', 'fita_dupla_face', 'fita_crepe', 'fita_para_embalagem', 'fita_isolante',
-  'etiqueta_para_impressao', 'etiqueta_de_preco', 'etiqueta_escolar', 'adesivo_decorativo', 'etiquetas_em_geral',
-  'borracha', 'corretivo_em_fita', 'corretivo_liquido', 'caneta_corretiva', 'tinta_guache', 'tinta_para_tecido',
-  'tinta_acrilica', 'tinta_pva_artesanato', 'tinta_dimensional_relevo', 'aquarela', 'tinta_spray',
-  'tinta_metalica', 'tinta_nanquim', 'pincel_chato', 'pincel_redondo', 'pincel_artistico',
-  'acessorios_para_pintura', 'lapis_artistico', 'materiais_desenho_artistico', 'stencil', 'massa_de_modelar',
-  'kit_de_modelagem', 'pasta_com_elastico', 'mochila_escolar', 'estojo_triplo', 'mouse_sem_fio',
-]);
-
 // Convenção: toda imagem de produto gerada pelo MCP do Magnific fica em
 // assets/catalog/images/<id-do-item>.png. Não há mapa fixo — a cobertura é
 // de todos os produtos ativos (ver manifest.json). Caso um arquivo falhe ao
@@ -84,6 +57,13 @@ const IMAGE_COVERED_IDS = new Set([
 // visual e o evento catalog_image_load_error é disparado.
 function getImagePath(item) {
   return `assets/catalog/images/${item.id}.png`;
+}
+
+// Camada derivada leve (WebP, ~640px) gerada a partir dos PNGs fonte via
+// assets/catalog/generate-webp.mjs — os PNGs originais (2048px) nunca são
+// alterados nem removidos. Ver assets/catalog/README-images.md.
+function getWebpImagePath(item) {
+  return `assets/catalog/images/webp/${item.id}.webp`;
 }
 
 // Quantidade máxima de produtos em cada fileira horizontal da home.
@@ -138,9 +118,13 @@ function fallbackMediaHtml(item, category, bgClass) {
 function cardMediaHtml(item, category) {
   const bgClass = variantBgClass(item.visualVariant);
   const src = getImagePath(item);
+  const webpSrc = getWebpImagePath(item);
   return `<div class="cat-card-media ${bgClass}">
-    <img src="${esc(src)}" alt="${esc(item.name)}" width="256" height="256" loading="lazy"
-      onerror="this.parentElement.classList.add('cat-card-media-placeholder'); this.remove(); window.trackEvent && window.trackEvent('catalog_image_load_error', { item_id: '${esc(item.id)}' });" />
+    <picture>
+      <source srcset="${esc(webpSrc)}" type="image/webp">
+      <img src="${esc(src)}" alt="${esc(item.name)}" width="256" height="256" loading="lazy" decoding="async"
+        onerror="this.parentElement.classList.add('cat-card-media-placeholder'); this.remove(); window.trackEvent && window.trackEvent('catalog_image_load_error', { item_id: '${esc(item.id)}' });" />
+    </picture>
   </div>`;
 }
 
@@ -529,14 +513,8 @@ function pickSectionItems(category) {
     round++;
   }
 
-  // Ordenação estável: produtos com imagem própria primeiro, preservando a
-  // diversidade de subcategorias já obtida pelo round-robin acima.
-  diverse.sort((a, b) => {
-    const aHas = IMAGE_COVERED_IDS.has(a.item.id) ? 0 : 1;
-    const bHas = IMAGE_COVERED_IDS.has(b.item.id) ? 0 : 1;
-    return aHas - bHas;
-  });
-
+  // Todos os produtos ativos têm imagem própria (ver manifest.json), então a
+  // ordem de diversidade por subcategoria do round-robin acima já é a final.
   const picked = diverse.slice(0, SECTION_ITEM_LIMIT).map(({ item, sub }) => ({ item, category, subcategory: sub }));
   sectionItemsCache.set(category.id, picked);
   return picked;
