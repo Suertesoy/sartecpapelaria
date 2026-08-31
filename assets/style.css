@@ -611,8 +611,8 @@ section { padding: 64px 0; }
   font-size: .84rem;
   color: rgba(255,255,255,0.45);
 }
-.footer-digital-link { color: rgba(255,255,255,0.78); text-decoration: none; font-weight: 600; }
-.footer-digital-link:hover { color: #FFFFFF; text-decoration: underline; }
+.footer-partner-link { color: rgba(255,255,255,0.78); text-decoration: none; font-weight: 600; }
+.footer-partner-link:hover { color: #FFFFFF; text-decoration: underline; }
 .footer-ai-note {
   font-size: .72rem;
   color: rgba(255,255,255,0.28);
@@ -2020,8 +2020,7 @@ section { padding: 64px 0; }
 }
 
 /* ======================== LISTA ESCOLAR (HOME) — GRADIENTE AZUL ======================== */
-/* Mesmos tons de azul usados nas demais faixas de destaque do site (ver
-   .sartec-digital-faixa acima e o antigo bloco "Como funciona"). */
+/* Mesmos tons de azul usados no antigo bloco "Como funciona" desta página. */
 .lista-escolar-azul {
   background: linear-gradient(135deg, #1B3A8A 0%, #2049B0 55%, #1D3F9E 100%);
   border-top: none !important;
@@ -2348,22 +2347,22 @@ section { padding: 64px 0; }
 }
 
 /* =========================================================
-   SARTEC DIGITAL CARD — glass + circuit effects
+   L A CABRAL CARD — glass + circuit effects
    ========================================================= */
-.sartec-digital-faixa::before {
+.la-cabral-faixa::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    repeating-linear-gradient(0deg,   transparent, transparent 39px, rgba(168,85,247,0.10) 39px, rgba(168,85,247,0.10) 40px),
-    repeating-linear-gradient(90deg,  transparent, transparent 39px, rgba(99,102,241,0.08) 39px, rgba(99,102,241,0.08) 40px);
+    repeating-linear-gradient(0deg,   transparent, transparent 39px, rgba(34,197,94,0.10) 39px, rgba(34,197,94,0.10) 40px),
+    repeating-linear-gradient(90deg,  transparent, transparent 39px, rgba(74,222,128,0.07) 39px, rgba(74,222,128,0.07) 40px);
   background-size: 40px 40px;
   opacity: 0.9;
   transition: opacity .28s ease, background-position .6s ease;
   pointer-events: none;
   border-radius: inherit;
 }
-.sartec-digital-faixa::after {
+.la-cabral-faixa::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -2371,14 +2370,14 @@ section { padding: 64px 0; }
   pointer-events: none;
   border-radius: inherit;
 }
-.sartec-digital-faixa-row { position: relative; z-index: 2; }
-.sartec-digital-faixa:hover::before {
+.la-cabral-faixa-row { position: relative; z-index: 2; }
+.la-cabral-faixa:hover::before {
   opacity: 1;
   background-position: 4px 4px;
 }
 @media (prefers-reduced-motion: reduce) {
-  .sartec-digital-faixa { transition: box-shadow .25s !important; transform: none !important; }
-  .sartec-digital-faixa::before { transition: none !important; }
+  .la-cabral-faixa { transition: box-shadow .25s !important; transform: none !important; }
+  .la-cabral-faixa::before { transition: none !important; }
 }
 
 /* =========================================================
@@ -3032,17 +3031,17 @@ body.is-leaving {
 }
 
 /* ======================================================
-   FAIXA SARTEC DIGITAL COMPACTA (páginas internas)
+   FAIXA L A CABRAL COMPACTA (páginas internas)
    ====================================================== */
-.sdc-faixa { background: linear-gradient(90deg, #0D1F4A 0%, #0F2660 100%); padding: 12px 20px; }
-.sdc-inner { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.sdc-copy { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 180px; }
-.sdc-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #7FA3F2; white-space: nowrap; flex-shrink: 0; }
-.sdc-sep { width: 1px; height: 13px; background: rgba(127,163,242,.28); flex-shrink: 0; }
-.sdc-text { font-size: 13px; color: #94A3B8; line-height: 1.4; }
-.sdc-btn { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.08); border: 1px solid rgba(127,163,242,.3); color: #CBD5E1; text-decoration: none; font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 8px; white-space: nowrap; transition: background .2s, border-color .2s; flex-shrink: 0; }
-.sdc-btn:hover { background: rgba(255,255,255,.16); border-color: rgba(127,163,242,.55); }
-@media (max-width: 640px) { .sdc-text { display: none; } }
+.la-cabral-compact { background: linear-gradient(90deg, #0D1B16 0%, #10241C 100%); padding: 12px 20px; }
+.la-cabral-compact-inner { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.la-cabral-compact-copy { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 180px; }
+.la-cabral-compact-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #4ADE80; white-space: nowrap; flex-shrink: 0; }
+.la-cabral-compact-sep { width: 1px; height: 13px; background: rgba(34,197,94,.28); flex-shrink: 0; }
+.la-cabral-compact-text { font-size: 13px; color: #B7C4BD; line-height: 1.4; }
+.la-cabral-compact-btn { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.08); border: 1px solid rgba(34,197,94,.3); color: #D7E9DF; text-decoration: none; font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 8px; white-space: nowrap; transition: background .2s, border-color .2s; flex-shrink: 0; }
+.la-cabral-compact-btn:hover { background: rgba(255,255,255,.16); border-color: rgba(74,222,128,.55); }
+@media (max-width: 640px) { .la-cabral-compact-text { display: none; } }
 
 /* ======================================================
    HOME LIST PREVIEW — REDESIGN ANIMAÇÃO

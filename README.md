@@ -38,7 +38,7 @@ Funções auxiliares disponíveis globalmente: `trackWhatsappClick`, `trackCtaCl
 |---|---|---|
 | `whatsapp_click` | Qualquer link `wa.me` do site (header, hero, footer, FAB, faixas) | `event_label` (`whatsapp_principal`/`whatsapp_copias`), `target_url` |
 | `cta_click` | Cliques em links para `lista-escolar.html`, `produtos.html`, `empresas.html`, `escolas.html`, `copias.html` | `event_label` (ex.: `cta_lista_escolar`) |
-| `external_click` | Cliques em Google Maps, Waze e Sartec Digital | `event_label` (`maps`/`waze`/`sartec_digital`) |
+| `external_click` | Cliques em Google Maps, Waze e L A Cabral | `event_label` (`maps`/`waze`/`la_cabral`) |
 | `faq_open` | Abertura de um `<details class="faq-item">` (Cópias, Escolas) | `question_text` |
 | `page_engagement_time` | Saída da página (`visibilitychange`/`pagehide`), só se ≥ 3s | `engagement_seconds` |
 | `scroll_depth` | Marcos de 25/50/75/90% de rolagem, uma vez por página | `percent` |

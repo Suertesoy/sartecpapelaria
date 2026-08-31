@@ -117,7 +117,7 @@ function _trackDebounced(el, windowMs = 800) {
   return true;
 }
 
-/* ---- Cliques: WhatsApp, Maps, Waze, Sartec Digital e CTAs internos ---- */
+/* ---- Cliques: WhatsApp, Maps, Waze, L A Cabral e CTAs internos ---- */
 function initAutoTracking() {
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a');
@@ -145,8 +145,8 @@ function initAutoTracking() {
       trackExternalClick(origem, 'waze', href);
       return;
     }
-    if (href.includes('sartec-digital.vercel.app')) {
-      trackExternalClick(origem, 'sartec_digital', href);
+    if (href.includes('lacabral.vercel.app')) {
+      trackExternalClick(origem, 'la_cabral', href);
       return;
     }
 
@@ -394,7 +394,7 @@ function renderFooter() {
       <div class="footer-bottom">
         <div class="container footer-bottom-inner">
           <span>© 2026 Sartec Papelaria e Informática &nbsp;·&nbsp; CNPJ: ${SARTEC.CNPJ}</span>
-          <span>Implementado pela <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="footer-digital-link">Sartec Digital</a></span>
+          <span>Implementado pela <a href="https://lacabral.vercel.app/" target="_blank" rel="noopener" class="footer-partner-link">L A Cabral</a></span>
           <span class="footer-ai-note">Algumas imagens deste site foram geradas ou editadas com inteligência artificial para fins ilustrativos.</span>
         </div>
       </div>
@@ -765,20 +765,20 @@ function initHomeListPreview() {
 }
 
 /* =========================================================
-   FAIXA SARTEC DIGITAL COMPACTA (páginas internas)
+   FAIXA L A CABRAL COMPACTA (páginas internas)
    ========================================================= */
-function renderSartecDigitalCompact() {
-  const mount = document.getElementById('digital-compact-mount');
+function renderLaCabralCompact() {
+  const mount = document.getElementById('la-cabral-compact-mount');
   if (!mount) return;
   mount.innerHTML = `
-    <div class="sdc-faixa">
-      <div class="sdc-inner">
-        <div class="sdc-copy">
-          <span class="sdc-label">Sartec Digital</span>
-          <span class="sdc-sep"></span>
-          <span class="sdc-text">Este site foi implementado pela Sartec Digital — automação e atendimento inteligente para pequenos negócios.</span>
+    <div class="la-cabral-compact">
+      <div class="la-cabral-compact-inner">
+        <div class="la-cabral-compact-copy">
+          <span class="la-cabral-compact-label">L A Cabral</span>
+          <span class="la-cabral-compact-sep"></span>
+          <span class="la-cabral-compact-text">Experiência digital desenvolvida pela L A Cabral — automação e organização de operações para pequenos negócios.</span>
         </div>
-        <a href="https://sartec-digital.vercel.app/" target="_blank" rel="noopener" class="sdc-btn">
+        <a href="https://lacabral.vercel.app/" target="_blank" rel="noopener" class="la-cabral-compact-btn">
           Conhecer
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
@@ -795,7 +795,7 @@ window.SartecInit = function ({ active, fab }) {
     renderHeader(active);
     renderDeliveryFaixa();
     renderEscolasFaixa();
-    renderSartecDigitalCompact();
+    renderLaCabralCompact();
     renderFooter();
     renderFab(fab || 'principal');
     initPageTransitions();
