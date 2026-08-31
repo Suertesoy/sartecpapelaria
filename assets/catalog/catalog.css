@@ -68,6 +68,10 @@ p.cat-hero-disclaimer {
 .cat-hero-visual-item-4 { width: 120px; height: 120px; bottom: 10px; right: 4%; z-index: 2; }
 .cat-hero-visual-item-5 { width: 130px; height: 130px; bottom: -10px; left: 38%; z-index: 4; transform: rotate(-4deg); }
 
+/* Foto antiga da fachada da loja — reaparece só no mobile (ver @media 640px),
+   substituindo a composição dos 5 produtos que fica amontoada em telas pequenas. */
+.cat-hero-visual-photo { display: none; }
+
 .cat-hero-steps {
   background: var(--vermelho);
   border-bottom: 1px solid var(--vermelho-escuro);
@@ -92,15 +96,64 @@ p.cat-hero-disclaimer {
 }
 
 @media (max-width: 640px) {
-  .cat-hero { padding: 20px 0; }
+  /* Composição dos 5 produtos some no mobile — fica pequena e amontoada.
+     No lugar entra a foto antiga da fachada da loja em tela cheia, com o texto
+     sobreposto num cartão — mesmo padrão usado no hero mobile das outras
+     páginas internas (.internal-hero em assets/style.css). */
+  .cat-hero {
+    position: relative;
+    overflow: hidden;
+    background: #1E3A8A;
+    min-height: 620px;
+    padding: 0;
+  }
+  .cat-hero-inner {
+    /* fica static de propósito: .cat-hero-visual (position:absolute) precisa
+       "furar" este elemento e usar .cat-hero como containing block, senão o
+       inset:0 fica preso à altura do cartão de texto em vez da seção inteira */
+    padding: 32px 16px 28px;
+    align-items: flex-start;
+  }
+
+  .cat-hero-visual-item-1,
+  .cat-hero-visual-item-2,
+  .cat-hero-visual-item-3,
+  .cat-hero-visual-item-4,
+  .cat-hero-visual-item-5 { display: none; }
+
+  .cat-hero-visual {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+  }
+  .cat-hero-visual-photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+  }
+
+  .cat-hero-text {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 22px 18px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 6px 24px rgba(15, 23, 42, 0.16);
+  }
   .cat-hero-text h1 { font-size: 1.3rem; }
   .cat-hero-text > p { font-size: .9rem; margin-bottom: 14px; }
-  .cat-hero-visual { max-width: 240px; min-height: 170px; }
-  .cat-hero-visual-item-1 { width: 130px; height: 130px; }
-  .cat-hero-visual-item-2 { width: 110px; height: 110px; }
-  .cat-hero-visual-item-3 { width: 76px; height: 76px; }
-  .cat-hero-visual-item-4 { width: 84px; height: 84px; }
-  .cat-hero-visual-item-5 { width: 90px; height: 90px; }
 }
 
 /* ---------- Barra de ferramentas fixa (busca, lista, categorias) ---------- */
