@@ -924,11 +924,17 @@ p.cat-hero-disclaimer {
 .cat-list-empty { text-align: center; color: var(--texto-suave); padding: 30px 10px; }
 
 .cat-list-review { border-top: 1px solid var(--cinza-borda); padding-top: 18px; margin-top: 6px; display: flex; flex-direction: column; gap: 14px; }
+.cat-list-review-title { font-family: Archivo, sans-serif; font-size: 1.05rem; margin: 0; color: var(--texto); }
 .cat-list-review-summary { font-weight: 700; color: var(--texto); }
+.cat-list-client-type,
 .cat-list-delivery { border: 1px solid var(--cinza-borda); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.cat-list-client-type legend,
 .cat-list-delivery legend { font-size: .82rem; font-weight: 700; padding: 0 4px; }
+.cat-list-client-type label,
 .cat-list-delivery label { display: flex; align-items: center; gap: 8px; font-size: .9rem; font-weight: 400; color: var(--texto); }
+.cat-list-client-type input,
 .cat-list-delivery input { accent-color: var(--azul); width: 16px; height: 16px; }
+.cat-list-client-type--invalid { border-color: var(--vermelho); }
 .cat-list-disclaimer { font-size: .8rem; color: var(--texto-suave); background: var(--cinza-fundo); border-radius: var(--radius-sm); padding: 10px 12px; }
 .cat-list-final-actions { justify-content: space-between; }
 

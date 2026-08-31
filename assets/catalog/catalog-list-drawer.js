@@ -26,7 +26,7 @@ import { showToast } from './catalog-toast.js';
 import { buildQuoteMessage, buildQuoteWhatsappUrl } from './catalog-message.js';
 import { esc } from './catalog-utils.js';
 
-let reviewState = { generalNote: '', deliveryPreference: 'retirada' };
+let reviewState = { generalNote: '', deliveryPreference: 'retirada', clientType: null };
 let expandedInstanceId = null;
 
 function specLines(entry) {
@@ -187,11 +187,15 @@ function renderDrawerBody(body) {
     ${complementaryItemsHtml(items)}
 
     <div class="cat-list-review">
+      <h3 class="cat-list-review-title">Solicitar orçamento pelo WhatsApp</h3>
       <p class="cat-list-review-summary">${reviewSummaryHtml(items)}</p>
 
-      <label class="cat-field cat-field-full">Observação geral do pedido
-        <textarea id="cat-list-general-note" rows="2" placeholder="Alguma informação que ajude a equipe a montar o orçamento">${esc(reviewState.generalNote)}</textarea>
-      </label>
+      <fieldset class="cat-list-client-type" data-client-type-group>
+        <legend>Este orçamento é para: <span class="cat-field-req" aria-hidden="true">*</span></legend>
+        <label><input type="radio" name="cat-client-type" value="pf" ${reviewState.clientType === 'pf' ? 'checked' : ''} /> Pessoa Física</label>
+        <label><input type="radio" name="cat-client-type" value="pj" ${reviewState.clientType === 'pj' ? 'checked' : ''} /> Pessoa Jurídica / Empresa</label>
+      </fieldset>
+      <p id="cat-client-type-erro" class="cat-field-erro" hidden>Selecione se este orçamento é para pessoa física ou jurídica.</p>
 
       <fieldset class="cat-list-delivery">
         <legend>Preferência de recebimento</legend>
@@ -200,7 +204,11 @@ function renderDrawerBody(body) {
         <label><input type="radio" name="cat-delivery" value="indefinido" ${reviewState.deliveryPreference === 'indefinido' ? 'checked' : ''} /> Ainda não sei</label>
       </fieldset>
 
-      <p class="cat-list-disclaimer">O envio da lista não representa uma compra ou reserva. A equipe da Sartec confirmará as opções disponíveis, os valores e as condições de entrega ou retirada pelo WhatsApp.</p>
+      <label class="cat-field cat-field-full">Observação geral do pedido
+        <textarea id="cat-list-general-note" rows="2" placeholder="Alguma informação que ajude a equipe a montar o orçamento">${esc(reviewState.generalNote)}</textarea>
+      </label>
+
+      <p class="cat-list-disclaimer">O envio não representa uma compra — a equipe da Sartec confirma tudo pelo WhatsApp.</p>
 
       <div class="cat-drawer-actions cat-list-final-actions">
         <button type="button" class="cat-drawer-btn-secondary" id="cat-list-clear">Limpar lista</button>
@@ -234,11 +242,26 @@ function wireComplementary(body) {
   });
 }
 
+function setClientTypeInvalid(body, invalid) {
+  const group = body.querySelector('[data-client-type-group]');
+  const erro = body.querySelector('#cat-client-type-erro');
+  group?.classList.toggle('cat-list-client-type--invalid', invalid);
+  if (erro) erro.hidden = !invalid;
+}
+
 function wireReviewControls(body, items) {
   const noteEl = body.querySelector('#cat-list-general-note');
   noteEl?.addEventListener('input', () => {
     reviewState.generalNote = noteEl.value;
     updateSendLink(body, items);
+  });
+
+  body.querySelectorAll('input[name="cat-client-type"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) reviewState.clientType = radio.value;
+      setClientTypeInvalid(body, false);
+      updateSendLink(body, items);
+    });
   });
 
   body.querySelectorAll('input[name="cat-delivery"]').forEach((radio) => {
@@ -261,6 +284,12 @@ function wireReviewControls(body, items) {
 
   const sendLink = body.querySelector('#cat-list-send');
   sendLink?.addEventListener('click', (e) => {
+    if (!reviewState.clientType) {
+      e.preventDefault();
+      setClientTypeInvalid(body, true);
+      body.querySelector('[data-client-type-group]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     const url = sendLink.getAttribute('href');
     if (!url || url === '#') {
       e.preventDefault();
@@ -271,6 +300,7 @@ function wireReviewControls(body, items) {
       list_item_count: getItemCount(),
       total_quantity: getTotalQuantity(),
       manual_item: items.some((it) => it.manual),
+      client_type: reviewState.clientType,
     });
   });
 }
@@ -278,10 +308,17 @@ function wireReviewControls(body, items) {
 function updateSendLink(body, items) {
   const sendLink = body.querySelector('#cat-list-send');
   if (!sendLink) return;
+  if (!reviewState.clientType) {
+    sendLink.setAttribute('href', '#');
+    sendLink.setAttribute('aria-disabled', 'true');
+    return;
+  }
+  sendLink.removeAttribute('aria-disabled');
   const message = buildQuoteMessage({
     items,
     generalNote: reviewState.generalNote,
     deliveryPreference: reviewState.deliveryPreference,
+    clientType: reviewState.clientType,
   });
   const url = buildQuoteWhatsappUrl(message);
   if (url) sendLink.setAttribute('href', url);

@@ -39,9 +39,9 @@ function formatManualLines(entry) {
 }
 
 /**
- * @param {{ items: import('./catalog-list.js').CatalogListItem[], generalNote?: string, deliveryPreference?: 'retirada'|'entrega'|'indefinido' }} params
+ * @param {{ items: import('./catalog-list.js').CatalogListItem[], generalNote?: string, deliveryPreference?: 'retirada'|'entrega'|'indefinido', clientType?: 'pf'|'pj' }} params
  */
-export function buildQuoteMessage({ items, generalNote, deliveryPreference }) {
+export function buildQuoteMessage({ items, generalNote, deliveryPreference, clientType }) {
   const catalogItems = items.filter((it) => !it.manual);
   const manualItems = items.filter((it) => it.manual);
   const blocos = [];
@@ -70,8 +70,13 @@ export function buildQuoteMessage({ items, generalNote, deliveryPreference }) {
   if (generalNote && generalNote.trim()) rodape.push(`Observação geral: ${generalNote.trim()}`);
   rodape.push(`Preferência de recebimento: ${DELIVERY_LABELS[deliveryPreference] || DELIVERY_LABELS.indefinido}.`);
 
+  const cabecalho = ['[SITE_CATALOGO_ORCAMENTO]'];
+  if (clientType === 'pf' || clientType === 'pj') {
+    cabecalho.push(`[TIPO_CLIENTE:${clientType.toUpperCase()}]`);
+  }
+
   return [
-    '[SITE_CATALOGO_ORCAMENTO]',
+    cabecalho.join('\n'),
     'Olá, montei uma lista de produtos pelo site da Sartec e gostaria de solicitar um orçamento.',
     blocos.join('\n\n'),
     rodape.join('\n'),
