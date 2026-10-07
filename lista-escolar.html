@@ -33,6 +33,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preload" as="image" href="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-apresentando.webp" type="image/webp" />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -40,49 +41,98 @@
   <div id="header-mount"></div>
 
   <!-- Hero — Lista Escolar -->
-  <section class="internal-hero hero-lista-escolar">
-    <div class="internal-hero-media">
-      <picture>
-        <source srcset="assets/hero-lista-escolar-mobile.png" media="(max-width: 640px)" />
-        <img src="assets/hero-lista-escolar-desktop.png" alt="Ferramenta de lista escolar da Sartec Papelaria" />
-      </picture>
-    </div>
-    <div class="internal-hero-content">
-      <div class="internal-hero-card">
-        <span class="internal-hero-badge">Ferramenta de lista escolar</span>
-        <h1>Envie sua lista, marque o que já tem.</h1>
-        <p>Foto ou PDF da lista, itens organizados para você conferir e um pedido pronto para o WhatsApp — sem digitar nada.</p>
-        <div class="internal-hero-btns">
-          <a href="#estado-upload" class="internal-hero-btn-wpp">Enviar minha lista</a>
-        </div>
+  <section class="le-hero">
+    <div class="container le-hero-grid">
+      <div class="le-hero-texto">
+        <span class="le-badge">Lista Escolar</span>
+        <h1>Resolva sua lista escolar <em>sem perder horas</em> procurando material.</h1>
+        <p class="le-hero-sub">Envie a foto ou PDF, confira os itens encontrados e continue com a Sartec pelo WhatsApp.</p>
+        <a href="#estado-upload" class="le-cta">
+          Enviar minha lista
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <p class="le-hero-seguro">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Sem cadastro e sem pagamento no site. Você confere tudo antes de enviar.</span>
+        </p>
+      </div>
+      <div class="le-hero-cena" aria-hidden="true">
+        <span class="le-fala le-fala-hero">Manda pra gente!</span>
+        <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-apresentando.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-apresentando.png" alt="" width="1000" height="644" fetchpriority="high" decoding="async" /></picture>
       </div>
     </div>
   </section>
 
   <!-- Como funciona — passo a passo -->
-  <section class="lista-como-funciona">
+  <section class="le-como" aria-labelledby="le-como-titulo">
     <div class="container">
-      <div class="lista-passos">
-        <div class="lista-passo">
-          <span class="lista-passo-num" aria-hidden="true">1</span>
-          <div>
-            <strong>Envie a foto ou PDF</strong>
-            <p>Tire uma foto da lista impressa ou anexe o PDF que a escola mandou.</p>
+      <header class="le-como-cab">
+        <h2 id="le-como-titulo">Como funciona</h2>
+        <p>É simples, rápido e a Sartec te acompanha em todo o processo.</p>
+      </header>
+      <ol class="le-passos">
+        <li class="le-passo le-passo-1">
+          <div class="le-passo-texto">
+            <span class="le-passo-num" aria-hidden="true">1</span>
+            <h3>1. Envie sua lista</h3>
+            <p>Foto ou PDF. Se tiver mais de uma página, pode mandar todas.</p>
           </div>
+          <div class="le-passo-cena" aria-hidden="true">
+            <span class="le-fala">Pode deixar!</span>
+            <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-vermelho-segurando-lista.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-vermelho-segurando-lista.png" alt="" width="560" height="634" loading="lazy" decoding="async" /></picture>
+          </div>
+        </li>
+        <li class="le-passo le-passo-2">
+          <div class="le-passo-texto">
+            <span class="le-passo-num" aria-hidden="true">2</span>
+            <h3>2. Confira os itens</h3>
+            <p>A gente organiza os materiais e você revisa tudo antes de continuar.</p>
+          </div>
+          <div class="le-passo-cena" aria-hidden="true">
+            <span class="le-fala">Eu te ajudo a conferir.</span>
+            <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-azul-lendo-lista.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-azul-lendo-lista.png" alt="" width="560" height="706" loading="lazy" decoding="async" /></picture>
+          </div>
+        </li>
+        <li class="le-passo le-passo-3">
+          <div class="le-passo-texto">
+            <span class="le-passo-num" aria-hidden="true">3</span>
+            <h3>3. Continue no WhatsApp</h3>
+            <p>A equipe da Sartec confirma os produtos, marcas e valores com você.</p>
+          </div>
+          <div class="le-passo-cena" aria-hidden="true">
+            <span class="le-fala">Daqui a gente continua junto.</span>
+            <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-whatsapp.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-whatsapp.png" alt="" width="640" height="486" loading="lazy" decoding="async" /></picture>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Transição para a ferramenta -->
+  <section class="le-pronto-wrap">
+    <div class="container">
+      <div class="le-pronto">
+        <div class="le-pronto-texto">
+          <h2>Pronto para começar?</h2>
+          <p>Tenha sua lista em mãos. Pode ser foto ou PDF.</p>
         </div>
-        <div class="lista-passo">
-          <span class="lista-passo-num" aria-hidden="true">2</span>
-          <div>
-            <strong>Revise os itens encontrados</strong>
-            <p>A ferramenta identifica os materiais. Você ajusta quantidades, marcas e o que já tem em casa.</p>
-          </div>
+        <div class="le-pronto-cena" aria-hidden="true">
+          <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-vermelho-apontando.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-vermelho-apontando.png" alt="" width="560" height="559" loading="lazy" decoding="async" /></picture>
         </div>
-        <div class="lista-passo">
-          <span class="lista-passo-num" aria-hidden="true">3</span>
-          <div>
-            <strong>Mande o pedido pelo WhatsApp</strong>
-            <p>Envie tudo de uma vez. Nossa equipe confirma disponibilidade, marcas/modelos e valores.</p>
-          </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modo revisão: cabeçalho compacto (visível só quando #estado-resultado está ativo) -->
+  <section class="le-revisao-cab" id="le-revisao-topo" aria-labelledby="le-revisao-titulo">
+    <div class="container">
+      <div class="le-revisao-card">
+        <div class="le-revisao-texto">
+          <h1 id="le-revisao-titulo">Sua lista está pronta para conferir</h1>
+          <p>Agora vamos por partes. Você pode ajustar tudo antes de enviar para a Sartec.</p>
+        </div>
+        <div class="le-revisao-mascote" aria-hidden="true">
+          <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-azul-conferindo-checklist.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-azul-conferindo-checklist.png" alt="" width="560" height="697" loading="lazy" decoding="async" /></picture>
         </div>
       </div>
     </div>
@@ -105,6 +155,11 @@
 
       <!-- ESTADO 1: UPLOAD -->
       <div class="estado ativo" id="estado-upload">
+        <div class="le-upload-stage">
+        <div class="le-upload-mascote" aria-hidden="true">
+          <span class="le-fala">É só colocar sua lista aqui.</span>
+          <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-vermelho-apontando.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-vermelho-apontando.png" alt="" width="560" height="559" loading="lazy" decoding="async" /></picture>
+        </div>
         <div class="form-card" style="max-width: 640px;">
           <form id="form-upload">
             <div class="campos-responsavel">
@@ -130,6 +185,7 @@
 
             <div class="form-group">
               <label>Arquivos da lista</label>
+              <p class="le-upload-nota">Foto ou PDF. Se a lista tiver várias páginas, envie todas.</p>
               <div class="upload-area" id="upload-area">
                 <div class="icon">📋</div>
                 <div class="label" id="upload-label">Clique ou arraste sua lista aqui</div>
@@ -155,11 +211,15 @@
             </div>
           </form>
         </div>
+        </div>
       </div>
 
       <!-- ESTADO 2: LOADING -->
       <div class="estado" id="estado-loading">
         <div class="lista-loading-card">
+          <div class="le-loading-mascote" aria-hidden="true">
+            <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-analise.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-analise.png" alt="" width="800" height="545" loading="lazy" decoding="async" /></picture>
+          </div>
           <div class="lista-loading-chips" aria-hidden="true">
             <span class="loading-chip chip-1">✏ Lápis</span>
             <span class="loading-chip chip-2">📓 Caderno</span>
@@ -168,7 +228,7 @@
             <span class="loading-chip chip-5">📁 Pasta</span>
           </div>
           <p class="lista-loading-titulo" id="lista-loading-titulo">Analisando sua lista...</p>
-          <p class="lista-loading-hint" id="loading-hint" aria-live="polite">Enviando lista para análise...</p>
+          <p class="lista-loading-hint" id="loading-hint" aria-live="polite">Organizando sua lista...</p>
           <div class="lista-loading-bar" aria-hidden="true"><div class="lista-loading-bar-fill"></div></div>
         </div>
       </div>
@@ -176,45 +236,104 @@
       <!-- ESTADO 3: RESULTADO -->
       <div class="estado" id="estado-resultado">
         <div id="resultado-badge"></div>
-        <div style="text-align:center; max-width: 720px; margin: 0 auto 32px;">
-          <span class="kicker">✓ Itens para revisar</span>
-          <h2>Confirme o que você quer comprar</h2>
-          <p class="sub">
-            Confira os itens abaixo. Marque <strong>"Não quero"</strong> nos que não precisa
-            e ajuste a quantidade do que falta. Nossa equipe confirma disponibilidade e preços pelo WhatsApp.
-          </p>
-          <p style="font-size:.8rem; color:var(--texto-suave); margin-top:-8px;">
-            A identificação dos itens é automática e pode precisar de conferência. A equipe confirma disponibilidade, marcas, modelos e preços pelo WhatsApp.
-          </p>
-        </div>
 
-        <div id="bloco-metadados"></div>
+        <nav class="le-etapas" aria-label="Etapas da revisão">
+          <ol>
+            <li><a href="#le-etapa-1"><span class="le-etapas-num" aria-hidden="true">1</span>Conferir a lista</a></li>
+            <li><a href="#le-etapa-2"><span class="le-etapas-num" aria-hidden="true">2</span>Dados e critério</a></li>
+            <li><a href="#le-etapa-3"><span class="le-etapas-num" aria-hidden="true">3</span>Revisar os materiais</a></li>
+            <li><a href="#le-etapa-4"><span class="le-etapas-num" aria-hidden="true">4</span>Enviar</a></li>
+          </ol>
+        </nav>
 
-        <div id="bloco-aluno"></div>
+        <!-- Etapa 1 -->
+        <section class="le-etapa le-etapa-leve" id="le-etapa-1" aria-labelledby="le-et1-t">
+          <header class="le-etapa-cab">
+            <span class="le-etapa-num" aria-hidden="true">1</span>
+            <div>
+              <h2 id="le-et1-t">Conferir a lista</h2>
+              <p>Encontramos estas informações na sua lista. Ajuste se precisar.</p>
+            </div>
+          </header>
+          <div id="bloco-metadados"></div>
+        </section>
 
-        <div id="bloco-preferencia"></div>
+        <!-- Etapa 2 -->
+        <section class="le-etapa le-etapa-leve" id="le-etapa-2" aria-labelledby="le-et2-t">
+          <header class="le-etapa-cab">
+            <span class="le-etapa-num" aria-hidden="true">2</span>
+            <div>
+              <h2 id="le-et2-t">Dados do aluno e critério do orçamento</h2>
+              <p>Conte um pouco sobre a criança e indique suas preferências gerais. A equipe da Sartec usa essas informações como referência para toda a lista.</p>
+            </div>
+          </header>
+          <div id="bloco-aluno"></div>
+          <div id="bloco-preferencia"></div>
+        </section>
 
-        <div class="resultado-header">
-          <div class="info">
-            <strong id="counter-quero">0 itens</strong> na sua lista •
-            <span id="counter-tem">0 não quero</span>
+        <!-- Etapa 3 -->
+        <section class="le-etapa le-etapa-principal" id="le-etapa-3" aria-labelledby="le-et3-t">
+          <header class="le-etapa-cab">
+            <span class="le-etapa-num" aria-hidden="true">3</span>
+            <div>
+              <h2 id="le-et3-t">Revisar os materiais</h2>
+              <p>Confirme o que você quer comprar. A equipe confirma disponibilidade, marcas, modelos e preços pelo WhatsApp.</p>
+            </div>
+          </header>
+          <div class="le-guia">
+            <div class="le-guia-corpo">
+              <p class="le-guia-titulo">Agora confira os materiais</p>
+              <p class="le-guia-texto">As preferências gerais da criança já serão consideradas. Aqui você só precisa ajustar quantidades, tirar o que já tem ou indicar alguma preferência específica de um item.</p>
+              <ul class="le-guia-lista">
+                <li>Já tem algum item? Marque <strong>Não quero</strong>.</li>
+                <li>Precisa de mais ou menos? Ajuste a <strong>quantidade</strong>.</li>
+                <li>Algum item precisa de algo específico? Use <strong>adicionar marca/preferência</strong> só nele.</li>
+              </ul>
+            </div>
+            <div class="le-guia-mascote" aria-hidden="true">
+              <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-azul-conferindo-checklist.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-azul-conferindo-checklist.png" alt="" width="560" height="697" loading="lazy" decoding="async" /></picture>
+            </div>
           </div>
-          <button id="btn-marcar-todos-tem" class="toggle-incluir nao" style="cursor:pointer">
-            Marcar todos como "Não quero"
-          </button>
-        </div>
+          <p class="le-etapa-aviso">A identificação dos itens é automática e pode precisar de conferência.</p>
 
-        <div class="itens-grid" id="itens-grid">
-          <!-- Cards renderizados via JS -->
-        </div>
+          <div class="resultado-header">
+            <div class="info">
+              <strong id="counter-quero">0 itens</strong> na sua lista •
+              <span id="counter-tem">0 não quero</span>
+            </div>
+            <button id="btn-marcar-todos-tem" class="toggle-incluir nao" style="cursor:pointer">
+              Marcar todos como "Não quero"
+            </button>
+          </div>
 
-        <div id="bloco-pedido-resumo"></div>
+          <div class="itens-grid" id="itens-grid">
+            <!-- Cards renderizados via JS -->
+          </div>
+        </section>
+
+        <!-- Etapa 4 (a barra .acoes-finais fica logo abaixo, filha direta de #estado-resultado para continuar sticky) -->
+        <section class="le-etapa le-etapa-leve le-etapa-final" id="le-etapa-4" aria-labelledby="le-et4-t">
+          <header class="le-etapa-cab">
+            <span class="le-etapa-num" aria-hidden="true">4</span>
+            <div>
+              <h2 id="le-et4-t">Enviar</h2>
+              <p>Quando estiver tudo certo, envie para a Sartec pelo WhatsApp.</p>
+            </div>
+          </header>
+          <div id="bloco-pedido-resumo"></div>
+          <div class="le-enviar-msg">
+            <div class="le-enviar-mascote" aria-hidden="true">
+              <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-whatsapp.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-whatsapp.png" alt="" width="640" height="486" loading="lazy" decoding="async" /></picture>
+            </div>
+            <p>Tudo certo. Agora a equipe da Sartec continua com você no WhatsApp.</p>
+          </div>
+        </section>
 
         <div class="acoes-finais">
           <div class="resumo">
             Nesta lista: <strong id="resumo-total">0 itens</strong>
           </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <div class="le-acoes-btns">
             <button id="btn-recomecar" class="btn btn-ghost">
               Limpar pedido
             </button>
@@ -225,7 +344,7 @@
               Enviar lista para orçamento
             </a>
           </div>
-          <p style="font-size: .82rem; color: var(--texto-suave); margin: 10px 0 0; line-height: 1.5">A equipe da Sartec confere estoque, marcas e valores antes de te responder pelo WhatsApp.</p>
+          <p class="le-acoes-nota">A equipe da Sartec confere estoque, marcas e valores antes de te responder pelo WhatsApp.</p>
         </div>
       </div>
 

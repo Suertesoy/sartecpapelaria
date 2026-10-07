@@ -3385,3 +3385,552 @@ body.is-leaving {
   .hlp-footer      { display: flex !important; }
   .hlp-cursor      { animation: none !important; }
 }
+
+/* =========================================================
+   LISTA ESCOLAR — mascotes como guias da experiência
+   Tudo namespaced em .le-* (ou contextual em #estado-upload)
+   ========================================================= */
+
+/* ---- Fala (balão secundário, decorativo) ---- */
+.le-fala {
+  position: absolute;
+  z-index: 3;
+  background: #FFFFFF;
+  color: var(--texto);
+  border: 2px solid var(--vermelho);
+  border-radius: 14px;
+  padding: 7px 12px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  transform: rotate(-3deg);
+  pointer-events: none;
+  max-width: 190px;
+}
+.le-fala::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  bottom: -9px;
+  width: 14px;
+  height: 14px;
+  background: #FFFFFF;
+  border-right: 2px solid var(--vermelho);
+  border-bottom: 2px solid var(--vermelho);
+  transform: rotate(45deg);
+  border-bottom-right-radius: 3px;
+}
+
+/* ---- Hero ---- */
+.le-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(520px 320px at 78% 22%, rgba(220, 38, 38, 0.07), transparent 70%),
+    radial-gradient(560px 360px at 92% 70%, rgba(30, 58, 138, 0.09), transparent 70%),
+    linear-gradient(180deg, #FFFFFF 0%, #F5F8FD 100%);
+  border-bottom: 1px solid var(--cinza-borda);
+}
+.le-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--azul) 0%, var(--vermelho) 100%);
+}
+.le-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 32px;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.le-hero-texto { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+.le-badge {
+  background: var(--vermelho-suave);
+  color: var(--vermelho-escuro);
+  border: 1px solid rgba(220, 38, 38, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+}
+.le-hero h1 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: clamp(30px, 4.2vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--texto);
+  margin: 0;
+}
+.le-hero h1 em { font-style: normal; color: var(--vermelho); }
+.le-hero-sub {
+  margin: 0;
+  max-width: 480px;
+  font-size: 1.08rem;
+  line-height: 1.55;
+  color: var(--texto-suave);
+}
+.le-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 26px;
+  background: var(--vermelho);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  border-radius: 13px;
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.30);
+  transition: background .15s, transform .15s;
+}
+.le-cta:hover { background: var(--vermelho-escuro); color: #FFFFFF; transform: translateY(-1px); }
+.le-cta:focus-visible { outline: 3px solid var(--azul); outline-offset: 3px; }
+.le-hero-seguro {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  max-width: 420px;
+  font-size: .9rem;
+  line-height: 1.45;
+  color: var(--texto-suave);
+}
+.le-hero-seguro svg { flex-shrink: 0; margin-top: 1px; color: var(--azul); }
+
+.le-hero-cena {
+  position: relative;
+  padding-top: 36px;
+  animation: le-entrar .6s ease-out both;
+}
+.le-hero-cena img { width: 100%; height: auto; max-width: 600px; margin-left: auto; }
+.le-fala-hero { top: 0; left: 12%; font-size: 15px; padding: 8px 14px; }
+
+@keyframes le-entrar {
+  from { opacity: 0; transform: translateY(14px) rotate(-1.5deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---- Como funciona ---- */
+.le-como { background: #FFFFFF; padding: 56px 0 40px; }
+.le-como-cab { margin-bottom: 28px; }
+.le-como-cab h2 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: clamp(26px, 3vw, 36px);
+  letter-spacing: -0.02em;
+  color: var(--texto);
+  margin: 0 0 6px;
+}
+.le-como-cab p { margin: 0; color: var(--texto-suave); font-size: 1.05rem; }
+
+.le-passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.le-passo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid var(--cinza-borda);
+}
+.le-passo-1 { background: linear-gradient(180deg, #FFF1F1 0%, #FFF8F8 100%); border-color: #FBD5D5; }
+.le-passo-2 { background: linear-gradient(180deg, #EAF0FC 0%, #F4F7FD 100%); border-color: #D3DDF3; }
+.le-passo-3 { background: linear-gradient(180deg, #FFF4E5 0%, #FFFAF2 100%); border-color: #F8DFB8; }
+
+.le-passo-texto { padding: 24px 24px 0; }
+.le-passo-num { display: none; } /* o número já está no título (h3) */
+.le-passo h3 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--texto);
+  margin: 0 0 8px;
+}
+.le-passo-texto p { margin: 0; color: var(--texto-suave); font-size: .98rem; line-height: 1.5; }
+
+.le-passo-cena { position: relative; height: 260px; margin-top: 8px; }
+.le-passo-cena picture { position: absolute; inset: 0; }
+.le-passo-cena img {
+  position: absolute;
+  bottom: -6px;
+  right: 6%;
+  height: 86%;
+  width: auto;
+  max-width: none;
+}
+.le-passo-3 .le-passo-cena img { right: 50%; transform: translateX(50%); height: auto; width: 82%; max-height: 86%; bottom: 0; object-fit: contain; object-position: bottom; }
+.le-passo-cena .le-fala { top: 12px; left: 18px; }
+
+/* ---- Transição "Pronto para começar?" ---- */
+.le-pronto-wrap { background: #FFFFFF; padding: 8px 0 8px; }
+.le-pronto {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-height: 132px;
+  padding: 28px 220px 28px 36px;
+  background: linear-gradient(90deg, #E7EEFB 0%, #EFF3FB 100%);
+  border: 1px solid #D3DDF3;
+  border-radius: 20px;
+}
+.le-pronto h2 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: clamp(22px, 2.6vw, 30px);
+  letter-spacing: -0.02em;
+  color: var(--texto);
+  margin: 0 0 4px;
+}
+.le-pronto p { margin: 0; color: var(--texto-suave); font-size: 1.02rem; }
+.le-pronto-cena { position: absolute; right: 36px; bottom: -34px; width: 168px; pointer-events: none; }
+.le-pronto-cena img { width: 100%; height: auto; transform: scaleX(-1); }
+
+/* ---- Entrada da ferramenta / upload ---- */
+#estado-upload .le-upload-stage {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+}
+#estado-upload .le-upload-stage .form-card { position: relative; z-index: 1; }
+.le-upload-mascote {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  right: -184px;
+  bottom: 250px;
+  width: 210px;
+}
+.le-upload-mascote img { width: 100%; height: auto; transform: scaleX(-1); }
+.le-upload-mascote .le-fala { top: -46px; left: 40px; }
+
+#estado-upload .le-upload-nota {
+  margin: -2px 0 10px;
+  font-size: .9rem;
+  line-height: 1.45;
+  color: var(--texto-suave);
+}
+
+/* ---- Responsivo ---- */
+@media (max-width: 1180px) {
+  /* sem espaço lateral: o Vermelho surge por trás da borda superior do card */
+  #estado-upload .le-upload-stage { margin-top: 64px; }
+  .le-upload-mascote { right: 28px; bottom: auto; top: -64px; width: 104px; }
+  .le-upload-mascote .le-fala { display: none; }
+}
+
+@media (max-width: 899px) {
+  .le-hero-grid { grid-template-columns: 1fr; gap: 8px; padding-top: 32px; padding-bottom: 0; }
+  .le-hero-cena { padding-top: 40px; }
+  .le-hero-cena img { max-width: 440px; margin: 0 auto; }
+  .le-fala-hero { left: 6%; }
+  .le-hero-sub { font-size: 1rem; }
+
+  .le-como { padding: 40px 0 28px; }
+  .le-passos { grid-template-columns: 1fr; gap: 16px; }
+  .le-passo { flex-direction: row; align-items: stretch; }
+  .le-passo-texto { flex: 1 1 50%; padding: 22px 8px 22px 22px; align-self: center; }
+  .le-passo-cena { flex: 1 1 50%; height: auto; min-height: 190px; margin-top: 0; }
+  .le-passo-cena img { height: 90%; right: 8%; bottom: -4px; }
+  .le-passo-3 .le-passo-cena img { width: 92%; height: auto; right: 50%; max-height: 90%; }
+  .le-passo-cena .le-fala { top: 14px; left: 8px; }
+
+  .le-pronto { padding: 24px 190px 24px 24px; }
+  .le-pronto-cena { right: 20px; width: 140px; bottom: -28px; }
+}
+
+@media (max-width: 559px) {
+  .le-hero-grid { padding-top: 24px; }
+  .le-hero h1 { font-size: clamp(27px, 7.4vw, 32px); }
+  .le-hero-texto { gap: 14px; }
+  .le-cta { width: 100%; justify-content: center; }
+  .le-hero-cena { padding-top: 34px; }
+  .le-hero-cena img { max-width: 330px; }
+  .le-fala-hero { font-size: 13px; left: 4%; }
+
+  .le-passo { flex-direction: column; }
+  .le-passo-texto { padding: 20px 20px 0; }
+  .le-passo-cena { flex: 0 0 auto; min-height: 0; height: 170px; margin-top: 4px; }
+  .le-passo-cena img { height: 100%; right: 6%; bottom: -8px; }
+  .le-passo-3 .le-passo-cena img { height: auto; width: 60%; max-height: 100%; right: 3%; transform: none; bottom: 0; }
+  .le-passo-3 .le-passo-cena .le-fala { left: 14px; max-width: 36%; }
+  .le-passo-cena .le-fala { top: auto; bottom: 22px; left: 18px; max-width: 46%; font-size: 12.5px; }
+
+  .le-pronto { padding: 20px 112px 20px 20px; min-height: 108px; }
+  .le-pronto-cena { right: 10px; width: 96px; bottom: -22px; }
+  #estado-upload .le-upload-stage { margin-top: 52px; }
+  .le-upload-mascote { width: 84px; top: -52px; right: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .le-hero-cena { animation: none; }
+  .le-cta { transition: none; }
+  .le-cta:hover { transform: none; }
+}
+
+/* =========================================================
+   LISTA ESCOLAR — Rodada 2: modo revisão guiada
+   Ganchos no <body> (lista.js › trocarEstado):
+     data-le-estado="upload|loading|resultado"
+     .le-pedido  → resultado ativo OU já existem listas salvas
+   ========================================================= */
+
+/* ---- Camada de aquisição recolhida ---- */
+body.le-pedido .le-hero,
+body.le-pedido .le-como,
+body.le-pedido .le-pronto-wrap { display: none; }
+
+/* O botão flutuante colidiria com a barra de envio durante a revisão */
+body[data-le-estado="resultado"] .fab-wpp { display: none; }
+
+/* ---- Cabeçalho compacto ---- */
+.le-revisao-cab { display: none; padding: 24px 0 0; background: #FFFFFF; }
+body[data-le-estado="resultado"] .le-revisao-cab { display: block; scroll-margin-top: var(--header-h); }
+.le-revisao-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 32px;
+  background: linear-gradient(90deg, #EAF0FC 0%, #F4F7FD 100%);
+  border: 1px solid #D3DDF3;
+  border-radius: 20px;
+}
+.le-revisao-texto h1 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: clamp(22px, 2.8vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--texto);
+  margin: 0 0 6px;
+}
+.le-revisao-texto p { margin: 0; color: var(--texto-suave); font-size: 1.02rem; line-height: 1.5; max-width: 560px; }
+.le-revisao-mascote { flex-shrink: 0; width: 104px; margin: -26px 0 -26px; }
+.le-revisao-mascote img { width: 100%; height: auto; }
+
+/* ---- Navegação por etapas (só âncoras; sem estado de conclusão) ---- */
+.le-etapas { margin: 0 0 20px; }
+.le-etapas ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.le-etapas a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #FFFFFF;
+  border: 1px solid var(--cinza-borda);
+  border-radius: 12px;
+  color: var(--texto);
+  font-weight: 700;
+  font-size: .9rem;
+  text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+.le-etapas a:hover { border-color: var(--azul); background: var(--azul-suave); }
+.le-etapas a:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+.le-etapas-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--azul);
+  color: #FFFFFF;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Etapas ---- */
+.le-etapa {
+  position: relative;
+  scroll-margin-top: calc(var(--header-h) + 12px);
+  background: #FFFFFF;
+  border: 1px solid var(--cinza-borda);
+  border-radius: 18px;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+}
+.le-etapa-principal { border-color: #BFD0F0; box-shadow: 0 6px 24px rgba(30, 58, 138, 0.07); }
+.le-etapa-cab { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+.le-etapa-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--azul);
+  color: #FFFFFF;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.le-etapa-cab h2 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+  color: var(--texto);
+  margin: 0 0 2px;
+}
+.le-etapa-cab p { margin: 0; font-size: .92rem; line-height: 1.45; color: var(--texto-suave); }
+.le-etapa-aviso { margin: 10px 0 14px; font-size: .8rem; color: var(--texto-suave); }
+
+/* Blocos renderizados por JS: sem "cartão dentro de cartão" dentro das etapas */
+#estado-resultado .le-etapa .meta-lista,
+#estado-resultado .le-etapa .aluno-lista,
+#estado-resultado .le-etapa .preferencia-orcamento {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+}
+
+/* Etapa 1 — compacta */
+#le-etapa-1 .meta-lista-titulo,
+#le-etapa-1 .meta-lista-dica { display: none; }
+#le-etapa-1 .le-etapa-cab { margin-bottom: 12px; }
+#le-etapa-1 .meta-lista-campos {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-bottom: 0;
+}
+
+/* Etapa 2 — protagonista */
+.le-guia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--azul-suave);
+  border: 1px solid #D3DDF3;
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+.le-guia-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: .95rem; color: var(--texto); }
+.le-guia-lista li { position: relative; padding-left: 26px; line-height: 1.4; }
+.le-guia-lista li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--azul);
+  color: #FFFFFF;
+  font-size: .68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.le-guia-lista strong { color: var(--azul); }
+.le-guia-mascote { flex-shrink: 0; width: 96px; margin: -30px 4px -18px 0; }
+.le-guia-mascote img { width: 100%; height: auto; }
+
+#le-etapa-3 .resultado-header { margin-bottom: 14px; padding: 14px 18px; }
+#le-etapa-3 .itens-grid { margin-bottom: 0; }
+
+/* Etapa 3 — leve */
+#le-etapa-2 #bloco-preferencia { margin-top: 22px; padding-top: 20px; border-top: 1px dashed var(--cinza-borda); }
+#le-etapa-2 .preferencia-option span { font-size: .78rem; }
+
+/* Etapa 4 */
+.le-etapa-final { margin-bottom: 14px; }
+#le-etapa-4 .resumo-total-pedido { margin-bottom: 16px; }
+.le-enviar-msg {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 14px;
+  padding: 14px 20px;
+}
+.le-enviar-msg p { margin: 0; font-weight: 600; color: #166534; line-height: 1.45; }
+.le-enviar-mascote { flex-shrink: 0; width: 104px; margin: -22px 0 -14px; }
+.le-enviar-mascote img { width: 100%; height: auto; }
+
+/* Barra final (continua sticky; classes no lugar dos estilos inline) */
+.le-acoes-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.le-acoes-nota { flex-basis: 100%; font-size: .82rem; color: var(--texto-suave); margin: 10px 0 0; line-height: 1.5; }
+
+/* ---- Loading com a dupla ---- */
+#estado-loading .lista-loading-card { max-width: 560px; padding-top: 28px; }
+.le-loading-mascote { width: min(300px, 72%); margin: 0 auto 14px; }
+.le-loading-mascote img { width: 100%; height: auto; }
+#estado-loading .lista-loading-chips { margin-bottom: 20px; }
+
+/* ---- Responsivo (modo revisão) ---- */
+@media (max-width: 899px) {
+  .le-guia-mascote { display: none; } /* no mobile/tablet a orientação fica inline */
+  .le-etapas ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .le-revisao-cab { padding: 14px 0 0; }
+  .le-revisao-card { padding: 16px 16px; gap: 12px; border-radius: 16px; }
+  .le-revisao-texto p { font-size: .9rem; }
+  .le-revisao-mascote { width: 68px; margin: -10px 0; }
+
+  .le-etapas a { padding: 8px 10px; font-size: .8rem; gap: 8px; }
+  .le-etapas-num { width: 22px; height: 22px; font-size: .72rem; }
+
+  .le-etapa { padding: 16px 14px; border-radius: 16px; margin-bottom: 14px; }
+  .le-etapa-cab { gap: 10px; margin-bottom: 14px; }
+  .le-etapa-num { width: 30px; height: 30px; font-size: .9rem; border-radius: 9px; }
+  .le-etapa-cab h2 { font-size: 1.1rem; }
+  .le-guia { padding: 14px 14px; }
+
+  .le-enviar-msg { padding: 12px 14px; gap: 12px; }
+  .le-enviar-mascote { width: 76px; margin: -14px 0 -8px; }
+  .le-enviar-msg p { font-size: .92rem; }
+
+  /* Barra sticky compacta: CTA primeiro, ações secundárias lado a lado */
+  body[data-le-estado="resultado"] .acoes-finais { padding: 12px; bottom: 8px; gap: 8px; }
+  body[data-le-estado="resultado"] .acoes-finais .resumo,
+  body[data-le-estado="resultado"] .le-acoes-nota { display: none; }
+  body[data-le-estado="resultado"] .le-acoes-btns { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  body[data-le-estado="resultado"] .le-acoes-btns #btn-enviar { grid-column: 1 / -1; order: -1; justify-content: center; text-align: center; }
+  body[data-le-estado="resultado"] .le-acoes-btns .btn { padding-left: 8px; padding-right: 8px; font-size: .8rem; white-space: nowrap; justify-content: center; }
+}
+
+/* Etapa 3: rótulo + asterisco na mesma linha (o label original é flex em coluna) */
+#le-etapa-2 .aluno-lista-field { display: block; }
+#le-etapa-2 .aluno-lista-field input { display: block; width: 100%; margin-top: 5px; }
+#le-etapa-2 .aluno-lista-field .campo-dica { margin-top: 5px; }
+@media (max-width: 640px) {
+  body[data-le-estado="resultado"] .le-acoes-btns #btn-enviar { font-size: .95rem; }
+}
+
+/* Etapa 3 (itens): título e apoio do guia */
+.le-guia-corpo { min-width: 0; }
+.le-guia-titulo { margin: 0 0 4px; font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--azul); }
+.le-guia-texto { margin: 0 0 10px; font-size: .92rem; line-height: 1.5; color: var(--texto); }

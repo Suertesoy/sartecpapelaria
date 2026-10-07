@@ -27,10 +27,10 @@ const PREFERENCIAS_GERAL = [
 ];
 
 const LOADING_MSGS = [
-  'Enviando lista para análise...',
-  'A IA está lendo os itens...',
-  'Identificando materiais para orçamento...',
-  'Organizando os itens para você revisar...',
+  'Organizando sua lista...',
+  'Lendo os materiais encontrados',
+  'Separando as informações importantes',
+  'Preparando tudo para você conferir',
 ];
 
 const LIMITE_BYTES       = 4 * 1024 * 1024;
@@ -67,6 +67,14 @@ let estado = {
 function trocarEstado(id) {
   document.querySelectorAll('.estado').forEach(el => el.classList.remove('ativo'));
   document.getElementById(id).classList.add('ativo');
+  // Gancho para o CSS do modo revisão (cabeçalho compacto, camada de aquisição recolhida)
+  document.body.dataset.leEstado = id.replace('estado-', '');
+  document.body.classList.toggle('le-pedido', id === 'estado-resultado' || estado.listas.length > 0);
+}
+
+// Início real da experiência de revisão (o container de faixas fica oculto na 1ª lista)
+function alvoInicioRevisao() {
+  return document.getElementById('le-revisao-topo') || document.getElementById('estado-resultado');
 }
 
 function scrollPara(el, block = 'center') {
@@ -316,7 +324,8 @@ function aplicarDadosAnalisados(dados) {
   renderizarFaixas();
   renderizarResultado();
   trocarEstado('estado-resultado');
-  scrollPara(document.getElementById('listas-container') || document.getElementById('estado-resultado'), 'start');
+  window.scrollTo({ top: window.scrollY, behavior: 'instant' }); // interrompe a rolagem suave do loading, se ainda em curso
+  scrollPara(alvoInicioRevisao(), 'start');
   trackEvent('school_list_analysis_completed', { item_count: estado.rascunho.itens.length });
 }
 
@@ -404,9 +413,10 @@ async function iniciarAnalise(arquivos) {
   let i = 0;
   hint.textContent = LOADING_MSGS[0];
   const interval = setInterval(() => {
-    i = (i + 1) % LOADING_MSGS.length;
+    // Não reinicia o ciclo nem sugere progresso: fica na última mensagem
+    i = Math.min(i + 1, LOADING_MSGS.length - 1);
     hint.textContent = LOADING_MSGS[i];
-  }, 700);
+  }, 2200);
 
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
@@ -844,6 +854,7 @@ function atualizarContadores() {
   if (counterQuero) counterQuero.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
   if (counterTem)   counterTem.textContent   = `${excluidos.length} não quero`;
   if (resumoTotal)  resumoTotal.textContent  = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
+  if (btnMarcarTodosTem) btnMarcarTodosTem.textContent = inclusos.length > 0 ? 'Marcar todos como "Não quero"' : 'Marcar todos como "Quero comprar"';
   renderizarResumoPedido();
 }
 
