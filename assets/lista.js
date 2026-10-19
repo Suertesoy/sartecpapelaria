@@ -19,12 +19,16 @@ const ITENS_MOCK = [
 
 const META_MOCK = { escola: 'Escola Exemplo', anoSerie: '3º ano', segmento: 'Ensino Fundamental I', anoLetivo: '2026' };
 
+// label/desc: desktop e mensagem do WhatsApp. labelMob/descMob: só a apresentação no mobile.
 const PREFERENCIAS_GERAL = [
-  { id: 'economico',  label: 'Mais econômico',            desc: 'Priorizar as opções mais em conta disponíveis.' },
-  { id: 'custo_ben', label: 'Melhor custo-benefício',     desc: 'Buscar equilíbrio entre qualidade e preço.' },
-  { id: 'escola',    label: 'Seguir sugestões da escola', desc: 'Quando a lista sugerir marca, tentar seguir a sugestão.' },
-  { id: 'qualidade', label: 'Marcas de maior qualidade',  desc: 'Priorizar marcas melhores, mesmo que custem mais.' },
+  { id: 'economico',  label: 'Mais econômico',            desc: 'Priorizar as opções mais em conta disponíveis.',           labelMob: 'Mais econômico',            descMob: 'Priorizar menor preço' },
+  { id: 'custo_ben', label: 'Melhor custo-benefício',     desc: 'Buscar equilíbrio entre qualidade e preço.',               labelMob: 'Melhor custo-benefício',     descMob: 'Equilíbrio entre preço e qualidade' },
+  { id: 'escola',    label: 'Seguir sugestões da escola', desc: 'Quando a lista sugerir marca, tentar seguir a sugestão.',  labelMob: 'Seguir sugestões da escola', descMob: 'Priorizar marcas sugeridas' },
+  { id: 'qualidade', label: 'Marcas de maior qualidade',  desc: 'Priorizar marcas melhores, mesmo que custem mais.',        labelMob: 'Maior qualidade',            descMob: 'Priorizar marcas melhores' },
 ];
+
+// Mesmo corte do CSS (max-width: 640px). Só escolhe textos de placeholder no momento do render.
+const ehMobile = () => window.matchMedia('(max-width: 640px)').matches;
 
 const LOADING_MSGS = [
   'Organizando sua lista...',
@@ -33,9 +37,7 @@ const LOADING_MSGS = [
   'Preparando tudo para você conferir',
 ];
 
-const LIMITE_BYTES       = 4 * 1024 * 1024;
 const MAX_ARQUIVOS       = 5;
-const LIMITE_TOTAL_BYTES = 20 * 1024 * 1024;
 
 // =============== ESTADO ===============
 
@@ -69,7 +71,8 @@ function trocarEstado(id) {
   document.getElementById(id).classList.add('ativo');
   // Gancho para o CSS do modo revisão (cabeçalho compacto, camada de aquisição recolhida)
   document.body.dataset.leEstado = id.replace('estado-', '');
-  document.body.classList.toggle('le-pedido', id === 'estado-resultado' || estado.listas.length > 0);
+  document.body.classList.toggle('le-pedido', id === 'estado-resultado' || id === 'estado-sucesso' || estado.listas.length > 0);
+  if (typeof window.atualizarOrientacaoMobile === 'function') window.atualizarOrientacaoMobile();
 }
 
 // Início real da experiência de revisão (o container de faixas fica oculto na 1ª lista)
@@ -93,7 +96,7 @@ function mostrarErro(msg) {
 
 function ocultarErro() {
   const el = document.getElementById('lista-erro');
-  if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+  if (el) { el.style.display = 'none'; el.innerHTML = ''; el.className = 'lista-erro-card'; }
 }
 
 function formatarTelefone(valor) {
@@ -159,7 +162,8 @@ function temProgresso() {
   return estado.listas.length > 0
     || estado.rascunho.itens.length > 0
     || estado.nome.trim() !== ''
-    || estado.whatsapp.trim() !== '';
+    || estado.whatsapp.trim() !== ''
+    || arquivosSelecionados.length > 0;
 }
 
 function mostrarBannerRestaurado() {
@@ -189,9 +193,7 @@ function limparTudoERecomecar() {
 
   renderizarFaixas();
   formUpload.reset();
-  clearTimeout(uploadFeedbackTimer);
-  uploadArea.classList.remove('upload-lendo', 'upload-ok');
-  uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+  limparArquivos();
   ocultarBannerSalvo();
 
   trocarEstado('estado-upload');
@@ -201,9 +203,15 @@ function limparTudoERecomecar() {
 // =============== UPLOAD ===============
 const uploadArea = document.getElementById('upload-area');
 const arquivoInput = document.getElementById('arquivo');
-const uploadLabel = document.getElementById('upload-label');
 const formUpload = document.getElementById('form-upload');
 const inputWhatsapp = document.getElementById('whatsapp');
+const grupoArquivos = document.getElementById('grupo-arquivos');
+const arquivosSel = document.getElementById('arquivos-sel');
+const arquivosSelTitulo = document.getElementById('arquivos-sel-titulo');
+const arquivosSelLista = document.getElementById('arquivos-sel-lista');
+const arquivosSelLimite = document.getElementById('arquivos-sel-limite');
+const arquivosAviso = document.getElementById('arquivos-aviso');
+const btnAddPagina = document.getElementById('btn-add-pagina');
 
 inputWhatsapp.addEventListener('input', (e) => {
   e.target.value = formatarTelefone(e.target.value);
@@ -219,57 +227,216 @@ if (nomeInput) {
   });
 }
 
-let uploadFeedbackTimer = null;
+// ---- Coleção própria de arquivos ----
+// O FileList do input é substituído a cada nova seleção (câmera no celular, por exemplo).
+// Por isso cada seleção é copiada para cá e o input é zerado; o submit usa só esta coleção.
+// Não é persistida em localStorage (File não é serializável).
+let arquivosSelecionados = []; // { id, file, chave, url }  (url = miniatura, só para imagens)
+let proximoIdArquivo = 1;
 
-uploadArea.addEventListener('click', () => arquivoInput.click());
-uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-uploadArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadArea.classList.remove('dragover');
-  if (e.dataTransfer.files.length) {
-    arquivoInput.files = e.dataTransfer.files;
-    onArquivoEscolhido();
-  }
-});
-arquivoInput.addEventListener('change', onArquivoEscolhido);
+const TIPOS_ARQUIVO = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', pdf: 'application/pdf' };
 
-function onArquivoEscolhido() {
-  const files = arquivoInput.files;
-  if (!files || files.length === 0) return;
-
-  trackEvent('school_list_upload_file_selected', { file_count: files.length });
-
-  clearTimeout(uploadFeedbackTimer);
-  uploadArea.classList.remove('upload-ok');
-  uploadArea.classList.add('upload-lendo');
-  const loadingMsg = files.length > 1 ? 'Lendo arquivos...' : 'Lendo arquivo...';
-  uploadLabel.innerHTML = `<span class="upload-spinner" aria-hidden="true"></span><span> ${loadingMsg}</span>`;
-
-  uploadFeedbackTimer = setTimeout(() => {
-    uploadArea.classList.remove('upload-lendo');
-    uploadArea.classList.add('upload-ok');
-    uploadLabel.innerHTML = '';
-
-    if (files.length === 1) {
-      const span = document.createElement('span');
-      span.textContent = `✓ Arquivo adicionado: ${files[0].name}`;
-      uploadLabel.appendChild(span);
-    } else {
-      const titulo = document.createElement('span');
-      titulo.textContent = `✓ ${files.length} arquivos adicionados`;
-      uploadLabel.appendChild(titulo);
-      const lista = document.createElement('span');
-      lista.className = 'upload-arquivos-lista';
-      lista.textContent = Array.from(files).map(f => f.name).join(' · ');
-      uploadLabel.appendChild(lista);
-    }
-  }, 520);
+// Mesmos tipos aceitos pela API (jpeg, png, pdf). Sem `type` do navegador, cai para a extensão.
+function tipoDoArquivo(file) {
+  if (Object.values(TIPOS_ARQUIVO).includes(file.type)) return file.type;
+  if (file.type) return null;
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  return TIPOS_ARQUIVO[ext] || null;
 }
+
+// Chave simples, sem hash: suficiente para evitar o mesmo arquivo duas vezes
+function chaveArquivo(file) {
+  return [file.name, file.size, file.lastModified, file.type].join('|');
+}
+
+function formatarTamanho(bytes) {
+  if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1).replace('.', ',') + ' MB';
+  return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+}
+
+function ehPdf(entrada) { return tipoDoArquivo(entrada.file) === 'application/pdf'; }
+
+// Só imagens: "página(s)". Se houver PDF no conjunto: "arquivo(s)".
+function descreverQuantidade(n, adicionadas) {
+  const soImagens = arquivosSelecionados.every(e => !ehPdf(e));
+  const unidade = soImagens ? (n === 1 ? 'página' : 'páginas') : (n === 1 ? 'arquivo' : 'arquivos');
+  if (!adicionadas) return `${n} ${unidade}`;
+  return `${n} ${unidade} ${soImagens ? 'adicionada' : 'adicionado'}${n === 1 ? '' : 's'}`;
+}
+
+function mostrarAvisoArquivos(msg) {
+  if (!arquivosAviso) return;
+  arquivosAviso.textContent = msg || '';
+  arquivosAviso.hidden = !msg;
+}
+
+function rotuloAnalisar() {
+  const n = arquivosSelecionados.length;
+  return n === 0 ? 'Analisar lista' : `Analisar ${descreverQuantidade(n)}`;
+}
+
+function atualizarBotaoAnalisar() {
+  const btn = document.getElementById('btn-analisar');
+  if (btn && !btn.disabled) btn.textContent = rotuloAnalisar();
+}
+
+function renderizarArquivos() {
+  const n = arquivosSelecionados.length;
+  grupoArquivos.classList.toggle('tem-arquivos', n > 0);
+  arquivosSel.hidden = n === 0;
+  atualizarBotaoAnalisar();
+  if (n === 0) { arquivosSelLista.innerHTML = ''; return; }
+
+  arquivosSelTitulo.textContent = descreverQuantidade(n, true);
+  arquivosSelLista.innerHTML = '';
+  arquivosSelecionados.forEach((ent, i) => {
+    const pdf = ehPdf(ent);
+    const li = document.createElement('li');
+    li.className = 'arquivo-item';
+    li.dataset.id = ent.id;
+
+    const thumb = document.createElement('span');
+    thumb.className = 'arquivo-thumb' + (pdf ? ' arquivo-thumb-pdf' : '');
+    thumb.setAttribute('aria-hidden', 'true');
+    if (!pdf && ent.url) {
+      const img = document.createElement('img');
+      img.src = ent.url;
+      img.alt = '';
+      thumb.appendChild(img);
+    } else {
+      thumb.textContent = 'PDF';
+    }
+
+    const info = document.createElement('span');
+    info.className = 'arquivo-info';
+    const nome = document.createElement('span');
+    nome.className = 'arquivo-nome';
+    nome.textContent = pdf ? `PDF · ${ent.file.name}` : `Página ${i + 1}`;
+    const meta = document.createElement('span');
+    meta.className = 'arquivo-meta';
+    meta.textContent = formatarTamanho(ent.file.size);
+    info.append(nome, meta);
+
+    const rem = document.createElement('button');
+    rem.type = 'button';
+    rem.className = 'arquivo-remover';
+    rem.textContent = 'Remover';
+    rem.setAttribute('aria-label', pdf ? `Remover PDF ${ent.file.name}` : `Remover página ${i + 1}`);
+    rem.addEventListener('click', () => removerArquivo(ent.id));
+
+    li.append(thumb, info, rem);
+    arquivosSelLista.appendChild(li);
+  });
+
+  const cheio = n >= MAX_ARQUIVOS;
+  btnAddPagina.hidden = cheio;
+  arquivosSelLimite.hidden = !cheio;
+}
+
+// Mudou o conjunto: qualquer confirmação/erro pendente deixa de valer.
+function aoMudarArquivos() {
+  pendingDados = null;
+  ocultarErro();
+  renderizarArquivos();
+}
+
+function adicionarArquivos(novos) {
+  mostrarAvisoArquivos('');
+  const recusas = [];
+  let adicionados = 0;
+  let duplicados = 0;
+  let bytesPdf = arquivosSelecionados.filter(e => ehPdf(e)).reduce((acc, e) => acc + e.file.size, 0);
+
+  for (const file of novos) {
+    const tipo = tipoDoArquivo(file);
+    if (!tipo) { recusas.push(`"${file.name}" não é PDF, JPG ou PNG.`); continue; }
+    const chave = chaveArquivo(file);
+    if (arquivosSelecionados.some(e => e.chave === chave)) { duplicados++; continue; }
+    if (arquivosSelecionados.length >= MAX_ARQUIVOS) {
+      recusas.push(`Você pode enviar até ${MAX_ARQUIVOS} arquivos por lista. Selecione os mais completos da mesma criança.`);
+      break;
+    }
+    if (tipo === 'application/pdf') {
+      // PDF não é comprimido: precisa caber sozinho (com os outros PDFs) no limite de envio
+      if (bytesPdf + file.size > ORCAMENTO_ENVIO_BYTES - MAX_ARQUIVOS * OVERHEAD_PARTE_BYTES) {
+        recusas.push(`O PDF "${file.name}" é grande demais para enviar. Use um PDF menor ou fotografe as páginas.`);
+        continue;
+      }
+    } else if (file.size > MAX_IMAGEM_ORIGINAL_BYTES) {
+      recusas.push(`A imagem "${file.name}" é grande demais. Tire a foto de novo ou use outra imagem.`);
+      continue;
+    }
+    arquivosSelecionados.push({
+      id: proximoIdArquivo++,
+      file,
+      chave,
+      url: tipo.startsWith('image/') ? URL.createObjectURL(file) : null,
+    });
+    if (tipo === 'application/pdf') bytesPdf += file.size;
+    adicionados++;
+  }
+
+  if (adicionados > 0) {
+    aoMudarArquivos();
+    // Só contagens: nunca nomes de arquivo
+    trackEvent('school_list_upload_file_selected', { file_count: arquivosSelecionados.length, added_count: adicionados });
+  }
+  const avisos = [...new Set(recusas)];
+  if (duplicados > 0) avisos.push(duplicados === 1 ? 'Esse arquivo já estava na lista.' : 'Alguns arquivos já estavam na lista.');
+  if (avisos.length) mostrarAvisoArquivos(avisos.join(' '));
+}
+
+function removerArquivo(id) {
+  const idx = arquivosSelecionados.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  const [removido] = arquivosSelecionados.splice(idx, 1);
+  if (removido.url) URL.revokeObjectURL(removido.url);
+  mostrarAvisoArquivos('');
+  aoMudarArquivos();
+  trackEvent('school_list_upload_file_removed', { file_count: arquivosSelecionados.length });
+
+  // O foco segue para um alvo que continua existindo
+  const proximo = arquivosSelLista.querySelectorAll('.arquivo-remover')[Math.min(idx, arquivosSelecionados.length - 1)];
+  if (proximo) proximo.focus();
+  else uploadArea.focus();
+}
+
+// Esvazia a coleção (recomeço, nova lista, separar listas, análise aplicada) e devolve o upload ao estado inicial.
+function limparArquivos() {
+  arquivosSelecionados.forEach(e => { if (e.url) URL.revokeObjectURL(e.url); });
+  arquivosSelecionados = [];
+  arquivoInput.value = '';
+  mostrarAvisoArquivos('');
+  renderizarArquivos();
+}
+
+function abrirSeletorDeArquivos() { arquivoInput.click(); }
+
+uploadArea.addEventListener('click', abrirSeletorDeArquivos);
+uploadArea.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirSeletorDeArquivos(); }
+});
+btnAddPagina.addEventListener('click', abrirSeletorDeArquivos);
+
+[uploadArea, arquivosSel].forEach(alvo => {
+  alvo.addEventListener('dragover', (e) => { e.preventDefault(); alvo.classList.add('dragover'); });
+  alvo.addEventListener('dragleave', () => alvo.classList.remove('dragover'));
+  alvo.addEventListener('drop', (e) => {
+    e.preventDefault();
+    alvo.classList.remove('dragover');
+    if (e.dataTransfer.files.length) adicionarArquivos(Array.from(e.dataTransfer.files));
+  });
+});
+
+arquivoInput.addEventListener('change', () => {
+  const escolhidos = Array.from(arquivoInput.files || []);
+  arquivoInput.value = ''; // libera o input: a próxima captura/seleção volta a disparar "change"
+  if (escolhidos.length) adicionarArquivos(escolhidos);
+});
 
 formUpload.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const arquivos = arquivoInput.files;
+  const arquivos = arquivosSelecionados.map(ent => ent.file);
 
   ocultarErro();
   trackEvent('school_list_form_attempt');
@@ -286,7 +453,7 @@ formUpload.addEventListener('submit', async (e) => {
     estado.whatsapp = whatsapp;
   }
 
-  if (!arquivos || arquivos.length === 0) {
+  if (arquivos.length === 0) {
     mostrarErro('Anexe a foto ou PDF da lista antes de continuar.');
     trackEvent('school_list_form_error', { reason: 'arquivo_ausente' });
     return;
@@ -295,26 +462,102 @@ formUpload.addEventListener('submit', async (e) => {
     mostrarErro(`Você pode enviar até ${MAX_ARQUIVOS} arquivos por lista. Selecione os mais completos da mesma criança.`);
     return;
   }
-  let totalBytes = 0;
-  for (const arq of arquivos) {
-    if (arq.size > LIMITE_BYTES) {
-      mostrarErro(`O arquivo "${arq.name}" é maior que 4MB. Reduza o tamanho e tente novamente.`);
-      return;
+  estado.rascunho.arquivoNome = arquivos.map(f => f.name).join(', ');
+  await iniciarAnalise(arquivos);
+});
+
+// =============== PREPARAÇÃO PARA ENVIO (compressão de fotos) ===============
+// A Vercel recusa corpo de request acima de 4,5 MB com 413 FUNCTION_PAYLOAD_TOO_LARGE, antes de o handler rodar.
+// Fotos de celular passam disso com facilidade. Só comprimimos quando o conjunto não cabe;
+// PDFs seguem intactos. O contrato com a API não muda: vários campos "arquivo".
+const ORCAMENTO_ENVIO_BYTES = 4_000_000;   // corpo total do multipart, com folga sobre os 4,5 MB da Vercel
+const OVERHEAD_PARTE_BYTES  = 1024;        // cabeçalhos multipart por arquivo
+const MAX_IMAGEM_ORIGINAL_BYTES = 30 * 1024 * 1024; // só protege a memória do navegador ao decodificar
+// A visão do Claude reduz imagens acima de ~1568 px no lado maior; passar muito disso só pesa no envio.
+const NIVEIS_COMPRESSAO = [
+  { lado: 1800, qualidade: 0.85 },
+  { lado: 1800, qualidade: 0.75 },
+  { lado: 1600, qualidade: 0.70 },
+  { lado: 1400, qualidade: 0.65 },
+  { lado: 1200, qualidade: 0.60 },
+];
+
+class ErroPreparo extends Error {}
+
+function ehImagemArquivo(file) { return (tipoDoArquivo(file) || '').startsWith('image/'); }
+
+function carregarImagem(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => resolve({ img, liberar: () => URL.revokeObjectURL(url) });
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+    img.src = url;
+  });
+}
+
+function canvasParaBlob(canvas, qualidade) {
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', qualidade));
+}
+
+// JPEG até `alvoBytes`, lado maior limitado, orientação EXIF aplicada pelo navegador ao desenhar a <img>.
+async function comprimirImagem(file, alvoBytes) {
+  let carregada;
+  try { carregada = await carregarImagem(file); }
+  catch (_) { throw new ErroPreparo(`Não foi possível preparar a imagem "${file.name}". Tente tirar a foto de novo.`); }
+  const { img, liberar } = carregada;
+  const canvas = document.createElement('canvas');
+  try {
+    const w = img.naturalWidth, h = img.naturalHeight;
+    for (const nivel of NIVEIS_COMPRESSAO) {
+      const escala = Math.min(1, nivel.lado / Math.max(w, h));
+      canvas.width  = Math.max(1, Math.round(w * escala));
+      canvas.height = Math.max(1, Math.round(h * escala));
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF'; // PNG com transparência não pode virar fundo preto no JPEG
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const blob = await canvasParaBlob(canvas, nivel.qualidade);
+      if (blob && blob.size <= alvoBytes) {
+        const nome = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+        return new File([blob], nome, { type: 'image/jpeg', lastModified: file.lastModified });
+      }
     }
-    totalBytes += arq.size;
+  } finally {
+    canvas.width = canvas.height = 0; // libera o buffer do canvas
+    liberar();
   }
-  if (totalBytes > LIMITE_TOTAL_BYTES) {
-    mostrarErro(`O conjunto de arquivos ultrapassou ${Math.round(LIMITE_TOTAL_BYTES / (1024 * 1024))}MB. Reduza o tamanho ou envie menos arquivos.`);
-    return;
+  throw new ErroPreparo('Não conseguimos reduzir as páginas o bastante para enviar. Envie menos páginas por vez.');
+}
+
+// Devolve os arquivos na mesma ordem. Se tudo já cabe, devolve os originais sem tocar em nada.
+async function prepararArquivosParaEnvio(files) {
+  const orcamento = ORCAMENTO_ENVIO_BYTES - files.length * OVERHEAD_PARTE_BYTES;
+  if (files.reduce((acc, f) => acc + f.size, 0) <= orcamento) return files;
+
+  const bytesPdf = files.filter(f => !ehImagemArquivo(f)).reduce((acc, f) => acc + f.size, 0);
+  const indicesImagens = files.map((f, i) => i).filter(i => ehImagemArquivo(files[i])).sort((a, b) => files[a].size - files[b].size);
+  if (!indicesImagens.length || bytesPdf >= orcamento) {
+    throw new ErroPreparo('Os arquivos ficaram grandes demais para enviar. Use um PDF menor ou fotografe as páginas.');
   }
 
-  estado.rascunho.arquivoNome = Array.from(arquivos).map(f => f.name).join(', ');
-  await iniciarAnalise(Array.from(arquivos));
-});
+  // Da menor para a maior: cada imagem pode usar uma parte igual do que sobra; as pequenas deixam folga para as grandes
+  const preparados = files.slice();
+  let restante = orcamento - bytesPdf;
+  let faltam = indicesImagens.length;
+  for (const i of indicesImagens) {
+    const cota = restante / faltam;
+    if (files[i].size > cota) preparados[i] = await comprimirImagem(files[i], cota);
+    restante -= preparados[i].size;
+    faltam--;
+  }
+  return preparados;
+}
 
 // =============== ANÁLISE COM IA ===============
 
 function aplicarDadosAnalisados(dados) {
+  limparArquivos(); // os arquivos já viraram esta lista; a próxima criança começa do zero
   if (!estado.rascunho.num) {
     estado.rascunho.num = nextListNum++;
     estado.rascunho.id  = 'lista_' + estado.rascunho.num + '_' + Date.now();
@@ -346,10 +589,7 @@ function mostrarErroMultiArquivo() {
 
   document.getElementById('btn-escolher-novamente')?.addEventListener('click', () => {
     ocultarErro();
-    clearTimeout(uploadFeedbackTimer);
-    arquivoInput.value = '';
-    uploadArea.classList.remove('upload-lendo', 'upload-ok');
-    uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+    limparArquivos();
     arquivoInput.click();
   });
 }
@@ -384,10 +624,7 @@ function mostrarConfirmacaoMultiArquivo() {
     pendingDados = null;
     el.className = 'lista-erro-card';
     ocultarErro();
-    clearTimeout(uploadFeedbackTimer);
-    arquivoInput.value = '';
-    uploadArea.classList.remove('upload-lendo', 'upload-ok');
-    uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+    limparArquivos();
   });
 }
 
@@ -398,7 +635,7 @@ async function iniciarAnalise(arquivos) {
   if (btnAnalisar) { btnAnalisar.disabled = true; btnAnalisar.textContent = 'Analisando...'; }
 
   const reativarBtn = () => {
-    if (btnAnalisar) { btnAnalisar.disabled = false; btnAnalisar.textContent = 'Analisar lista'; }
+    if (btnAnalisar) { btnAnalisar.disabled = false; btnAnalisar.textContent = rotuloAnalisar(); }
   };
 
   const tituloLoading = document.getElementById('lista-loading-titulo');
@@ -421,10 +658,29 @@ async function iniciarAnalise(arquivos) {
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
   try {
+    let paraEnviar;
+    try {
+      paraEnviar = await prepararArquivosParaEnvio(arquivos);
+    } catch (errPreparo) {
+      clearInterval(interval);
+      reativarBtn();
+      trocarEstado('estado-upload');
+      mostrarErro(errPreparo instanceof ErroPreparo ? errPreparo.message : 'Não foi possível preparar os arquivos. Tente novamente.');
+      return;
+    }
+
     const formData = new FormData();
-    for (const arq of arquivos) formData.append('arquivo', arq);
+    for (const arq of paraEnviar) formData.append('arquivo', arq);
 
     const resposta = await fetch('/api/analisar-lista', { method: 'POST', body: formData });
+    if (resposta.status === 413) {
+      // A infraestrutura recusou o corpo antes do handler (resposta não é JSON)
+      clearInterval(interval);
+      reativarBtn();
+      trocarEstado('estado-upload');
+      mostrarErro('Os arquivos ficaram grandes demais para enviar juntos. Envie menos páginas por vez.');
+      return;
+    }
     const dados = await resposta.json();
 
     clearInterval(interval);
@@ -521,11 +777,21 @@ function renderizarFaixas() {
   }).join('');
 
   container.querySelectorAll('.lista-faixa').forEach(faixa => {
-    faixa.addEventListener('click', () => expandirLista(faixa.dataset.id));
+    faixa.addEventListener('click', () => trocarParaLista(faixa.dataset.id));
   });
   container.querySelectorAll('.lista-faixa-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => { e.stopPropagation(); expandirLista(btn.dataset.id); });
+    btn.addEventListener('click', (e) => { e.stopPropagation(); trocarParaLista(btn.dataset.id); });
   });
+}
+
+// Troca iniciada pelo usuário (faixas). expandirLista também é usada pela validação, por isso o evento fica aqui.
+function trocarParaLista(id) {
+  const alvo = estado.listas.find(l => l.id === id);
+  trackEvent('school_list_switch_list', {
+    list_number: alvo ? alvo.num : undefined,
+    lists_count: estado.listas.length + (estado.rascunho.itens.length > 0 ? 1 : 0),
+  });
+  expandirLista(id);
 }
 
 function salvarRascunhoNaListas() {
@@ -576,6 +842,35 @@ function mostrarErroAluno(campoId, msg) {
   }, 80);
 }
 
+// ---- Aviso leve de pendências (não bloqueia; a validação final continua em validarEEnviar) ----
+let pendentesSinalizados = false;
+
+function atualizarPendentes() {
+  const a = estado.rascunho.aluno || {};
+  const faltaNome = !(a.nome || '').trim();
+  const faltaCor  = !(a.preferenciaCor || '').trim();
+  const mostrar   = pendentesSinalizados && (faltaNome || faltaCor);
+  ['le-pendentes-aviso', 'le-pendentes-aviso-3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.hidden = !mostrar;
+  });
+  const nome = document.getElementById('aluno-nome');
+  const cor  = document.getElementById('aluno-cor');
+  if (nome) nome.classList.toggle('campo-pendente', mostrar && faltaNome);
+  if (cor)  cor.classList.toggle('campo-pendente',  mostrar && faltaCor);
+}
+
+function sinalizarPendentes() {
+  if (estado.rascunho.itens.length === 0) return;
+  pendentesSinalizados = true;
+  atualizarPendentes();
+}
+
+function reiniciarPendentes() {
+  pendentesSinalizados = false;
+  atualizarPendentes();
+}
+
 function abrirListaComErro(listaId, campoId, msg) {
   if (estado.rascunho.id === listaId) {
     mostrarErroAluno(campoId, msg);
@@ -616,7 +911,39 @@ function validarEEnviar(e) {
     items_excluded: itensExcluidos,
     items_total: itensInclusos + itensExcluidos,
   });
+
+  // O link (target=_blank) abre o WhatsApp pelo comportamento padrão; o site não sabe se a mensagem foi enviada.
+  setTimeout(mostrarSucesso, 250);
 }
+
+// =============== ESTADO DE SUCESSO (fechamento visual, sem confirmar envio) ===============
+function mostrarSucesso() {
+  const todas = [
+    ...estado.listas,
+    ...(estado.rascunho.itens.length > 0 ? [estado.rascunho] : []),
+  ];
+  const itensInclusos = todas.reduce((acc, l) => acc + l.itens.filter(x => x.incluso).length, 0);
+
+  const reabrir = document.getElementById('btn-reabrir-wpp');
+  if (reabrir && btnEnviar && btnEnviar.href) reabrir.href = btnEnviar.href;
+
+  trocarEstado('estado-sucesso');
+  const alvo = document.getElementById('estado-sucesso');
+  scrollPara(alvo, 'start');
+  const titulo = document.getElementById('le-sucesso-titulo');
+  if (titulo) titulo.focus({ preventScroll: true });
+
+  trackEvent('school_list_success_view', { lists_count: todas.length, items_included: itensInclusos });
+}
+
+document.getElementById('btn-voltar-lista')?.addEventListener('click', () => {
+  pedidoEnviado = false; // pode voltar a editar; o aviso de saída volta a valer
+  trocarEstado('estado-resultado');
+  scrollPara(alvoInicioRevisao(), 'start');
+});
+
+// Única ação que apaga o pedido a partir do sucesso
+document.getElementById('btn-nova-lista-sucesso')?.addEventListener('click', limparTudoERecomecar);
 
 // =============== RESULTADO ===============
 const grid            = document.getElementById('itens-grid');
@@ -632,30 +959,32 @@ function renderizarAluno() {
   const bloco = document.getElementById('bloco-aluno');
   if (!bloco) return;
   const a = estado.rascunho.aluno;
+  const mob = ehMobile();
   bloco.innerHTML = `
     <div class="aluno-lista">
       <p class="aluno-lista-titulo">Dados da criança/aluno <span class="campo-obrigatorio-nota">campos obrigatórios</span></p>
       <p class="aluno-lista-desc">Para separar tudo certinho, informe de quem é esta lista e quais cores ou estilos a criança prefere.</p>
       <div class="aluno-lista-grid">
         <label class="aluno-lista-field">
-          Nome da criança/aluno <span class="campo-req" aria-hidden="true">*</span>
+          <span class="le-desk">Nome da criança/aluno</span><span class="le-mob">Nome</span> <span class="campo-req" aria-hidden="true">*</span>
           <input id="aluno-nome" type="text" value="${esc(a.nome)}" placeholder="Ex: Pedro, Ana, Lucas" />
         </label>
         <label class="aluno-lista-field">
-          Preferência de cores, personagens ou estilo <span class="campo-req" aria-hidden="true">*</span>
-          <input id="aluno-cor" type="text" value="${esc(a.preferenciaCor)}" placeholder="Ex: azul, rosa, tons claros, sem personagem, qualquer cor" />
-          <span class="campo-dica">Ajuda a equipe a separar opções sem assumir preferência. Pode escrever "qualquer cor" se não tiver preferência.</span>
+          <span class="le-desk">Preferência de cores, personagens ou estilo</span><span class="le-mob">O que ela gosta?</span> <span class="campo-req" aria-hidden="true">*</span>
+          <input id="aluno-cor" type="text" value="${esc(a.preferenciaCor)}" placeholder="${mob ? 'Ex: azul, sem personagem, qualquer cor' : 'Ex: azul, rosa, tons claros, sem personagem, qualquer cor'}" />
+          <span class="campo-dica"><span class="le-desk">Ajuda a equipe a separar opções sem assumir preferência. Pode escrever "qualquer cor" se não tiver preferência.</span><span class="le-mob">Cor, personagem ou estilo. Se não tiver preferência, escreva "qualquer cor".</span></span>
         </label>
         <label class="aluno-lista-field aluno-lista-field-full">
-          Observações adicionais
-          <input id="aluno-obs" type="text" value="${esc(a.observacoes)}" placeholder="Ex: evitar personagens, pode ser qualquer estampa, preferência por tons claros" />
+          <span class="le-desk">Observações adicionais</span><span class="le-mob">Alguma observação? <span class="campo-opcional">Opcional</span></span>
+          <input id="aluno-obs" type="text" value="${esc(a.observacoes)}" placeholder="${mob ? 'Ex: evitar personagens' : 'Ex: evitar personagens, pode ser qualquer estampa, preferência por tons claros'}" />
         </label>
       </div>
     </div>
   `;
-  document.getElementById('aluno-nome').addEventListener('input', e => { estado.rascunho.aluno.nome = e.target.value; ocultarErroAluno(); atualizarLinkEnviar(); });
-  document.getElementById('aluno-cor').addEventListener('input',  e => { estado.rascunho.aluno.preferenciaCor = e.target.value; ocultarErroAluno(); atualizarLinkEnviar(); });
+  document.getElementById('aluno-nome').addEventListener('input', e => { estado.rascunho.aluno.nome = e.target.value; ocultarErroAluno(); atualizarPendentes(); atualizarLinkEnviar(); });
+  document.getElementById('aluno-cor').addEventListener('input',  e => { estado.rascunho.aluno.preferenciaCor = e.target.value; ocultarErroAluno(); atualizarPendentes(); atualizarLinkEnviar(); });
   document.getElementById('aluno-obs').addEventListener('input',  e => { estado.rascunho.aluno.observacoes = e.target.value; atualizarLinkEnviar(); });
+  reiniciarPendentes(); // novo render (outra lista ou novo resultado): recomeça sem aviso
 }
 
 function renderizarPreferenciaGeral() {
@@ -663,34 +992,57 @@ function renderizarPreferenciaGeral() {
   if (!bloco) return;
   bloco.innerHTML = `
     <div class="preferencia-orcamento">
-      <p class="preferencia-titulo">Preferência para o orçamento</p>
+      <p class="preferencia-titulo"><span class="le-desk">Preferência para o orçamento</span><span class="le-mob">Critério do orçamento</span></p>
       <p class="preferencia-desc">Escolha como a equipe deve priorizar marcas e opções ao montar seu orçamento. A disponibilidade, marcas/modelos e valores são confirmados pelo WhatsApp.</p>
       <div class="preferencia-options">
         ${PREFERENCIAS_GERAL.map(p => `
-        <button class="preferencia-option${estado.rascunho.preferenciaGeral === p.id ? ' ativo' : ''}" type="button" data-pref="${p.id}">
-          <strong>${esc(p.label)}</strong>
-          <span>${esc(p.desc)}</span>
+        <button class="preferencia-option${estado.rascunho.preferenciaGeral === p.id ? ' ativo' : ''}" type="button" data-pref="${p.id}" aria-pressed="${estado.rascunho.preferenciaGeral === p.id}">
+          <strong><span class="le-desk">${esc(p.label)}</span><span class="le-mob">${esc(p.labelMob)}</span></strong>
+          <span class="pref-desc"><span class="le-desk">${esc(p.desc)}</span><span class="le-mob">${esc(p.descMob)}</span></span>
         </button>`).join('')}
       </div>
     </div>
   `;
   bloco.querySelectorAll('.preferencia-option').forEach(btn => {
     btn.addEventListener('click', () => {
+      const mudou = estado.rascunho.preferenciaGeral !== btn.dataset.pref;
       estado.rascunho.preferenciaGeral = btn.dataset.pref;
-      bloco.querySelectorAll('.preferencia-option').forEach(b => b.classList.toggle('ativo', b === btn));
+      bloco.querySelectorAll('.preferencia-option').forEach(b => {
+        b.classList.toggle('ativo', b === btn);
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
       atualizarLinkEnviar();
+      if (mudou) trackEvent('school_list_budget_preference_change', { preference: btn.dataset.pref, list_number: estado.rascunho.num });
     });
   });
+}
+
+function resumoMetadados(m) {
+  const detalhe = [m.anoSerie, m.segmento, m.anoLetivo].map(v => (v || '').trim()).filter(Boolean).join(' · ');
+  return {
+    escola: (m.escola || '').trim() || 'Escola não identificada',
+    detalhe: detalhe || 'Série, segmento e ano letivo não identificados',
+  };
 }
 
 function renderizarMetadados() {
   const bloco = document.getElementById('bloco-metadados');
   if (!bloco) return;
   const m = estado.rascunho.metadados;
+  const nadaIdentificado = !['escola', 'anoSerie', 'segmento', 'anoLetivo'].some(c => (m[c] || '').trim());
+  const r = resumoMetadados(m);
+  // No mobile os campos só aparecem ao tocar em "Editar" (ou se a IA não identificou nada). No desktop ficam sempre visíveis.
   bloco.innerHTML = `
-    <div class="meta-lista">
+    <div class="meta-lista${nadaIdentificado ? ' editando' : ''}">
       <p class="meta-lista-titulo">Dados identificados na lista</p>
-      <div class="meta-lista-campos">
+      <div class="meta-resumo">
+        <div class="meta-resumo-txt">
+          <strong id="meta-resumo-escola">${esc(r.escola)}</strong>
+          <span id="meta-resumo-detalhe">${esc(r.detalhe)}</span>
+        </div>
+        <button type="button" class="meta-editar" id="meta-editar" aria-expanded="${nadaIdentificado}" aria-controls="meta-campos">${nadaIdentificado ? 'Concluir' : 'Editar'}</button>
+      </div>
+      <div class="meta-lista-campos" id="meta-campos">
         <label>Escola<input id="meta-escola"    value="${esc(m.escola)}"    placeholder="Não identificado" /></label>
         <label>Ano / Série<input id="meta-anoSerie"  value="${esc(m.anoSerie)}"  placeholder="Não identificado" /></label>
         <label>Segmento<input id="meta-segmento"  value="${esc(m.segmento)}"  placeholder="Não identificado" /></label>
@@ -699,9 +1051,21 @@ function renderizarMetadados() {
       <p class="meta-lista-dica">Confira se os dados estão corretos. Eles ajudam a equipe da Sartec a localizar a lista certa e confirmar o orçamento.</p>
     </div>
   `;
+  const caixa = bloco.querySelector('.meta-lista');
+  const btnEditar = document.getElementById('meta-editar');
+  btnEditar.addEventListener('click', () => {
+    const abrir = !caixa.classList.contains('editando');
+    caixa.classList.toggle('editando', abrir);
+    btnEditar.setAttribute('aria-expanded', String(abrir));
+    btnEditar.textContent = abrir ? 'Concluir' : 'Editar';
+    if (abrir) document.getElementById('meta-escola').focus();
+  });
   ['escola', 'anoSerie', 'segmento', 'anoLetivo'].forEach(campo => {
     document.getElementById(`meta-${campo}`).addEventListener('input', (e) => {
       estado.rascunho.metadados[campo] = e.target.value;
+      const novo = resumoMetadados(estado.rascunho.metadados);
+      document.getElementById('meta-resumo-escola').textContent = novo.escola;
+      document.getElementById('meta-resumo-detalhe').textContent = novo.detalhe;
       atualizarLinkEnviar();
     });
   });
@@ -757,7 +1121,7 @@ function renderizarResultado() {
 
   grid.innerHTML = estado.rascunho.itens.map(it => {
     const busca = encodeURIComponent('material escolar ' + it.nome + (it.obs ? ' ' + it.obs : ''));
-    const marcaLabel = it.marcaSugerida ? it.marcaSugerida : 'não informada';
+    const marcaSugerida = (it.marcaSugerida || '').trim();
     const temPref = (it.preferenciaCliente || '').trim() !== '';
     return `
     <div class="item-card ${it.incluso ? '' : 'excluido'}" data-id="${it.id}">
@@ -765,18 +1129,20 @@ function renderizarResultado() {
         <h4>${esc(it.nome)}</h4>
         ${it.obs ? `<div class="obs">${esc(it.obs)}</div>` : ''}
       </div>
-      <p class="marca-sugerida">Sugestão da escola: <strong>${esc(marcaLabel)}</strong></p>
-      <button class="marca-preferencia-toggle" type="button">${temPref ? 'Editar marca/preferência' : '+ adicionar marca/preferência'}</button>
-      <div class="marca-preferencia-wrap" style="display:${temPref ? 'block' : 'none'}">
-        <input
-          class="marca-preferencia-input"
-          type="text"
-          value="${esc(it.preferenciaCliente || '')}"
-          placeholder="Ex: Faber-Castell, Tilibra, mais barato, qualquer marca"
-          aria-label="Marca ou preferência para ${esc(it.nome)}"
-        />
+      ${marcaSugerida ? `<p class="marca-sugerida">Sugestão da escola: <strong>${esc(marcaSugerida)}</strong></p>` : ''}
+      <div class="item-extras">
+        <button class="marca-preferencia-toggle" type="button">${temPref ? 'Editar marca/preferência' : '+ adicionar marca/preferência'}</button>
+        <div class="marca-preferencia-wrap" style="display:${temPref ? 'block' : 'none'}">
+          <input
+            class="marca-preferencia-input"
+            type="text"
+            value="${esc(it.preferenciaCliente || '')}"
+            placeholder="Ex: Faber-Castell, Tilibra, mais barato, qualquer marca"
+            aria-label="Marca ou preferência para ${esc(it.nome)}"
+          />
+        </div>
+        <a href="https://www.google.com/search?tbm=isch&q=${busca}" target="_blank" rel="noopener" class="item-img-buscar">O que é este item?</a>
       </div>
-      <a href="https://www.google.com/search?tbm=isch&q=${busca}" target="_blank" rel="noopener" class="item-img-buscar">O que é este item?</a>
       <div class="item-controls">
         <div class="qty-control">
           <button class="qty-btn" data-acao="menos" aria-label="Diminuir">−</button>
@@ -827,6 +1193,15 @@ function renderizarResultado() {
       toggle.textContent = input.value.trim() ? 'Editar marca/preferência' : '+ adicionar marca/preferência';
       atualizarLinkEnviar();
     });
+
+    // Só metadados: nunca o texto digitado
+    input.addEventListener('change', () => {
+      trackEvent('school_list_item_preference_change', {
+        item_id: item.id,
+        action: input.value.trim() ? 'set' : 'clear',
+        list_number: estado.rascunho.num,
+      });
+    });
   });
 
   btnMarcarTodosTem.textContent = 'Marcar todos como "Não quero"';
@@ -854,6 +1229,8 @@ function atualizarContadores() {
   if (counterQuero) counterQuero.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
   if (counterTem)   counterTem.textContent   = `${excluidos.length} não quero`;
   if (resumoTotal)  resumoTotal.textContent  = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
+  const barraItens = document.getElementById('le-barra-itens');
+  if (barraItens) barraItens.textContent = `${inclusos.length} ${inclusos.length === 1 ? 'item' : 'itens'}`;
   if (btnMarcarTodosTem) btnMarcarTodosTem.textContent = inclusos.length > 0 ? 'Marcar todos como "Não quero"' : 'Marcar todos como "Quero comprar"';
   renderizarResumoPedido();
 }
@@ -948,8 +1325,7 @@ A equipe pode conferir estoque, marcas e valores e me enviar o orçamento pelo W
 btnMarcarTodosTem.addEventListener('click', () => {
   const algumIncluso = estado.rascunho.itens.some(x => x.incluso);
   estado.rascunho.itens.forEach(x => x.incluso = !algumIncluso);
-  atualizarUI();
-  btnMarcarTodosTem.textContent = algumIncluso ? 'Marcar todos como "Não quero"' : 'Marcar todos como "Quero comprar"';
+  atualizarUI(); // atualizarContadores() já deixa o rótulo coerente com o estado novo
   trackEvent('school_list_mark_all_toggle', { new_state: algumIncluso ? 'nao_quero' : 'quero' });
 });
 
@@ -970,22 +1346,61 @@ btnAdicionarLista.addEventListener('click', () => {
 
   renderizarFaixas();
   salvarProgresso();
+  trackEvent('school_list_add_list', { list_number: nextListNum, lists_count: estado.listas.length });
 
-  clearTimeout(uploadFeedbackTimer);
-  arquivoInput.value = '';
-  uploadArea.classList.remove('upload-lendo', 'upload-ok');
-  uploadLabel.textContent = 'Clique ou arraste sua lista aqui';
+  limparArquivos();
 
   trocarEstado('estado-upload');
   const alvo = document.getElementById('listas-container');
   scrollPara(alvo && alvo.children.length ? alvo : document.getElementById('estado-upload'), 'start');
 });
 
-btnLimpar.addEventListener('click', () => {
-  if (confirm('Tem certeza que deseja apagar todas as listas deste pedido?')) {
+// =============== MODAL "LIMPAR PEDIDO" (no lugar do confirm nativo) ===============
+const modalLimpar = document.getElementById('le-modal-limpar');
+const modalCancelar = document.getElementById('le-modal-cancelar');
+const modalConfirmar = document.getElementById('le-modal-confirmar');
+let modalOpener = null;
+
+function abrirModalLimpar(opener) {
+  if (!modalLimpar) return;
+  modalOpener = opener || document.activeElement;
+  modalLimpar.hidden = false;
+  document.body.classList.add('le-modal-aberto');
+  modalCancelar.focus();
+}
+
+function fecharModalLimpar() {
+  if (!modalLimpar) return;
+  modalLimpar.hidden = true;
+  document.body.classList.remove('le-modal-aberto');
+  const opener = modalOpener;
+  modalOpener = null;
+  if (opener && document.contains(opener) && opener.offsetParent !== null) opener.focus();
+}
+
+if (modalLimpar) {
+  modalLimpar.addEventListener('click', (e) => {
+    if (e.target.hasAttribute('data-fechar-modal')) fecharModalLimpar();
+  });
+  modalCancelar.addEventListener('click', fecharModalLimpar);
+  modalConfirmar.addEventListener('click', () => {
+    modalOpener = null; // o fluxo reinicia no upload; não devolve o foco ao botão que some
+    fecharModalLimpar();
     limparTudoERecomecar();
-  }
-});
+  });
+  document.addEventListener('keydown', (e) => {
+    if (modalLimpar.hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); fecharModalLimpar(); return; }
+    if (e.key === 'Tab') {
+      const foco = [modalCancelar, modalConfirmar];
+      const i = foco.indexOf(document.activeElement);
+      if (i === -1 || (e.shiftKey && i === 0)) { e.preventDefault(); foco[e.shiftKey ? 1 : 0].focus(); }
+      else if (!e.shiftKey && i === foco.length - 1) { e.preventDefault(); foco[0].focus(); }
+    }
+  });
+}
+
+btnLimpar.addEventListener('click', () => abrirModalLimpar(btnLimpar));
 
 if (btnEnviar) {
   btnEnviar.addEventListener('click', validarEEnviar);
@@ -1002,12 +1417,111 @@ window.addEventListener('beforeunload', (e) => {
 // =============== LIMPAR PEDIDO — BANNER ===============
 const btnLimparSalvo = document.getElementById('btn-limpar-salvo');
 if (btnLimparSalvo) {
-  btnLimparSalvo.addEventListener('click', () => {
-    if (confirm('Tem certeza que deseja apagar todas as listas deste pedido?')) {
-      limparTudoERecomecar();
-    }
-  });
+  btnLimparSalvo.addEventListener('click', () => abrirModalLimpar(btnLimparSalvo));
 }
+
+// =============== AVISO LEVE DE PENDÊNCIAS: gatilhos ===============
+(function iniciarGatilhosPendentes() {
+  const etapa2 = document.getElementById('le-etapa-2');
+  if (etapa2) {
+    etapa2.addEventListener('focusout', (e) => {
+      if (e.relatedTarget && !etapa2.contains(e.relatedTarget)) sinalizarPendentes();
+    });
+  }
+  document.querySelectorAll('.le-etapas a[href="#le-etapa-3"], .le-etapas a[href="#le-etapa-4"]').forEach(a => {
+    a.addEventListener('click', sinalizarPendentes);
+  });
+  const etapa3 = document.getElementById('le-etapa-3');
+  if (etapa3 && 'IntersectionObserver' in window) {
+    new IntersectionObserver((entradas) => {
+      if (entradas.some(en => en.isIntersecting)) sinalizarPendentes();
+    }, { threshold: 0.25 }).observe(etapa3);
+  }
+})();
+
+// =============== ORIENTAÇÃO MOBILE (passo atual + barra compacta) ===============
+// Só orienta: não bloqueia etapas nem marca conclusão. No desktop o CSS esconde tudo isto.
+function iniciarOrientacaoMobile() {
+  const ids = ['le-etapa-1', 'le-etapa-2', 'le-etapa-3', 'le-etapa-4'];
+  const NOMES = ['Conferir a lista', 'Dados da criança', 'Materiais', 'Enviar'];
+  const texto = document.getElementById('le-passo-atual');
+  const links = Array.from(document.querySelectorAll('.le-etapas a'));
+  const barra = document.getElementById('le-barra');
+  const btnContinuar = document.getElementById('btn-continuar');
+  const acoes = document.querySelector('.acoes-finais');
+  const mq = window.matchMedia('(max-width: 640px)');
+  let passo = -1;
+  let agendado = false;
+
+  function atualizar() {
+    agendado = false;
+    if (!mq.matches || document.body.dataset.leEstado !== 'resultado') return;
+
+    // Passo atual = última etapa cujo topo já passou de ~40% da altura da tela
+    const linha = window.innerHeight * 0.4;
+    let atual = 0;
+    ids.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= linha) atual = i;
+    });
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) atual = ids.length - 1;
+
+    if (atual !== passo) {
+      passo = atual;
+      if (texto) texto.textContent = `Passo ${atual + 1} de 4 · ${NOMES[atual]}`;
+      links.forEach((a, i) => {
+        if (i === atual) a.setAttribute('aria-current', 'step');
+        else a.removeAttribute('aria-current');
+      });
+    }
+
+    // A barra compacta some quando o CTA completo (etapa 4) já está na tela
+    const ctaVisivel = acoes && acoes.getBoundingClientRect().top < window.innerHeight - 8;
+    if (barra) barra.classList.toggle('visivel', !ctaVisivel);
+  }
+
+  function agendar() {
+    if (agendado) return;
+    agendado = true;
+    requestAnimationFrame(atualizar);
+  }
+  window.addEventListener('scroll', agendar, { passive: true });
+  window.addEventListener('resize', agendar);
+  if (mq.addEventListener) mq.addEventListener('change', agendar);
+  window.atualizarOrientacaoMobile = agendar;
+
+  // Teclado aberto: a barra sairia da frente do campo que a pessoa está preenchendo
+  const campoDeTexto = (el) => el && el.matches && el.matches('input, textarea');
+  document.addEventListener('focusin', (e) => {
+    if (campoDeTexto(e.target) && e.target.closest('#estado-resultado')) document.body.classList.add('le-digitando');
+  });
+  document.addEventListener('focusout', (e) => {
+    if (!campoDeTexto(e.relatedTarget)) document.body.classList.remove('le-digitando');
+  });
+
+  if (btnContinuar) {
+    btnContinuar.addEventListener('click', () => {
+      sinalizarPendentes(); // mesmo gatilho do passo 4 na navegação
+      const etapa4 = document.getElementById('le-etapa-4');
+      const jaNoEnvio = etapa4 && etapa4.getBoundingClientRect().top < 140;
+      // Já no passo 4 (CTA ainda abaixo da dobra): leva até o botão de envio
+      scrollPara(jaNoEnvio ? acoes : etapa4, jaNoEnvio ? 'end' : 'start');
+      trackEvent('school_list_continue_to_send', { items_included: estado.rascunho.itens.filter(x => x.incluso).length });
+    });
+  }
+}
+iniciarOrientacaoMobile();
+
+// =============== FAB x CTA DE ANÁLISE (só esta página) ===============
+// O botão flutuante global do WhatsApp encostava no "Analisar". Enquanto o formulário de upload está visível,
+// a classe abaixo o esconde no mobile (CSS). Fora dele, o FAB segue como nas outras páginas.
+(function observarFormularioUpload() {
+  const card = document.querySelector('#estado-upload .form-card');
+  if (!card || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver((entradas) => {
+    document.body.classList.toggle('le-fab-oculto', entradas.some(en => en.isIntersecting));
+  }).observe(card);
+})();
 
 // =============== RESTAURAR PROGRESSO AO CARREGAR ===============
 (function inicializarProgresso() {
@@ -1039,4 +1553,5 @@ if (btnLimparSalvo) {
   }
 
   mostrarBannerRestaurado();
+  trackEvent('school_list_restore', { lists_count: estado.listas.length + (temRascunho ? 1 : 0), has_draft: temRascunho });
 })();

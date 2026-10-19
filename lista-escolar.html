@@ -183,15 +183,24 @@
               <p>Envie o arquivo da próxima lista para análise. Não é preciso informar nome e WhatsApp novamente.</p>
             </div>
 
-            <div class="form-group">
-              <label>Arquivos da lista</label>
+            <div class="form-group" id="grupo-arquivos">
+              <label id="arquivos-label">Arquivos da lista</label>
               <p class="le-upload-nota">Foto ou PDF. Se a lista tiver várias páginas, envie todas.</p>
-              <div class="upload-area" id="upload-area">
-                <div class="icon">📋</div>
+              <div class="upload-area" id="upload-area" role="button" tabindex="0" aria-describedby="arquivos-label">
+                <div class="icon" aria-hidden="true">📋</div>
                 <div class="label" id="upload-label">Clique ou arraste sua lista aqui</div>
-                <div class="hint">Pode enviar PDF, foto ou mais de um arquivo quando forem partes da mesma lista · até 4MB por arquivo</div>
-                <input type="file" id="arquivo" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none" />
+                <div class="hint">Pode enviar PDF, foto ou mais de um arquivo quando forem partes da mesma lista · até 5 por lista</div>
               </div>
+              <input type="file" id="arquivo" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none" />
+
+              <!-- Páginas/arquivos já adicionados (coleção própria; não depende do FileList do input) -->
+              <div class="arquivos-sel" id="arquivos-sel" hidden>
+                <p class="arquivos-sel-titulo" id="arquivos-sel-titulo" role="status" aria-live="polite"></p>
+                <ul class="arquivos-sel-lista" id="arquivos-sel-lista"></ul>
+                <button type="button" class="arquivos-sel-add" id="btn-add-pagina">+ Adicionar outra página</button>
+                <p class="arquivos-sel-limite" id="arquivos-sel-limite" hidden>Você chegou ao limite de 5 arquivos por lista.</p>
+              </div>
+              <p class="arquivos-aviso" id="arquivos-aviso" role="alert" hidden></p>
             </div>
 
             <div class="aviso-lista-unica">
@@ -238,11 +247,12 @@
         <div id="resultado-badge"></div>
 
         <nav class="le-etapas" aria-label="Etapas da revisão">
+          <p class="le-passo-atual" id="le-passo-atual" aria-hidden="true">Passo 1 de 4 · Conferir a lista</p>
           <ol>
-            <li><a href="#le-etapa-1"><span class="le-etapas-num" aria-hidden="true">1</span>Conferir a lista</a></li>
-            <li><a href="#le-etapa-2"><span class="le-etapas-num" aria-hidden="true">2</span>Dados e critério</a></li>
-            <li><a href="#le-etapa-3"><span class="le-etapas-num" aria-hidden="true">3</span>Revisar os materiais</a></li>
-            <li><a href="#le-etapa-4"><span class="le-etapas-num" aria-hidden="true">4</span>Enviar</a></li>
+            <li><a href="#le-etapa-1"><span class="le-etapas-num" aria-hidden="true">1</span><span class="le-etapas-txt">Conferir a lista</span></a></li>
+            <li><a href="#le-etapa-2"><span class="le-etapas-num" aria-hidden="true">2</span><span class="le-etapas-txt">Dados e critério</span></a></li>
+            <li><a href="#le-etapa-3"><span class="le-etapas-num" aria-hidden="true">3</span><span class="le-etapas-txt">Revisar os materiais</span></a></li>
+            <li><a href="#le-etapa-4"><span class="le-etapas-num" aria-hidden="true">4</span><span class="le-etapas-txt">Enviar</span></a></li>
           </ol>
         </nav>
 
@@ -263,11 +273,13 @@
           <header class="le-etapa-cab">
             <span class="le-etapa-num" aria-hidden="true">2</span>
             <div>
-              <h2 id="le-et2-t">Dados do aluno e critério do orçamento</h2>
-              <p>Conte um pouco sobre a criança e indique suas preferências gerais. A equipe da Sartec usa essas informações como referência para toda a lista.</p>
+              <h2 id="le-et2-t"><span class="le-desk">Dados do aluno e critério do orçamento</span><span class="le-mob">Sobre a criança</span></h2>
+              <p><span class="le-desk">Conte um pouco sobre a criança e indique suas preferências gerais. A equipe da Sartec usa essas informações como referência para toda a lista.</span><span class="le-mob">Conta pra gente o que ela gosta. Isso vale para toda a lista.</span></p>
             </div>
           </header>
+          <p class="le-obrig-nota"><span class="campo-req" aria-hidden="true">*</span> Nome da criança e preferência de cores são obrigatórios para enviar o orçamento.</p>
           <div id="bloco-aluno"></div>
+          <p class="le-pendentes" id="le-pendentes-aviso" role="status" hidden>Preencha estes dados antes de enviar o orçamento.</p>
           <div id="bloco-preferencia"></div>
         </section>
 
@@ -280,6 +292,7 @@
               <p>Confirme o que você quer comprar. A equipe confirma disponibilidade, marcas, modelos e preços pelo WhatsApp.</p>
             </div>
           </header>
+          <p class="le-pendentes" id="le-pendentes-aviso-3" role="status" hidden>Faltam dados da criança. Preencha antes de enviar o orçamento. <a href="#le-etapa-2">Ir para os dados</a></p>
           <div class="le-guia">
             <div class="le-guia-corpo">
               <p class="le-guia-titulo">Agora confira os materiais</p>
@@ -288,6 +301,14 @@
                 <li>Já tem algum item? Marque <strong>Não quero</strong>.</li>
                 <li>Precisa de mais ou menos? Ajuste a <strong>quantidade</strong>.</li>
                 <li>Algum item precisa de algo específico? Use <strong>adicionar marca/preferência</strong> só nele.</li>
+              </ul>
+            </div>
+            <div class="le-guia-mob">
+              <p class="le-guia-mob-titulo">Só ajuste o que precisar.</p>
+              <ul class="le-chips">
+                <li>Quantidade</li>
+                <li>Tirar o que já tem</li>
+                <li>Marca ou preferência</li>
               </ul>
             </div>
             <div class="le-guia-mascote" aria-hidden="true">
@@ -348,12 +369,36 @@
         </div>
       </div>
 
+      <!-- Barra compacta (só mobile, só durante a revisão): leva ao envio; o CTA completo fica na etapa 4 -->
+      <div class="le-barra" id="le-barra" role="region" aria-label="Resumo e próximo passo">
+        <span class="le-barra-resumo"><strong id="le-barra-itens">0 itens</strong> na lista</span>
+        <button type="button" class="btn btn-primary le-barra-btn" id="btn-continuar">Revisar e enviar</button>
+      </div>
+
+      <!-- ESTADO 4: SUCESSO (após clique válido no CTA do WhatsApp) -->
+      <div class="estado" id="estado-sucesso">
+        <div class="le-sucesso">
+          <div class="le-sucesso-mascote" aria-hidden="true">
+            <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-comemorando.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-comemorando.png" alt="" width="640" height="488" loading="lazy" decoding="async" /></picture>
+          </div>
+          <h2 id="le-sucesso-titulo" tabindex="-1">Tudo pronto para continuar no WhatsApp</h2>
+          <p class="le-sucesso-texto">Abrimos sua lista no WhatsApp. Confira a mensagem e envie para a equipe da Sartec.</p>
+          <p class="le-sucesso-nota">Seu pedido continua salvo neste navegador até você começar uma nova lista.</p>
+          <div class="le-sucesso-acoes">
+            <button type="button" id="btn-nova-lista-sucesso" class="btn btn-primary">Começar uma nova lista</button>
+            <button type="button" id="btn-voltar-lista" class="btn btn-ghost">Voltar para minha lista</button>
+          </div>
+          <a id="btn-reabrir-wpp" class="le-sucesso-link" target="_blank" rel="noopener">Não abriu? Abrir o WhatsApp de novo</a>
+        </div>
+      </div>
+
     </div>
   </section>
 
   <!-- O QUE ACONTECE DEPOIS -->
-  <section style="background: var(--cinza-fundo); border-top: 1px solid #E2E8F0">
-    <div class="container" style="padding-top: 64px; padding-bottom: 64px">
+  <section class="le-depois">
+    <div class="container le-depois-in">
+      <div class="le-depois-desk">
       <div style="text-align: center; max-width: 560px; margin: 0 auto 40px">
         <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 30px; margin: 0 0 10px; letter-spacing: -0.01em">O que acontece depois do envio</h2>
         <p style="margin: 0; font-size: 17px; color: #475569; line-height: 1.5">A equipe da Sartec entra em ação assim que a mensagem chega.</p>
@@ -380,11 +425,26 @@
           <p style="margin: 0; font-size: 15px; color: #475569; line-height: 1.5">Aprova o orçamento e decide: retirada na loja ou entrega. A gente separa tudo para você.</p>
         </div>
       </div>
+      </div>
 
+      <!-- Mobile: resumo curto + os quatro passos sob demanda (<details> funciona com teclado) -->
+      <div class="le-depois-mob">
+        <h2>Depois do envio</h2>
+        <p>A Sartec confere estoque e marcas e manda seu orçamento pelo WhatsApp.</p>
+        <details class="le-depois-det">
+          <summary>Ver como funciona</summary>
+          <ol>
+            <li><strong>Recebemos sua lista.</strong> A mensagem chega organizada no nosso WhatsApp.</li>
+            <li><strong>Verificamos o estoque.</strong> Item por item, com marcas, quantidades e modelos.</li>
+            <li><strong>Enviamos o orçamento.</strong> Com valores e prazo para retirada ou entrega.</li>
+            <li><strong>Você confirma e combina.</strong> Retirada na loja ou entrega; a gente separa tudo.</li>
+          </ol>
+        </details>
+      </div>
     </div>
   </section>
 
-  <div id="la-cabral-compact-mount"></div>
+  <div id="la-cabral-compact-mount" class="le-cabral"></div>
 
   <!-- Visite a Sartec -->
   <section class="loja-fw">
@@ -413,6 +473,19 @@
       </div>
     </div>
   </section>
+
+  <!-- Confirmação própria de "Limpar pedido" -->
+  <div class="le-modal" id="le-modal-limpar" hidden>
+    <div class="le-modal-fundo" data-fechar-modal></div>
+    <div class="le-modal-caixa" role="alertdialog" aria-modal="true" aria-labelledby="le-modal-titulo" aria-describedby="le-modal-texto">
+      <h2 id="le-modal-titulo">Limpar este pedido?</h2>
+      <p id="le-modal-texto">Todas as listas e alterações salvas neste pedido serão apagadas.</p>
+      <div class="le-modal-acoes">
+        <button type="button" class="btn btn-ghost" id="le-modal-cancelar">Cancelar</button>
+        <button type="button" class="btn le-btn-perigo" id="le-modal-confirmar">Limpar pedido</button>
+      </div>
+    </div>
+  </div>
 
   <div id="footer-mount"></div>
 

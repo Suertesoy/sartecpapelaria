@@ -3913,24 +3913,494 @@ body[data-le-estado="resultado"] .le-revisao-cab { display: block; scroll-margin
   .le-enviar-mascote { width: 76px; margin: -14px 0 -8px; }
   .le-enviar-msg p { font-size: .92rem; }
 
-  /* Barra sticky compacta: CTA primeiro, ações secundárias lado a lado */
-  body[data-le-estado="resultado"] .acoes-finais { padding: 12px; bottom: 8px; gap: 8px; }
-  body[data-le-estado="resultado"] .acoes-finais .resumo,
-  body[data-le-estado="resultado"] .le-acoes-nota { display: none; }
-  body[data-le-estado="resultado"] .le-acoes-btns { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  body[data-le-estado="resultado"] .le-acoes-btns #btn-enviar { grid-column: 1 / -1; order: -1; justify-content: center; text-align: center; }
-  body[data-le-estado="resultado"] .le-acoes-btns .btn { padding-left: 8px; padding-right: 8px; font-size: .8rem; white-space: nowrap; justify-content: center; }
+  /* (a barra sticky mobile foi reescrita na Rodada 4: ver .le-barra e .acoes-finais no fim do arquivo) */
 }
 
 /* Etapa 3: rótulo + asterisco na mesma linha (o label original é flex em coluna) */
 #le-etapa-2 .aluno-lista-field { display: block; }
 #le-etapa-2 .aluno-lista-field input { display: block; width: 100%; margin-top: 5px; }
 #le-etapa-2 .aluno-lista-field .campo-dica { margin-top: 5px; }
-@media (max-width: 640px) {
-  body[data-le-estado="resultado"] .le-acoes-btns #btn-enviar { font-size: .95rem; }
-}
 
 /* Etapa 3 (itens): título e apoio do guia */
 .le-guia-corpo { min-width: 0; }
 .le-guia-titulo { margin: 0 0 4px; font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--azul); }
 .le-guia-texto { margin: 0 0 10px; font-size: .92rem; line-height: 1.5; color: var(--texto); }
+
+/* =========================================================
+   LISTA ESCOLAR — Rodada 3: pendências, sucesso e modal
+   ========================================================= */
+
+/* Obrigatórios e aviso leve (âmbar, sem alarme) */
+.le-obrig-nota { margin: -4px 0 12px; font-size: .84rem; color: var(--texto-suave); }
+.le-pendentes {
+  margin: 12px 0;
+  padding: 10px 14px;
+  background: #FFF8E6;
+  border: 1px solid #F5D98B;
+  border-radius: 10px;
+  color: #6B4E00;
+  font-size: .9rem;
+  line-height: 1.45;
+}
+.le-pendentes[hidden] { display: none; }
+.le-pendentes a { color: #6B4E00; font-weight: 700; text-decoration: underline; }
+#estado-resultado .campo-pendente { border-color: #E5A100; background: #FFFCF2; }
+#le-etapa-3 .le-pendentes { margin: -6px 0 14px; }
+
+/* Estado de sucesso */
+#estado-sucesso { scroll-margin-top: calc(var(--header-h) + 12px); }
+.le-sucesso {
+  max-width: 640px;
+  margin: 24px auto 8px;
+  padding: 28px 28px 24px;
+  background: linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 70%);
+  border: 1px solid #BBF7D0;
+  border-radius: 20px;
+  text-align: center;
+  animation: le-entrar .5s ease-out both;
+}
+.le-sucesso-mascote { width: min(260px, 70%); margin: 0 auto 10px; }
+.le-sucesso-mascote img { width: 100%; height: auto; }
+.le-sucesso h2 {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: clamp(22px, 3vw, 28px);
+  letter-spacing: -0.02em;
+  color: var(--texto);
+  margin: 0 0 8px;
+}
+.le-sucesso h2:focus { outline: none; }
+.le-sucesso-texto { margin: 0 auto 8px; max-width: 460px; color: var(--texto); line-height: 1.5; }
+.le-sucesso-nota { margin: 0 auto 18px; max-width: 460px; font-size: .86rem; color: var(--texto-suave); }
+.le-sucesso-acoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+.le-sucesso-link { font-size: .86rem; color: var(--azul); font-weight: 600; }
+
+/* Modal "Limpar pedido" */
+.le-modal { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.le-modal[hidden] { display: none; }
+.le-modal-fundo { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.55); }
+.le-modal-caixa {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: #FFFFFF;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3);
+}
+.le-modal-caixa h2 { font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--texto); margin: 0 0 8px; }
+.le-modal-caixa p { margin: 0 0 20px; color: var(--texto-suave); line-height: 1.5; }
+.le-modal-acoes { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.le-btn-perigo { background: var(--vermelho); color: #FFFFFF; border: 2px solid var(--vermelho); }
+.le-btn-perigo:hover { background: var(--vermelho-escuro); border-color: var(--vermelho-escuro); color: #FFFFFF; }
+body.le-modal-aberto { overflow: hidden; }
+
+@media (max-width: 480px) {
+  .le-sucesso { padding: 22px 16px 20px; margin-top: 12px; }
+  .le-sucesso-acoes .btn { width: 100%; justify-content: center; }
+  .le-modal-acoes .btn { flex: 1 1 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .le-sucesso { animation: none; }
+}
+
+/* =========================================================
+   LISTA ESCOLAR — Rodada 4 / Fase A: páginas e arquivos adicionados
+   ========================================================= */
+#grupo-arquivos.tem-arquivos .upload-area { display: none; }
+.upload-area:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+
+.arquivos-sel {
+  border: 2px dashed var(--cinza-borda);
+  border-radius: var(--radius);
+  background: var(--cinza-fundo);
+  padding: 14px;
+}
+.arquivos-sel[hidden] { display: none; }
+.arquivos-sel.dragover { border-color: var(--azul); background: var(--azul-suave); }
+.arquivos-sel-titulo {
+  margin: 0 0 10px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #166534;
+}
+.arquivos-sel-lista { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.arquivo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFFFFF;
+  border: 1px solid var(--cinza-borda);
+  border-radius: 12px;
+  padding: 8px 8px 8px 8px;
+}
+.arquivo-thumb {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--azul-suave);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.arquivo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.arquivo-thumb-pdf { background: #FEE2E2; color: #991B1B; font-weight: 800; font-size: .72rem; letter-spacing: .04em; }
+.arquivo-info { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.arquivo-nome { font-weight: 600; font-size: .95rem; color: var(--texto); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.arquivo-meta { font-size: .78rem; color: var(--texto-suave); }
+.arquivo-remover {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  color: var(--vermelho-escuro);
+  font: inherit;
+  font-weight: 700;
+  font-size: .86rem;
+  cursor: pointer;
+}
+.arquivo-remover:hover { background: var(--vermelho-suave); }
+.arquivo-remover:focus-visible, .arquivos-sel-add:focus-visible { outline: 3px solid var(--azul); outline-offset: 1px; }
+.arquivos-sel-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  background: #FFFFFF;
+  border: 2px solid var(--azul);
+  border-radius: 12px;
+  color: var(--azul);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.arquivos-sel-add:hover { background: var(--azul-suave); }
+.arquivos-sel-add[hidden], .arquivos-sel-limite[hidden] { display: none; }
+.arquivos-sel-limite { margin: 0; font-size: .86rem; color: var(--texto-suave); text-align: center; }
+.arquivos-aviso {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  background: #FFF8E6;
+  border: 1px solid #F5D98B;
+  border-radius: 10px;
+  color: #6B4E00;
+  font-size: .88rem;
+  line-height: 1.45;
+}
+.arquivos-aviso[hidden] { display: none; }
+
+/* =========================================================
+   LISTA ESCOLAR — Rodada 4 / Fase B: UX mobile da revisão
+   Corte mobile = 640px. Acima disso o desktop segue como estava.
+   ========================================================= */
+
+/* Textos alternativos: versão longa no desktop, curta no mobile */
+.le-mob { display: none; }
+
+/* Peças que só existem no mobile */
+.meta-resumo,
+.le-passo-atual,
+.le-guia-mob,
+.le-barra,
+.le-depois-mob { display: none; }
+.campo-opcional { font-weight: 400; color: var(--texto-suave); }
+
+/* Cards dos itens: no desktop o grupo some do layout e os filhos ficam exatamente onde estavam */
+.item-extras { display: contents; }
+.preferencia-option strong span { font-size: inherit; color: inherit; line-height: inherit; }
+
+/* "Depois do envio": mesmos valores que eram inline */
+.le-depois { background: var(--cinza-fundo); border-top: 1px solid #E2E8F0; }
+.le-depois-in { padding-top: 64px; padding-bottom: 64px; }
+
+/* ---- Vermelho de "Pronto para começar?": a ponta do lápis passa da borda do card em vez de ser cortada ---- */
+.le-pronto { overflow: visible; }
+.le-pronto-cena { z-index: 2; }
+
+/* ---- Vermelho do upload: acima do card, para o braço/dedo não parecer cortado ---- */
+#estado-upload .le-upload-stage .form-card { z-index: 1; }
+.le-upload-mascote { z-index: 2; pointer-events: none; }
+.le-upload-mascote img { pointer-events: none; }
+@media (max-width: 1180px) {
+  /* ~20px do Vermelho entram sobre a borda do card; o resto fica acima dele */
+  #estado-upload .le-upload-stage { margin-top: 84px; }
+  .le-upload-mascote { top: -84px; }
+}
+
+/* Até 899px o Vermelho do upload (logo abaixo) já aponta para o formulário: dois iguais empilhados só repetem */
+@media (max-width: 899px) {
+  .le-pronto-cena { display: none; }
+  .le-pronto { padding-right: 24px; min-height: 0; }
+}
+
+@media (max-width: 640px) {
+  .le-desk { display: none; }
+  .le-mob { display: revert; }
+
+  /* Mais largura útil e menos altura perdida */
+  .lista-tool { padding: 14px 0 32px; }
+  .lista-tool > .container,
+  .le-revisao-cab > .container { padding-left: 16px; padding-right: 16px; }
+  #estado-upload .le-upload-stage { margin-top: 64px; }
+  .le-upload-mascote { top: -64px; width: 84px; right: 20px; }
+  #estado-upload .form-card { padding: 22px 16px; }
+
+  /* iOS dá zoom ao focar campo com fonte menor que 16px */
+  #estado-resultado input[type="text"] { font-size: 16px; }
+
+  /* ---- 2.2 Cabeçalho do modo revisão ---- */
+  .le-revisao-card { padding: 12px 14px; }
+  .le-revisao-texto h1 { font-size: 1.2rem; margin: 0; }
+  .le-revisao-texto p { display: none; }
+  .le-revisao-mascote { width: 56px; margin: -8px 0; }
+
+  /* Progresso compacto: "Passo N de 4 · Etapa" + 4 pontos (âncoras continuam funcionando) */
+  .le-etapas {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0 -16px 12px;
+    padding: 7px 16px;
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--cinza-borda);
+  }
+  .le-passo-atual {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: .8rem;
+    color: var(--texto);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .le-etapas ol { display: flex; gap: 2px; flex-shrink: 0; }
+  .le-etapas a {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+  }
+  .le-etapas a:hover { background: transparent; }
+  .le-etapas-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .le-etapas-num { width: 24px; height: 24px; font-size: .72rem; background: var(--azul-suave); color: var(--azul); border: 1px solid #C9D6F2; }
+  .le-etapas a[aria-current="step"] .le-etapas-num { background: var(--azul); color: #FFFFFF; border-color: var(--azul); }
+
+  /* Etapas: o título basta (número e descrição já estão no progresso) */
+  .le-etapa { padding: 14px 10px; margin-bottom: 12px; border-radius: 14px; scroll-margin-top: calc(var(--header-h) + 56px); }
+  .le-etapa-num { display: none; }
+  .le-etapa-cab { margin-bottom: 10px; }
+  .le-etapa-cab h2 { font-size: 1.15rem; margin: 0; }
+  .le-etapa-cab p { display: none; }
+  #le-etapa-2 .le-etapa-cab p { display: block; margin-top: 2px; font-size: .9rem; }
+  .le-obrig-nota { display: none; }
+
+  /* ---- 2.3 Etapa 1: ler primeiro, editar sob demanda ---- */
+  .meta-resumo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--azul-suave);
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+  .meta-resumo-txt { min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+  .meta-resumo-txt strong { font-family: 'Archivo', sans-serif; font-size: 1rem; color: var(--texto); }
+  .meta-resumo-txt span { font-size: .88rem; color: var(--texto-suave); }
+  .meta-editar {
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 0 16px;
+    background: #FFFFFF;
+    border: 1.5px solid var(--azul);
+    border-radius: 10px;
+    color: var(--azul);
+    font: inherit;
+    font-weight: 700;
+    font-size: .9rem;
+    cursor: pointer;
+  }
+  .meta-editar:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+  #le-etapa-1 .meta-lista:not(.editando) .meta-lista-campos { display: none; }
+  #le-etapa-1 .meta-lista.editando .meta-lista-campos { margin-top: 10px; grid-template-columns: 1fr; }
+  #le-etapa-1 .meta-lista-campos label { font-size: .85rem; }
+  #le-etapa-1 .meta-lista-campos input { padding: 10px 12px; }
+
+  /* ---- 2.4 Etapa 2: sobre a criança ---- */
+  .aluno-lista-titulo,
+  .aluno-lista-desc { display: none; }
+  .aluno-lista-grid { gap: 12px; }
+  .aluno-lista-field { font-size: .92rem; color: var(--texto); font-weight: 700; }
+  .aluno-lista-field input { padding: 11px 12px; }
+  .campo-dica { font-size: .82rem; font-weight: 400; }
+  #le-etapa-2 #bloco-preferencia { margin-top: 16px; padding-top: 14px; }
+
+  /* ---- 2.5 Critério do orçamento: linhas de rádio compactas ---- */
+  .preferencia-titulo { font-family: 'Archivo', sans-serif; font-size: .95rem; text-transform: none; letter-spacing: 0; margin: 0 0 8px; }
+  .preferencia-desc { display: none; }
+  .preferencia-options { grid-template-columns: 1fr; gap: 6px; }
+  .preferencia-option { position: relative; padding: 8px 12px 8px 42px; gap: 1px; min-height: 48px; justify-content: center; }
+  .preferencia-option::before {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    margin-top: -9px;
+    border-radius: 50%;
+    border: 2px solid #94A3B8;
+    background: #FFFFFF;
+  }
+  .preferencia-option.ativo::before { border-color: var(--azul); background: radial-gradient(circle, var(--azul) 0 4px, #FFFFFF 5px); }
+  .preferencia-option strong { font-size: .92rem; line-height: 1.2; }
+  .preferencia-option .pref-desc { font-size: .78rem; line-height: 1.25; }
+  #le-etapa-2 .preferencia-option .pref-desc { font-size: .78rem; }
+
+  /* ---- 2.6 Etapa 3: guia curto com o Azul no lugar do texto ---- */
+  .le-guia { padding: 10px 12px; gap: 10px; }
+  .le-guia-corpo { display: none; }
+  .le-guia-mob { display: block; flex: 1; min-width: 0; }
+  .le-guia-mob-titulo { margin: 0 0 6px; font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 1rem; color: var(--azul); }
+  .le-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .le-chips li { background: #FFFFFF; border: 1px solid #C9D6F2; border-radius: 999px; padding: 2px 10px; font-size: .78rem; font-weight: 700; color: var(--azul); line-height: 1.5; }
+  .le-guia-mascote { display: block; width: 52px; margin: -6px 0; }
+  .le-etapa-aviso { margin: 8px 0 10px; }
+
+  /* ---- 2.8 Cabeçalho dos itens ---- */
+  #le-etapa-3 .resultado-header { padding: 8px 12px; margin-bottom: 10px; gap: 6px 10px; border-radius: 12px; }
+  .resultado-header .info { font-size: .9rem; }
+  #btn-marcar-todos-tem { font-size: .78rem; padding: 6px 12px; }
+
+  /* ---- 2.7 Cards dos itens ---- */
+  .itens-grid { gap: 8px; }
+  .item-card { padding: 10px 10px 12px; gap: 6px; }
+  .item-card h4 { font-size: 1rem; }
+  .item-extras { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; }
+  .marca-preferencia-toggle { order: 1; display: inline-flex; align-items: center; min-height: 32px; font-size: .8rem; font-weight: 600; color: var(--azul); }
+  .item-img-buscar { order: 2; display: inline-flex; align-items: center; min-height: 32px; margin: 0; font-size: .78rem; font-weight: 400; color: var(--texto-suave); text-decoration: underline; }
+  .marca-preferencia-wrap { order: 3; flex-basis: 100%; margin: 0 0 4px; }
+  .marca-preferencia-input { padding: 10px 12px; }
+  .item-controls { flex-wrap: wrap; row-gap: 8px; gap: 6px; }
+  .qty-control { gap: 6px; padding: 3px; }
+  .qty-btn { width: 30px; height: 30px; }
+  .item-choice-option { padding: 8px 8px; font-size: .78rem; min-height: 36px; }
+
+  /* ---- 2.9 Barra compacta (passos 1 a 3): ~66px + safe-area ---- */
+  body[data-le-estado="resultado"] .le-barra {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: #FFFFFF;
+    border-top: 1px solid var(--cinza-borda);
+    box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08);
+    transform: translateY(100%);
+    visibility: hidden;
+    transition: transform .18s ease-out, visibility 0s linear .18s;
+  }
+  body[data-le-estado="resultado"] .le-barra.visivel { transform: none; visibility: visible; transition: transform .18s ease-out; }
+  body.le-digitando[data-le-estado="resultado"] .le-barra.visivel { visibility: hidden; transition: none; }
+  .le-barra-resumo { font-size: .95rem; color: var(--texto-suave); white-space: nowrap; }
+  .le-barra-resumo strong { color: var(--azul); font-size: 1.05rem; }
+  .le-barra-btn { min-height: 46px; padding: 0 20px; font-size: .95rem; white-space: nowrap; }
+  :root:has(body[data-le-estado="resultado"]) { scroll-padding-bottom: 88px; }
+
+  /* ---- 2.9/2.10 Etapa 4: CTA completo em fluxo normal, ações secundárias logo abaixo ---- */
+  .acoes-finais { position: static; padding: 16px; gap: 12px; flex-direction: column; align-items: stretch; box-shadow: none; border-radius: 16px; }
+  .acoes-finais .resumo { font-size: .95rem; text-align: center; }
+  .le-acoes-btns { width: 100%; display: grid; grid-template-columns: .85fr 1.15fr; gap: 8px; }
+  .le-acoes-btns #btn-enviar { grid-column: 1 / -1; order: -1; min-height: 52px; padding: 14px 16px; font-size: 1rem; justify-content: center; text-align: center; }
+  .le-acoes-btns .btn-ghost,
+  .le-acoes-btns .btn-adicionar { min-height: 44px; padding: 10px 6px; font-size: .84rem; white-space: nowrap; text-align: center; justify-content: center; }
+  .le-acoes-nota { margin: 0; text-align: center; }
+  .le-etapa-final { margin-bottom: 12px; }
+
+  /* ---- 2.11 Depois do envio: resumo + <details> ---- */
+  .le-depois-desk { display: none; }
+  .le-depois-mob { display: block; }
+  .le-depois { padding: 28px 0; } /* o padding global de section (64px) somava com o do container */
+  .le-depois-in { padding-top: 0; padding-bottom: 0; }
+  .le-depois-mob h2 { font-size: 1.25rem; margin: 0 0 6px; }
+  .le-depois-mob p { margin: 0 0 14px; font-size: .95rem; line-height: 1.45; }
+  .le-depois-det summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1.5px solid var(--azul);
+    border-radius: 999px;
+    color: var(--azul);
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+  .le-depois-det summary::-webkit-details-marker { display: none; }
+  .le-depois-det summary::after { content: '▾'; font-size: .9em; transition: transform .15s; }
+  .le-depois-det[open] summary::after { transform: rotate(180deg); }
+  .le-depois-det summary:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+  .le-depois-det ol { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 12px; counter-reset: passo; }
+  .le-depois-det li { position: relative; padding-left: 38px; font-size: .92rem; line-height: 1.45; color: var(--texto-suave); counter-increment: passo; }
+  .le-depois-det li::before {
+    content: counter(passo);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--azul);
+    color: #FFFFFF;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: .85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .le-depois-det li:last-child::before { background: var(--vermelho); }
+  .le-depois-det li strong { color: var(--texto); }
+
+  /* ---- 2.13 L A Cabral: faixa mais fina, só nesta página (componente global intacto) ---- */
+  .le-cabral .la-cabral-compact { padding: 5px 16px; }
+  .le-cabral .la-cabral-compact-btn { padding: 4px 10px; font-size: 11.5px; }
+  .le-cabral .la-cabral-compact-label { font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-le-estado="resultado"] .le-barra,
+  body[data-le-estado="resultado"] .le-barra.visivel { transition: none; }
+  .le-depois-det summary::after { transition: none; }
+}
+
+/* FAB do WhatsApp x CTA de análise (só Lista Escolar, só mobile): some enquanto o formulário de upload está na tela
+   (classe posta por lista.js) e durante a análise. Fora disso, o FAB segue como nas demais páginas. */
+@media (max-width: 640px) {
+  body.le-fab-oculto .fab-wpp,
+  body[data-le-estado="loading"] .fab-wpp { display: none; }
+}
