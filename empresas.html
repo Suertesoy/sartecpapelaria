@@ -49,9 +49,9 @@
       transition: border-color .15s, box-shadow .15s;
     }
     .form-input:focus { border-color: #1E3A8A; box-shadow: 0 0 0 3px rgba(30,58,138,0.12); }
-    .wpp-btn:hover { background: #1FB858 !important; }
-    .hero-wpp:hover { background: #1FB858 !important; }
-    .hero-cad:hover { background: #EFF3FB !important; }
+    .wpp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+    .wpp-btn::before { content: ''; width: 22px; height: 22px; flex-shrink: 0; background: currentColor; -webkit-mask: var(--wpp-icon) center / contain no-repeat; mask: var(--wpp-icon) center / contain no-repeat; }
+    .wpp-btn:hover { background: #166534 !important; }
     .pedido-btn:hover { background: #16306F !important; }
   </style>
 </head>
@@ -62,23 +62,31 @@
   <main>
 
     <!-- Hero — Empresas -->
-    <section class="internal-hero hero-empresas">
-      <div class="internal-hero-media">
-        <picture>
-          <source srcset="assets/hero-empresas-mobile.png" media="(max-width: 640px)" />
-          <img src="assets/hero-empresas-desktop.png?v=2" alt="Sartec Papelaria — atendimento para empresas com faturamento e desconto por volume" />
-        </picture>
-      </div>
-      <div class="internal-hero-content">
-        <div class="internal-hero-card">
-          <span class="internal-hero-badge">Atendimento para empresas</span>
-          <h1>Material de escritório com faturamento para empresas cadastradas.</h1>
-          <p>Peça orçamento pelo WhatsApp, consulte condições especiais por volume e combine entrega com a equipe da Sartec.</p>
-          <div class="internal-hero-btns">
-            <a href="#cadastro" id="cta-cadastrar-empresa" class="internal-hero-btn-wpp" style="background: var(--azul);">Cadastrar minha empresa</a>
-            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Quero%20falar%20sobre%20compras%20para%20minha%20empresa." target="_blank" rel="noopener" class="internal-hero-btn-sec">Falar no WhatsApp</a>
+    <section class="emp-hero" aria-labelledby="emp-hero-title">
+      <div class="emp-hero-inner">
+        <div class="emp-hero-copy">
+          <span class="ed-badge on-dark"><span class="ed-badge-dot" aria-hidden="true"></span>Compras para escritório</span>
+          <h1 id="emp-hero-title">Material de escritório com <em>faturamento</em> e condições por volume.</h1>
+          <p class="emp-hero-sub">Cadastre o seu negócio, peça orçamento direto com a equipe e combine reposições e entrega sem burocracia.</p>
+          <div class="emp-hero-btns">
+            <a href="#cadastro" id="cta-cadastrar-empresa" class="btn-ed btn-ed-light">Cadastrar minha empresa</a>
+            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Quero%20falar%20sobre%20compras%20para%20minha%20empresa." target="_blank" rel="noopener" class="btn-wa on-dark">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+              <span>Pedir orçamento no WhatsApp</span>
+            </a>
           </div>
+          <ul class="emp-fatos" role="list">
+            <li><strong>Faturamento</strong><span>Para cadastros aprovados pela Sartec</span></li>
+            <li><strong>Desconto por volume</strong><span>Condições combinadas com a equipe</span></li>
+            <li><strong>Atendimento direto</strong><span>Orçamento pelo WhatsApp</span></li>
+          </ul>
         </div>
+        <figure class="emp-hero-quadro">
+          <picture>
+            <source srcset="assets/hero-empresas-mobile.png" media="(max-width: 640px)" />
+            <img src="assets/hero-empresas-desktop.png?v=2" alt="Fachada da Sartec ao fundo e, na mesa, notebook, planilhas e material de escritório" width="1816" height="866" decoding="async" />
+          </picture>
+        </figure>
       </div>
     </section>
 
@@ -159,7 +167,7 @@
             </select>
           </label>
           <div id="emp-erro" style="display: none; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px; padding: 12px 16px; font-size: 14.5px; color: #B91C1C; font-weight: 600"></div>
-          <button onclick="empEnviar()" style="font-family: 'Source Sans 3', sans-serif; background: #25D366; color: #FFFFFF; border: none; cursor: pointer; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px" class="wpp-btn">Enviar cadastro pelo WhatsApp</button>
+          <button onclick="empEnviar()" style="font-family: 'Source Sans 3', sans-serif; background: #15803D; color: #FFFFFF; border: none; cursor: pointer; font-weight: 700; font-size: 17px; padding: 16px 28px; border-radius: 14px" class="wpp-btn">Enviar cadastro pelo WhatsApp</button>
           <p style="margin: 0; font-size: 13px; color: #94A3B8; line-height: 1.5; text-align: center">Nenhum dado fica salvo no site — a mensagem abre direto no seu WhatsApp para você revisar e enviar.</p>
         </div>
 
@@ -168,7 +176,7 @@
           <div style="background: #EFF3FB; border: 1px solid #DBE4F8; border-radius: 18px; padding: 32px; display: flex; flex-direction: column; gap: 12px">
             <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 21px; color: #1E3A8A">Sua empresa já é cadastrada?</strong>
             <p style="margin: 0; font-size: 16px; color: #475569; line-height: 1.55">Então é só mandar o pedido direto. A equipe verifica suas condições e retorna com o orçamento.</p>
-            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Nossa%20empresa%20j%C3%A1%20%C3%A9%20cadastrada%20na%20Sartec%20e%20queremos%20fazer%20um%20pedido." target="_blank" rel="noopener" style="align-self: flex-start; margin-top: 4px; background: #1E3A8A; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 16px; padding: 14px 24px; border-radius: 14px" class="pedido-btn">Fazer pedido no WhatsApp</a>
+            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Nossa%20empresa%20j%C3%A1%20%C3%A9%20cadastrada%20na%20Sartec%20e%20queremos%20fazer%20um%20pedido." target="_blank" rel="noopener" style="align-self: flex-start; margin-top: 4px" class="btn-wa"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span>Fazer pedido no WhatsApp</span></a>
           </div>
           <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; padding: 32px; display: flex; flex-direction: column; gap: 12px">
             <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 18px">Como funciona a aprovação</strong>
