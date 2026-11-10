@@ -2046,26 +2046,13 @@ section { padding: 64px 0; }
 }
 
 /* ======================== LISTA ESCOLAR (HOME) — GRADIENTE AZUL ======================== */
-/* Mesmos tons de azul usados no antigo bloco "Como funciona" desta página. */
+/* Mesmos tons de azul usados no antigo bloco "Como funciona" desta página. Sem aba/triângulo no topo:
+   Lista Escolar e Catálogo são jornadas independentes. */
 .lista-escolar-azul {
   background: linear-gradient(135deg, #1B3A8A 0%, #2049B0 55%, #1D3F9E 100%);
   border-top: none !important;
   border-bottom: none !important;
   position: relative;
-}
-.lista-escolar-azul::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 56px solid transparent;
-  border-right: 56px solid transparent;
-  border-top: 34px solid var(--cinza-fundo);
-  z-index: 2;
-  pointer-events: none;
 }
 
 /* ======================== HERO FULL WIDTH ======================== */
@@ -4451,7 +4438,7 @@ body.le-modal-aberto { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .parceira-card { transition: none; } .parceira-card:hover { transform: none; } }
 
 /* Faixa da Home: carrossel contínuo de logos */
-.parceiras-faixa { --item-w: 180px; --item-gap: 16px; --faixa-dur: 60s; background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 32px 0 26px; scroll-margin-top: calc(var(--header-h) + 8px); }
+.parceiras-faixa { --item-w: 180px; --item-gap: 16px; --faixa-n: 14; --faixa-dur: calc(var(--faixa-n) * 2.8s); background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 32px 0 26px; scroll-margin-top: calc(var(--header-h) + 8px); }
 .parceiras-faixa-head { max-width: var(--container); margin: 0 auto 10px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
 .parceiras-faixa-copy { min-width: 0; }
 .parceiras-faixa-head h2 { font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(1.3rem, 2.6vw, 1.85rem); line-height: 1.15; margin: 0; color: var(--texto); letter-spacing: -0.02em; }
@@ -4469,7 +4456,7 @@ body.le-modal-aberto { overflow: hidden; }
 /* as duas metades têm largura idêntica (itens + margens): -50% fecha o loop sem salto */
 @keyframes parceiras-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (max-width: 640px) {
-  .parceiras-faixa { --item-w: 156px; --item-gap: 8px; --faixa-dur: 50s; padding: 22px 0 18px; }
+  .parceiras-faixa { --item-w: 156px; --item-gap: 8px; --faixa-dur: calc(var(--faixa-n) * 2.4s); padding: 22px 0 18px; }
   .parceiras-faixa-head { padding: 0 16px; }
   .parceiras-faixa-cta { width: 100%; justify-content: center; }
 }
@@ -4629,21 +4616,6 @@ body.le-modal-aberto { overflow: hidden; }
 .hero-ed-copy h1 em { font-style: normal; color: var(--vermelho); display: inline-block; }
 .hero-ed-sub { margin: 0; max-width: 480px; font-size: clamp(1.02rem, 1.4vw, 1.18rem); line-height: 1.58; color: var(--texto-suave); }
 .hero-ed-btns { display: flex; flex-wrap: wrap; gap: 12px; }
-.hero-ed-proof {
-  list-style: none;
-  margin: 6px 0 0;
-  padding: 18px 0 0;
-  border-top: 1px solid rgba(15, 23, 42, 0.12);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 34px;
-}
-.hero-ed-proof li { display: flex; flex-direction: column; line-height: 1.25; }
-.hero-ed-proof a { display: flex; flex-direction: column; color: inherit; line-height: 1.25; }
-.hero-ed-proof a:hover strong { color: var(--vermelho); }
-.hero-ed-proof strong { font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 1.35rem; color: var(--azul); letter-spacing: -0.02em; transition: color .15s; }
-.hero-ed-proof span { font-size: .88rem; color: var(--texto-suave); }
-
 @media (max-width: 860px) {
   .hero-ed { display: flex; flex-direction: column; }
   .hero-ed-inner { order: 1; min-height: 0; padding: 40px 24px 8px; }
@@ -4657,7 +4629,6 @@ body.le-modal-aberto { overflow: hidden; }
   .hero-ed-copy h1 { font-size: clamp(30px, 8.6vw, 36px); }
   .hero-ed-btns { width: 100%; flex-direction: column; }
   .hero-ed-btns .btn-ed { width: 100%; }
-  .hero-ed-proof { display: none; }
   .hero-ed-bg { height: 300px; }
   .hero-ed-bg img { object-position: center bottom; }
 }

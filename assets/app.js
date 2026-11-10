@@ -356,7 +356,7 @@ function renderEscolasFaixa() {
     </ul>`;
 
   mount.innerHTML = `
-    <section class="parceiras-faixa" id="parceiras" aria-labelledby="parceiras-faixa-titulo">
+    <section class="parceiras-faixa" id="parceiras" aria-labelledby="parceiras-faixa-titulo" style="--faixa-n:${ESCOLAS_PARCEIRAS.length}">
       <div class="parceiras-faixa-head">
         <div class="parceiras-faixa-copy">
           <h2 id="parceiras-faixa-titulo"><span class="parceiras-faixa-num">${ESCOLAS_PARCEIRAS.length}</span> escolas já são parceiras da Sartec</h2>

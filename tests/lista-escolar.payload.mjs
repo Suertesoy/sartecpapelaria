@@ -275,14 +275,14 @@ export async function fasePayload(ctx) {
     await s.ctx.close();
   });
 
-  await teste('F3 1440px: o FAB continua visível e igual no upload (desktop sem regressão)', async () => {
+  await teste('F3 1440px: WhatsApp único no desktop — botão do cabeçalho visível e FAB oculto', async () => {
     const s = await abrir(browser, base, { viewport: { width: 1440, height: 900 } });
     const { page } = s;
-    await page.waitForSelector('.fab-wpp');
+    await page.waitForSelector('.btn-wpp-header');
     await page.evaluate(() => document.getElementById('btn-analisar').scrollIntoView({ block: 'center' }));
     await page.waitForTimeout(250);
-    ok(await page.locator('.fab-wpp').evaluate(e => getComputedStyle(e).display !== 'none'), 'FAB visível no desktop');
-    ok(await page.evaluate(() => !document.body.classList.contains('le-fab-oculto') || getComputedStyle(document.querySelector('.fab-wpp')).display !== 'none'), 'classe não afeta o desktop');
+    ok(await page.locator('.btn-wpp-header').evaluate(e => getComputedStyle(e).display !== 'none'), 'botão WhatsApp do cabeçalho visível no desktop');
+    ok(await page.locator('.fab-wpp').evaluate(e => getComputedStyle(e).display === 'none'), 'FAB oculto no desktop (regra de WhatsApp único)');
     await s.ctx.close();
   });
 

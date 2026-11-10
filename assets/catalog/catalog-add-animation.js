@@ -28,6 +28,11 @@ let hideTimer = null;
 let exitTimer = null;
 let repositionBound = false;
 let currentGetTarget = getListTargetEl;
+// Modo "local" (demo da home): chip e papel vivem DENTRO deste contêiner (position: absolute),
+// rolam junto com a seção e nunca ficam soltos sobre a página. Sem contêiner = comportamento
+// original do catálogo real (position: fixed no body).
+let currentContainer = null;
+const activeFlights = new Set();
 
 function reducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -69,29 +74,50 @@ function flyChip(originEl, targetEl, onArrive) {
     return;
   }
   const targetRect = targetEl.getBoundingClientRect();
-  const from = rectCenter(originRect);
-  const to = rectCenter(targetRect);
+  let from = rectCenter(originRect);
+  let to = rectCenter(targetRect);
+
+  const container = currentContainer;
+  if (container) {
+    const c = container.getBoundingClientRect();
+    from = { x: from.x - c.left, y: from.y - c.top };
+    to = { x: to.x - c.left, y: to.y - c.top };
+  }
 
   const chip = document.createElement('div');
-  chip.className = 'cat-fly-chip';
+  chip.className = container ? 'cat-fly-chip cat-fly-chip-local' : 'cat-fly-chip';
   chip.setAttribute('aria-hidden', 'true');
   chip.textContent = '📋';
   chip.style.left = `${from.x}px`;
   chip.style.top = `${from.y}px`;
-  document.body.appendChild(chip);
+  (container || document.body).appendChild(chip);
 
   let settled = false;
+  let fallbackId = 0;
+  const flight = {
+    cancel() {
+      if (settled) return;
+      settled = true;
+      clearTimeout(fallbackId);
+      chip.remove();
+      activeFlights.delete(flight);
+    },
+  };
   const finish = () => {
     if (settled) return;
     settled = true;
+    clearTimeout(fallbackId);
     chip.remove();
+    activeFlights.delete(flight);
     onArrive();
   };
+  activeFlights.add(flight);
 
   chip.addEventListener('transitionend', finish, { once: true });
-  window.setTimeout(finish, FLIGHT_FALLBACK_MS);
+  fallbackId = window.setTimeout(finish, FLIGHT_FALLBACK_MS);
 
   requestAnimationFrame(() => {
+    if (settled) return;
     chip.style.left = `${to.x}px`;
     chip.style.top = `${to.y}px`;
     chip.classList.add('cat-fly-chip-flying');
@@ -100,8 +126,18 @@ function flyChip(originEl, targetEl, onArrive) {
 
 // ---- Papel de confirmação ("Minha lista") ----
 
+function mountPaper() {
+  if (!paperEl) return;
+  const host = currentContainer || document.body;
+  paperEl.classList.toggle('cat-list-paper-local', !!currentContainer);
+  if (paperEl.parentNode !== host) host.appendChild(paperEl);
+}
+
 function ensurePaperEl() {
-  if (paperEl) return paperEl;
+  if (paperEl) {
+    mountPaper();
+    return paperEl;
+  }
   paperEl = document.createElement('div');
   paperEl.className = 'cat-list-paper';
   paperEl.hidden = true;
@@ -115,12 +151,12 @@ function ensurePaperEl() {
 
   paperEl.appendChild(label);
   paperEl.appendChild(linesContainerEl);
-  document.body.appendChild(paperEl);
+  mountPaper();
 
   if (!repositionBound) {
     repositionBound = true;
     const reposition = () => {
-      if (!paperEl.hidden) positionPaper();
+      if (!paperEl.hidden && !currentContainer) positionPaper();
     };
     window.addEventListener('resize', reposition);
     window.addEventListener('scroll', reposition, { passive: true });
@@ -135,6 +171,17 @@ function positionPaper() {
   const margin = 12;
   const w = paperEl.offsetWidth || 200;
   const h = paperEl.offsetHeight || 90;
+
+  if (currentContainer) {
+    // relativo ao contêiner da demo: acompanha a rolagem da seção e nunca sai dela
+    const c = currentContainer.getBoundingClientRect();
+    const maxLeft = Math.max(8, c.width - 8 - w);
+    const left = Math.max(8, Math.min(rect.right - c.left - w, maxLeft));
+    const top = Math.max(8, rect.bottom - c.top + 10);
+    paperEl.style.left = `${left}px`;
+    paperEl.style.top = `${top}px`;
+    return;
+  }
 
   let left = rect.right - w;
   left = Math.max(margin, Math.min(left, window.innerWidth - margin - w));
@@ -264,11 +311,13 @@ function enqueueLine(name) {
  * papel — o fly + bump acontece sempre.
  * @param {HTMLElement|null} originEl botão que originou a adição (Adicionar, Adicionar com detalhes, opção confirmada...)
  * @param {string} productName nome do produto adicionado
- * @param {{ getTarget?: () => HTMLElement|null }} [opts] permite apontar para um "Minha lista" diferente do
- *   catálogo real (ex.: a demonstração da home, ver assets/home-catalog-demo.js). Sem opts, comportamento inalterado.
+ * @param {{ getTarget?: () => HTMLElement|null, container?: HTMLElement|null }} [opts] permite apontar para um
+ *   "Minha lista" diferente do catálogo real (ex.: a demonstração da home, ver assets/home-catalog-demo.js) e
+ *   ancorar chip e papel dentro de um contêiner (position: relative) em vez do body. Sem opts, comportamento inalterado.
  */
 export function celebrateAdd(originEl, productName, opts = {}) {
   currentGetTarget = opts.getTarget || getListTargetEl;
+  currentContainer = opts.container || null;
   const targetEl = currentGetTarget();
   const showPaperForThisAdd = sessionAddCount < MAX_PAPER_LINES;
   sessionAddCount++;
@@ -297,6 +346,7 @@ export function celebrateAdd(originEl, productName, opts = {}) {
  * loop da home para reiniciar cada ciclo como se fosse uma nova sessão.
  */
 export function resetCelebrateState() {
+  activeFlights.forEach((f) => f.cancel());
   sessionAddCount = 0;
   writtenNames = [];
   lineQueue = [];
@@ -309,4 +359,12 @@ export function resetCelebrateState() {
     paperEl.classList.remove('cat-list-paper-visible', 'cat-list-paper-exit');
     if (linesContainerEl) linesContainerEl.innerHTML = '';
   }
+}
+
+/**
+ * Interrompe de vez qualquer animação em andamento: cancela chips em voo, limpa timers,
+ * fila e papel. A demo da home chama isto ao sair da seção.
+ */
+export function cancelCelebrations() {
+  resetCelebrateState();
 }

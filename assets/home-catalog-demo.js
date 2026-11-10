@@ -7,7 +7,7 @@
    (aria-hidden), sem tocar no localStorage nem na lista real.
    ====================================================== */
 
-import { celebrateAdd, resetCelebrateState } from './catalog/catalog-add-animation.js';
+import { celebrateAdd, resetCelebrateState, cancelCelebrations } from './catalog/catalog-add-animation.js';
 
 const PRODUCTS = [
   { key: 'caderno', name: 'Caderno' },
@@ -46,7 +46,11 @@ function initHomeCatalogDemo() {
   const timers = [];
 
   function after(ms, fn) {
-    const id = window.setTimeout(fn, ms);
+    const id = window.setTimeout(() => {
+      const i = timers.indexOf(id);
+      if (i !== -1) timers.splice(i, 1);
+      fn();
+    }, ms);
     timers.push(id);
     return id;
   }
@@ -105,7 +109,7 @@ function initHomeCatalogDemo() {
 
         // Mesma animação (voo até "Minha lista" + papel escrevendo o nome) do
         // catálogo real — só aponta para o pill decorativo desta demo.
-        celebrateAdd(it.addEl, it.name, { getTarget: () => listPill });
+        celebrateAdd(it.addEl, it.name, { getTarget: () => listPill, container: card });
 
         after(240, () => {
           if (token !== cycleToken) return;
@@ -155,6 +159,9 @@ function initHomeCatalogDemo() {
   function stop() {
     cycleToken++; // invalida quaisquer callbacks pendentes
     clearTimers();
+    // chip em voo, papel e fila: nada pode sobreviver fora da seção
+    cancelCelebrations();
+    cursor.classList.remove('hcp-demo-cursor-show', 'hcp-demo-cursor-click');
   }
 
   window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', () => {

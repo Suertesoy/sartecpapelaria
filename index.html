@@ -38,12 +38,6 @@
   <style>
     html { scroll-behavior: smooth; }
 
-    /* --- Service cards como links --- */
-    a.service-card { color: var(--texto); }
-    a.service-card:hover { color: var(--azul); }
-    a.service-card h3 { color: var(--texto); }
-    a.service-card:hover h3 { color: var(--azul); }
-
     /* --- Faixa L A Cabral --- */
     .la-cabral-faixa { transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease; }
     .la-cabral-faixa:hover { transform: translateY(-2px); box-shadow: 0 20px 56px rgba(13,27,22,0.45), 0 6px 24px rgba(34,197,94,0.20) !important; border-color: rgba(34,197,94,0.48) !important; }
@@ -76,7 +70,6 @@
       </div>
       <div class="hero-ed-inner">
         <div class="hero-ed-copy">
-          <span class="ed-badge"><span class="ed-badge-dot" aria-hidden="true"></span>Há 32 anos em São José dos Campos</span>
           <h1 id="hero-title">Envie a lista, escolha os produtos, <em>peça o orçamento.</em></h1>
           <p class="hero-ed-sub">São 32 anos de balcão. No site, você envia a lista escolar por foto ou PDF, monta um pedido no catálogo e a equipe confirma opções e valores com você.</p>
           <div class="hero-ed-btns">
@@ -87,11 +80,6 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
             <span>Prefere conversar? Chame a equipe no WhatsApp</span>
           </a>
-          <ul class="hero-ed-proof" role="list">
-            <li><strong>32 anos</strong><span>de história na cidade</span></li>
-            <li><a href="#parceiras"><strong>14 escolas</strong><span>já são parceiras</span></a></li>
-            <li><strong>Equipe</strong><span>confere cada pedido</span></li>
-          </ul>
         </div>
       </div>
     </section>
@@ -103,68 +91,7 @@
     <div id="escolas-faixa-mount"></div>
 
     <!-- =====================================================
-         2. FAIXA ENTREGA GRÁTIS
-         ===================================================== -->
-    <div id="delivery-faixa-mount"></div>
-
-    <!-- =====================================================
-         2B. PRÉVIA DO CATÁLOGO DE PRODUTOS
-         Demonstração estática (aria-hidden) — a experiência real
-         de busca, listas e adição vive em produtos.html.
-         ===================================================== -->
-    <section class="hcp-section" aria-labelledby="hcp-title">
-      <div class="container hcp-grid">
-
-        <div class="hcp-preview" id="hcp-demo" aria-hidden="true">
-          <div class="hcp-preview-card">
-            <div class="hcp-preview-bar">
-              <span class="hcp-preview-search">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <span>Buscar produto</span>
-              </span>
-              <span class="hcp-preview-list" id="hcp-list-pill">📋 Minha lista <span class="hcp-preview-list-count" id="hcp-list-count">0</span></span>
-            </div>
-            <div class="hcp-preview-products">
-              <div class="hcp-preview-product">
-                <div class="hcp-preview-product-media"><img src="assets/catalog/images/caderno_universitario_10_materias.png" alt="" loading="lazy" width="120" height="120" /></div>
-                <span class="hcp-preview-product-name">Caderno</span>
-                <span class="hcp-preview-product-add" id="hcp-add-caderno">+ Adicionar</span>
-              </div>
-              <div class="hcp-preview-product">
-                <div class="hcp-preview-product-media"><img src="assets/catalog/images/caneta_esferografica.png" alt="" loading="lazy" width="120" height="120" /></div>
-                <span class="hcp-preview-product-name">Caneta</span>
-                <span class="hcp-preview-product-add" id="hcp-add-caneta">+ Adicionar</span>
-              </div>
-              <div class="hcp-preview-product">
-                <div class="hcp-preview-product-media"><img src="assets/catalog/images/estojo_triplo.png" alt="" loading="lazy" width="120" height="120" /></div>
-                <span class="hcp-preview-product-name">Estojo</span>
-                <span class="hcp-preview-product-add" id="hcp-add-estojo">+ Adicionar</span>
-              </div>
-            </div>
-            <div class="hcp-preview-ready" id="hcp-preview-ready">
-              <span class="hcp-preview-ready-dot">✓</span>
-              <span>Lista pronta para enviar ao orçamento</span>
-            </div>
-            <div class="hcp-demo-cursor" id="hcp-demo-cursor" aria-hidden="true"></div>
-          </div>
-        </div>
-
-        <div class="hcp-copy">
-          <span class="kicker">Catálogo interativo</span>
-          <h2 id="hcp-title">Escolha os produtos e monte sua lista de orçamento.</h2>
-          <p>Explore as categorias, adicione o que procura e informe detalhes como quantidade, cor, marca ou modelo. Depois, envie a lista pronta para a equipe confirmar opções e valores pelo WhatsApp.</p>
-          <p class="hcp-flow">Explore os produtos → monte sua lista → envie para orçamento</p>
-          <div>
-            <a href="produtos.html" class="hcp-cta">Explorar o catálogo</a>
-          </div>
-          <p class="hcp-cta-note">Sem pagamento no site. A equipe confirma disponibilidade, opções e valores antes do orçamento.</p>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =====================================================
-         3. SEÇÃO LISTA ESCOLAR
+         2. LISTA ESCOLAR (logo após as escolas parceiras)
          ===================================================== -->
     <section class="lista-escolar-azul" style="padding: 0;">
       <div style="max-width: 1180px; margin: 0 auto; padding: clamp(48px, 9vw, 80px) 20px;">
@@ -354,55 +281,65 @@
     </section>
 
     <!-- =====================================================
-         4. O QUE OFERECEMOS
+         3B. CATÁLOGO INTERATIVO (jornada independente da Lista Escolar)
+         Demonstração estática (aria-hidden) — a experiência real
+         de busca, listas e adição vive em produtos.html.
          ===================================================== -->
-    <section style="background: #FFFFFF; padding: clamp(44px, 8vw, 72px) 0;">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 0 20px;">
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 44px; max-width: 640px;">
-          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 32px; margin: 0; letter-spacing: -0.01em;">O que oferecemos</h2>
-          <p style="margin: 0; font-size: 18px; color: #475569; line-height: 1.5;">Ferramentas e atendimento para resolver materiais, listas, cópias e compras para empresas.</p>
+    <section class="hcp-section" aria-labelledby="hcp-title">
+      <div class="container hcp-grid">
+
+        <div class="hcp-preview" id="hcp-demo" aria-hidden="true">
+          <div class="hcp-preview-card">
+            <div class="hcp-preview-bar">
+              <span class="hcp-preview-search">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Buscar produto</span>
+              </span>
+              <span class="hcp-preview-list" id="hcp-list-pill">📋 Minha lista <span class="hcp-preview-list-count" id="hcp-list-count">0</span></span>
+            </div>
+            <div class="hcp-preview-products">
+              <div class="hcp-preview-product">
+                <div class="hcp-preview-product-media"><img src="assets/catalog/images/caderno_universitario_10_materias.png" alt="" loading="lazy" width="120" height="120" /></div>
+                <span class="hcp-preview-product-name">Caderno</span>
+                <span class="hcp-preview-product-add" id="hcp-add-caderno">+ Adicionar</span>
+              </div>
+              <div class="hcp-preview-product">
+                <div class="hcp-preview-product-media"><img src="assets/catalog/images/caneta_esferografica.png" alt="" loading="lazy" width="120" height="120" /></div>
+                <span class="hcp-preview-product-name">Caneta</span>
+                <span class="hcp-preview-product-add" id="hcp-add-caneta">+ Adicionar</span>
+              </div>
+              <div class="hcp-preview-product">
+                <div class="hcp-preview-product-media"><img src="assets/catalog/images/estojo_triplo.png" alt="" loading="lazy" width="120" height="120" /></div>
+                <span class="hcp-preview-product-name">Estojo</span>
+                <span class="hcp-preview-product-add" id="hcp-add-estojo">+ Adicionar</span>
+              </div>
+            </div>
+            <div class="hcp-preview-ready" id="hcp-preview-ready">
+              <span class="hcp-preview-ready-dot">✓</span>
+              <span>Lista pronta para enviar ao orçamento</span>
+            </div>
+            <div class="hcp-demo-cursor" id="hcp-demo-cursor" aria-hidden="true"></div>
+          </div>
         </div>
-        <div class="services">
 
-          <a href="lista-escolar.html" class="service-card">
-            <div class="service-icon azul">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-            </div>
-            <h3>Lista Escolar</h3>
-            <p>Foto ou PDF da lista, itens organizados e orçamento direto no WhatsApp.</p>
-            <span class="arrow">Enviar lista →</span>
-          </a>
-
-          <a href="copias.html" class="service-card">
-            <div class="service-icon vermelho">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            </div>
-            <h3>Cópias e Impressão</h3>
-            <p>Envie o arquivo pelo WhatsApp exclusivo do setor. Orçamento com prazo na hora.</p>
-            <span class="arrow">Pedir cópias →</span>
-          </a>
-
-          <a href="produtos.html" class="service-card">
-            <div class="service-icon azul">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            </div>
-            <h3>Produtos</h3>
-            <p>Explore o catálogo, adicione produtos com ou sem detalhes e envie sua lista para orçamento.</p>
-            <span class="arrow">Montar lista →</span>
-          </a>
-
-          <a href="empresas.html" class="service-card">
-            <div class="service-icon vermelho">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
-            </div>
-            <h3>Empresas</h3>
-            <p>Compras por faturamento para empresas cadastradas, com desconto por volume e entrega combinada.</p>
-            <span class="arrow">Faturar empresa →</span>
-          </a>
-
+        <div class="hcp-copy">
+          <span class="kicker">Catálogo interativo</span>
+          <h2 id="hcp-title">Escolha os produtos e monte sua lista de orçamento.</h2>
+          <p>Explore as categorias, adicione o que procura e informe detalhes como quantidade, cor, marca ou modelo. Depois, envie a lista pronta para a equipe confirmar opções e valores pelo WhatsApp.</p>
+          <p class="hcp-flow">Explore os produtos → monte sua lista → envie para orçamento</p>
+          <div>
+            <a href="produtos.html" class="hcp-cta">Explorar o catálogo</a>
+          </div>
+          <p class="hcp-cta-note">Sem pagamento no site. A equipe confirma disponibilidade, opções e valores antes do orçamento.</p>
         </div>
+
       </div>
     </section>
+
+    <!-- =====================================================
+         3C. FAIXA ENTREGA GRÁTIS (depois do catálogo)
+         ===================================================== -->
+    <div id="delivery-faixa-mount"></div>
 
     <!-- =====================================================
          5. POR QUE ESCOLHER A SARTEC
