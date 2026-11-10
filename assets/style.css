@@ -4404,3 +4404,47 @@ body.le-modal-aberto { overflow: hidden; }
   body.le-fab-oculto .fab-wpp,
   body[data-le-estado="loading"] .fab-wpp { display: none; }
 }
+
+/* ======================== ESCOLAS PARCEIRAS (logos oficiais) ======================== */
+.parceiras-sec { background: #FFFFFF; }
+.parceiras-wrap { max-width: 1180px; margin: 0 auto; padding: 72px 20px; }
+.parceiras-head { max-width: 720px; margin: 0 auto 40px; text-align: center; }
+.parceiras-head h2 { font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -0.01em; margin: 0 0 12px; }
+.parceiras-head p { margin: 0; font-size: 17px; color: #475569; line-height: 1.55; }
+.parceiras-grid { --cols: 4; --gap: 20px; list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap); }
+.parceira-card { flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); aspect-ratio: 3 / 2; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; overflow: hidden; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.parceira-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30,58,138,.10); border-color: #CBD5E1; }
+.parceira-card img { display: block; width: 100%; height: 100%; object-fit: contain; }
+@media (max-width: 960px) { .parceiras-grid { --cols: 3; } }
+@media (max-width: 640px) {
+  .parceiras-wrap { padding: 52px 16px; }
+  .parceiras-grid { --cols: 2; --gap: 12px; }
+  .parceira-card { border-radius: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .parceira-card { transition: none; } .parceira-card:hover { transform: none; } }
+
+/* Faixa da Home: carrossel contínuo de logos */
+.parceiras-faixa { --item-w: 180px; --item-gap: 16px; --faixa-dur: 60s; background: #FFFFFF; border-top: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; padding: 28px 0 24px; }
+.parceiras-faixa-head { max-width: var(--container); margin: 0 auto 6px; padding: 0 20px; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.parceiras-faixa-head h2 { font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.15rem; margin: 0; color: var(--azul); letter-spacing: -0.01em; }
+.parceiras-faixa-head a { font-weight: 700; font-size: .95rem; color: var(--vermelho); }
+.parceiras-faixa-head a:hover { color: var(--vermelho-escuro); text-decoration: underline; }
+.parceiras-faixa-viewport { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
+.parceiras-faixa-track { display: flex; width: max-content; animation: parceiras-scroll var(--faixa-dur) linear infinite; will-change: transform; }
+.parceiras-faixa-viewport:hover .parceiras-faixa-track { animation-play-state: paused; }
+.parceiras-faixa-set { list-style: none; margin: 0; padding: 0; display: flex; flex-shrink: 0; }
+.parceiras-faixa-item { flex: 0 0 var(--item-w); width: var(--item-w); aspect-ratio: 3 / 2; margin-right: var(--item-gap); }
+.parceiras-faixa-item img { display: block; width: 100%; height: 100%; object-fit: contain; }
+/* as duas metades têm largura idêntica (itens + margens): -50% fecha o loop sem salto */
+@keyframes parceiras-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (max-width: 640px) {
+  .parceiras-faixa { --item-w: 156px; --item-gap: 8px; --faixa-dur: 50s; padding: 22px 0 18px; }
+  .parceiras-faixa-head { padding: 0 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .parceiras-faixa-viewport { -webkit-mask-image: none; mask-image: none; }
+  .parceiras-faixa-track { animation: none; display: block; width: auto; padding: 0 16px; }
+  .parceiras-faixa-set { flex-wrap: wrap; justify-content: center; flex-shrink: 1; }
+  .parceiras-faixa-item { margin: 0 calc(var(--item-gap) / 2); }
+  .parceiras-faixa-set[aria-hidden="true"] { display: none; }
+}

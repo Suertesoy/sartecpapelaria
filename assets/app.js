@@ -327,32 +327,46 @@ function renderDeliveryFaixa() {
 /* =========================================================
    FAIXA DE PARCERIA COM ESCOLAS (MARQUEE)
    ========================================================= */
+const ESCOLAS_PARCEIRAS = [
+  { slug: 'aster', nome: 'Colégio Aster' },
+  { slug: 'azimute', nome: 'Centro Educacional Azimute' },
+  { slug: 'castelinho-novo', nome: 'Escola Castelinho Novo' },
+  { slug: 'catavento', nome: 'Colégio Catavento' },
+  { slug: 'cesc', nome: 'CESC – Centro Educacional Sonho de Criança' },
+  { slug: 'escola-crista-batista', nome: 'Escola Cristã Batista' },
+  { slug: 'espaco-natural', nome: 'Escola Espaço Natural' },
+  { slug: 'jesus-eucaristico', nome: 'Educandário Jesus Eucarístico' },
+  { slug: 'maria-das-dores', nome: 'Maria das Dores – Escola de Educação Infantil' },
+  { slug: 'moppe', nome: 'Moppe' },
+  { slug: 'serra-e-mar', nome: 'Serra&Mar' },
+  { slug: 'teofilo-rezende', nome: 'Teófilo Rezende' },
+  { slug: 'vale-magico', nome: 'Escola Infantil Vale Mágico' },
+  { slug: 'vera-magaldi', nome: 'Centro Educacional Vera Magaldi' },
+];
+
 function renderEscolasFaixa() {
   const mount = document.getElementById('escolas-faixa-mount');
   if (!mount) return;
 
-  const items = [
-    { ico: '🏫', texto: 'Seja uma escola parceira' },
-    { ico: '✨', texto: 'Veja condições e benefícios' },
-    { ico: '🏫', texto: 'Sua escola pode ser parceira' },
-    { ico: '📋', texto: 'Entenda como indicar a Sartec' },
-  ];
-
-  const pills = items.map(i => `
-    <a href="escolas.html" class="escola-pill" tabindex="-1" aria-hidden="true">
-      <span class="badge">${i.ico}</span>
-      <span>${i.texto}</span>
-    </a>
-  `).join('');
+  const img = (e, decorativa) => `<img src="assets/escolas-parceiras/${e.slug}.webp" alt="${decorativa ? '' : 'Logomarca ' + e.nome.replace(/&/g, '&amp;')}" width="600" height="400" loading="lazy" decoding="async" />`;
+  // A segunda cópia existe só para o loop visual; fica oculta para tecnologias assistivas.
+  const lista = (decorativa) => `
+    <ul class="parceiras-faixa-set" role="list"${decorativa ? ' aria-hidden="true"' : ''}>
+      ${ESCOLAS_PARCEIRAS.map(e => `<li class="parceiras-faixa-item">${img(e, decorativa)}</li>`).join('')}
+    </ul>`;
 
   mount.innerHTML = `
-    <a href="escolas.html" class="escolas-faixa-link" aria-label="Saiba mais sobre parceria com escolas">
-      <div class="escolas-faixa">
-        <div class="faixa-track">
-          ${pills}${pills}${pills}${pills}
+    <section class="parceiras-faixa" aria-labelledby="parceiras-faixa-titulo">
+      <div class="parceiras-faixa-head">
+        <h2 id="parceiras-faixa-titulo">Escolas parceiras</h2>
+        <a href="escolas.html">Conheça a parceria <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="parceiras-faixa-viewport">
+        <div class="parceiras-faixa-track">
+          ${lista(false)}${lista(true)}
         </div>
       </div>
-    </a>
+    </section>
   `;
 }
 
