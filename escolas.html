@@ -36,32 +36,6 @@
   <link rel="stylesheet" href="assets/style.css" />
   <style>
     html { scroll-behavior: smooth; }
-    .faq-item { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; }
-    .faq-item summary {
-      list-style: none;
-      cursor: pointer;
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-    .faq-item summary::-webkit-details-marker { display: none; }
-    .faq-item summary::marker { display: none; }
-    .faq-item summary strong { font-size: 17px; font-weight: 700; color: #0F172A; flex: 1; }
-    .faq-item summary::after {
-      content: '+';
-      font-size: 22px;
-      color: #1E3A8A;
-      font-weight: 700;
-      flex-shrink: 0;
-      line-height: 1;
-      user-select: none;
-    }
-    .faq-item[open] summary::after { content: '−'; }
-    .faq-body { padding: 0 24px 20px; font-size: 15.5px; color: #475569; line-height: 1.6; margin: 0; }
-    .wpp-btn:hover { background: #16306F !important; }
-    .hero-btn:hover { background: #EFF3FB !important; }
   </style>
 </head>
 <body>
@@ -70,169 +44,46 @@
 
   <main>
 
-    <!-- Hero — Escolas Parceiras: a parceria já é realidade, então as logomarcas abrem a página -->
-    <section class="esc-hero" aria-labelledby="esc-hero-title">
-      <div class="esc-hero-top">
-        <div class="esc-hero-copy">
-          <span class="ed-badge"><span class="ed-badge-dot" aria-hidden="true"></span>Escolas parceiras</span>
-          <h1 id="esc-hero-title"><span class="num">14</span> escolas já confiam na Sartec. A sua pode ser a próxima.</h1>
-          <p class="esc-hero-sub">As famílias das escolas parceiras têm desconto diferenciado nas listas escolares e um jeito simples de organizar a volta às aulas: enviam a lista por foto ou PDF e recebem o orçamento pelo WhatsApp.</p>
-          <div class="esc-hero-btns">
-            <a href="lista-escolar.html" class="btn-ed btn-ed-primary">Enviar lista escolar</a>
-            <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20saber%20mais%20sobre%20parceria%20para%20escolas." target="_blank" rel="noopener" class="btn-wa">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-              <span>Quero a parceria na minha escola</span>
-            </a>
-          </div>
-        </div>
-        <div class="esc-hero-scene" aria-hidden="true">
-          <span class="le-fala">Já são 14!</span>
-          <picture><source srcset="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-comemorando.webp" type="image/webp" /><img src="assets/mascotes-sartec/lista-escolar/web/mascote-dupla-comemorando.png" alt="" width="640" height="488" decoding="async" /></picture>
-        </div>
-      </div>
-      <div class="esc-hero-wall" id="escolas-parceiras">
-        <h2 class="esc-wall-label" id="parceiras-titulo">As escolas parceiras da Sartec</h2>
-        <ul class="parceiras-grid" role="list" aria-labelledby="parceiras-titulo">
-          <li class="parceira-card"><img src="assets/escolas-parceiras/aster.webp" alt="Logomarca Colégio Aster" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/azimute.webp" alt="Logomarca Centro Educacional Azimute" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/castelinho-novo.webp" alt="Logomarca Escola Castelinho Novo" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/catavento.webp" alt="Logomarca Colégio Catavento" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/cesc.webp" alt="Logomarca CESC – Centro Educacional Sonho de Criança" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/escola-crista-batista.webp" alt="Logomarca Escola Cristã Batista" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/espaco-natural.webp" alt="Logomarca Escola Espaço Natural" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/jesus-eucaristico.webp" alt="Logomarca Educandário Jesus Eucarístico" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/maria-das-dores.webp" alt="Logomarca Maria das Dores – Escola de Educação Infantil" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/moppe.webp" alt="Logomarca Moppe" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/serra-e-mar.webp" alt="Logomarca Serra&amp;Mar" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/teofilo-rezende.webp" alt="Logomarca Teófilo Rezende" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/vale-magico.webp" alt="Logomarca Escola Infantil Vale Mágico" width="600" height="400" loading="lazy" decoding="async" /></li>
-          <li class="parceira-card"><img src="assets/escolas-parceiras/vera-magaldi.webp" alt="Logomarca Centro Educacional Vera Magaldi" width="600" height="400" loading="lazy" decoding="async" /></li>
-        </ul>
-      </div>
-    </section>
+    <!-- Hero — vitrine das escolas parceiras: as logomarcas são o elemento principal -->
+<section class="esc-hero" aria-labelledby="esc-hero-title">
+  <div class="esc-hero-top">
+    <h1 id="esc-hero-title"><span class="num">14</span> escolas parceiras. <em>Desconto diferenciado</em> na lista escolar.</h1>
+    <p class="esc-hero-sub">Se a sua escola está entre elas, a lista escolar já conta com condições especiais na Sartec.</p>
+    <a href="lista-escolar.html" class="btn-ed btn-ed-primary">Enviar lista escolar</a>
+  </div>
+  <div class="esc-hero-wall" id="escolas-parceiras">
+    <h2 class="sr-only" id="parceiras-titulo">Escolas parceiras da Sartec</h2>
+    <ul class="parceiras-grid" role="list" aria-labelledby="parceiras-titulo">
+          <li class="parceira-card" style="--s:1.070;--tx:0.08%;--ty:0.13%"><img src="assets/escolas-parceiras/aster.webp" alt="Logomarca Colégio Aster" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.082;--tx:0.08%;--ty:1.13%"><img src="assets/escolas-parceiras/azimute.webp" alt="Logomarca Centro Educacional Azimute" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.077;--tx:0.17%;--ty:-0.13%"><img src="assets/escolas-parceiras/castelinho-novo.webp" alt="Logomarca Escola Castelinho Novo" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.091;--tx:0.08%;--ty:0.13%"><img src="assets/escolas-parceiras/catavento.webp" alt="Logomarca Colégio Catavento" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.176;--tx:0.08%;--ty:0.13%"><img src="assets/escolas-parceiras/cesc.webp" alt="Logomarca CESC – Centro Educacional Sonho de Criança" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.085;--tx:0.17%;--ty:0.13%"><img src="assets/escolas-parceiras/escola-crista-batista.webp" alt="Logomarca Escola Cristã Batista" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.077;--tx:0.17%;--ty:0.13%"><img src="assets/escolas-parceiras/espaco-natural.webp" alt="Logomarca Escola Espaço Natural" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.085;--tx:0.17%;--ty:0.13%"><img src="assets/escolas-parceiras/jesus-eucaristico.webp" alt="Logomarca Educandário Jesus Eucarístico" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.113;--tx:0.08%;--ty:0.13%"><img src="assets/escolas-parceiras/maria-das-dores.webp" alt="Logomarca Maria das Dores – Escola de Educação Infantil" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.070;--tx:0.17%;--ty:0.13%"><img src="assets/escolas-parceiras/moppe.webp" alt="Logomarca Moppe" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.139;--tx:0.08%;--ty:0.38%"><img src="assets/escolas-parceiras/serra-e-mar.webp" alt="Logomarca Serra&amp;Mar" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.392;--tx:0.00%;--ty:0.25%"><img src="assets/escolas-parceiras/teofilo-rezende.webp" alt="Logomarca Teófilo Rezende" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.085;--tx:0.17%;--ty:0.13%"><img src="assets/escolas-parceiras/vale-magico.webp" alt="Logomarca Escola Infantil Vale Mágico" width="600" height="400" loading="lazy" decoding="async" /></li>
+          <li class="parceira-card" style="--s:1.174;--tx:0.17%;--ty:0.13%"><img src="assets/escolas-parceiras/vera-magaldi.webp" alt="Logomarca Centro Educacional Vera Magaldi" width="600" height="400" loading="lazy" decoding="async" /></li>
+    </ul>
+  </div>
+</section>
 
-    <!-- Como a parceria funciona -->
-    <section id="como-funciona" style="background: #FFFFFF">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px">
-        <div style="text-align: center; max-width: 580px; margin: 0 auto 48px">
-          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(24px, 3vw, 34px); margin: 0 0 12px; letter-spacing: -0.01em">Como a parceria funciona</h2>
-          <p style="margin: 0; font-size: 17px; color: #475569; line-height: 1.5">Simples, direto e sem burocracia. Tudo começa com uma conversa.</p>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px">
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-            <span style="width: 40px; height: 40px; border-radius: 12px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">1</span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">A escola indica a Sartec</strong>
-            <p style="margin: 0; font-size: 15.5px; color: #475569; line-height: 1.55">A comunidade escolar recebe um canal organizado para enviar listas e tirar dúvidas.</p>
-          </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-            <span style="width: 40px; height: 40px; border-radius: 12px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">2</span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">A família envia a lista</strong>
-            <p style="margin: 0; font-size: 15.5px; color: #475569; line-height: 1.55">A lista pode ser enviada por foto ou PDF, direto pelo WhatsApp ou pelo site.</p>
-          </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-            <span style="width: 40px; height: 40px; border-radius: 12px; background: #1E3A8A; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">3</span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">A Sartec organiza o pedido</strong>
-            <p style="margin: 0; font-size: 15.5px; color: #475569; line-height: 1.55">A equipe confere os itens, ajusta quantidades e envia o orçamento.</p>
-          </div>
-          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
-            <span style="width: 40px; height: 40px; border-radius: 12px; background: #DC2626; color: #FFFFFF; font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">4</span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px">Todos ganham praticidade</strong>
-            <p style="margin: 0; font-size: 15.5px; color: #475569; line-height: 1.55">A escola facilita a rotina das famílias e a Sartec centraliza o atendimento.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- Novas escolas: contato discreto -->
+<section class="esc-convite" id="parceria" aria-labelledby="esc-convite-titulo">
+  <div class="esc-convite-inner">
+    <p class="esc-convite-texto" id="esc-convite-titulo"><strong>Sua escola ainda não é parceira?</strong> Converse com a Sartec e conheça as condições.</p>
+    <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20saber%20mais%20sobre%20parceria%20para%20escolas." target="_blank" rel="noopener" class="btn-wa">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      <span>Falar sobre parceria</span>
+    </a>
+  </div>
+</section>
 
-    <!-- Benefícios -->
-    <section style="background: #F8FAFC; border-top: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px">
-
-        <!-- Benefícios para a escola -->
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 36px; display: flex; flex-direction: column; gap: 16px">
-          <div style="display: flex; align-items: center; gap: 12px">
-            <span style="width: 14px; height: 14px; background: #1E3A8A; transform: rotate(45deg); border-radius: 3px; display: block; flex-shrink: 0"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 21px">Para a escola</strong>
-          </div>
-          <ul style="margin: 0; padding-left: 20px; font-size: 15.5px; color: #475569; line-height: 2">
-            <li>Menos dúvidas sobre material escolar entre as famílias</li>
-            <li>Atendimento organizado para a comunidade</li>
-            <li>Condições comerciais combinadas diretamente com a Sartec</li>
-            <li>Canal simples para a volta às aulas</li>
-            <li>Apoio de uma papelaria local com atendimento próximo</li>
-          </ul>
-        </div>
-
-        <!-- Benefícios para as famílias -->
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 36px; display: flex; flex-direction: column; gap: 16px">
-          <div style="display: flex; align-items: center; gap: 12px">
-            <span style="width: 14px; height: 14px; background: #DC2626; transform: rotate(45deg); border-radius: 3px; display: block; flex-shrink: 0"></span>
-            <strong style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 21px">Para as famílias</strong>
-          </div>
-          <ul style="margin: 0; padding-left: 20px; font-size: 15.5px; color: #475569; line-height: 2">
-            <li><strong>Desconto diferenciado nas listas escolares das escolas parceiras</strong></li>
-            <li>Enviar a lista por foto ou PDF</li>
-            <li>Receber o orçamento pelo WhatsApp</li>
-            <li>Marcar o que já tem em casa</li>
-            <li>Tirar dúvidas sobre itens da lista</li>
-            <li>Comprar com uma papelaria local de confiança</li>
-          </ul>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- CTA parceria -->
-    <section id="parceria" style="background: #FFFFFF">
-      <div style="max-width: 1180px; margin: 0 auto; padding: 72px 20px">
-        <div style="background: linear-gradient(135deg, #1E3A8A 0%, #2347AF 100%); border-radius: 18px; padding: 48px 40px; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; max-width: 720px; margin: 0 auto; text-align: left">
-          <span style="background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.25); color: #FFFFFF; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; border-radius: 100px">Sua escola pode ser parceira</span>
-          <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(22px, 3vw, 30px); color: #FFFFFF; margin: 0; letter-spacing: -0.01em; line-height: 1.2">Converse com a Sartec e descubra o formato certo para a sua escola.</h2>
-          <p style="margin: 0; font-size: 17px; color: rgba(255,255,255,0.85); line-height: 1.55; max-width: 500px">Sem burocracia. A equipe explica as condições e define junto com a escola o melhor jeito de atender as famílias.</p>
-          <a href="https://wa.me/5512981594959?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Sartec%20e%20quero%20saber%20mais%20sobre%20parceria%20para%20escolas."
-             target="_blank" rel="noopener"
-             class="btn-wa">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            <span>Falar com a Sartec sobre parceria</span></a>
-        </div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section style="background: #F8FAFC; border-top: 1px solid #E2E8F0">
-      <div style="max-width: 880px; margin: 0 auto; padding: 72px 20px">
-        <h2 style="font-family: Archivo, sans-serif; font-weight: 800; font-size: 32px; margin: 0 0 32px; letter-spacing: -0.01em">Perguntas frequentes</h2>
-        <div style="display: flex; flex-direction: column; gap: 12px">
-
-          <details class="faq-item">
-            <summary><strong>Quanto custa para a escola ser parceira?</strong></summary>
-            <p class="faq-body">As condições são combinadas diretamente com a equipe da Sartec, de acordo com o formato da parceria e o período de atendimento.</p>
-          </details>
-
-          <details class="faq-item">
-            <summary><strong>A escola precisa assinar contrato?</strong></summary>
-            <p class="faq-body">Depende do tipo de parceria. A Sartec conversa com a escola para definir o formato mais simples e adequado.</p>
-          </details>
-
-          <details class="faq-item">
-            <summary><strong>A parceria vale para lista parcial?</strong></summary>
-            <p class="faq-body">Sim. A família pode enviar a lista completa ou apenas os itens que ainda precisa comprar.</p>
-          </details>
-
-          <details class="faq-item">
-            <summary><strong>Como a família comprova que é de uma escola parceira?</strong></summary>
-            <p class="faq-body">A forma de identificação pode ser combinada com a escola — comunicado, lista, indicação ou outro critério definido em conjunto.</p>
-          </details>
-
-          <details class="faq-item">
-            <summary><strong>Como a escola começa?</strong></summary>
-            <p class="faq-body">Basta chamar a Sartec pelo WhatsApp para conversar sobre o formato da parceria.</p>
-          </details>
-
-        </div>
-      </div>
-    </section>
-
-    <div id="la-cabral-compact-mount"></div>
+<div id="la-cabral-compact-mount"></div>
 
     <!-- Visite a Sartec -->
     <section class="loja-fw">
