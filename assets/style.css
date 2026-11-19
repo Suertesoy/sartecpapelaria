@@ -4438,7 +4438,7 @@ body.le-modal-aberto { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .parceira-card { transition: none; } .parceira-card:hover { transform: none; } }
 
 /* Faixa da Home: carrossel contínuo de logos */
-.parceiras-faixa { --item-w: 180px; --item-gap: 16px; --faixa-n: 14; --faixa-dur: calc(var(--faixa-n) * 2.8s); background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 32px 0 26px; scroll-margin-top: calc(var(--header-h) + 8px); }
+.parceiras-faixa { --item-w: 180px; --item-gap: 16px; --faixa-n: 15; --faixa-dur: calc(var(--faixa-n) * 2.8s); background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 32px 0 26px; scroll-margin-top: calc(var(--header-h) + 8px); }
 .parceiras-faixa-head { max-width: var(--container); margin: 0 auto 10px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
 .parceiras-faixa-copy { min-width: 0; }
 .parceiras-faixa-head h2 { font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(1.3rem, 2.6vw, 1.85rem); line-height: 1.15; margin: 0; color: var(--texto); letter-spacing: -0.02em; }
@@ -4875,4 +4875,26 @@ body.le-modal-aberto { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .btn-ed, .btn-wa, .btn-wpp-header, .fab-wpp, .parceiras-faixa-cta { transition: none; }
   .btn-ed:hover, .btn-wa:hover, .btn-wpp-header:hover, .fab-wpp:hover { transform: none; }
+}
+
+/* Cartão com legenda (E.E.I Estrelinha Mágica): só existe o símbolo, então o nome entra como texto.
+   O arquivo segue a tela 600x400 das demais logos, com o símbolo na parte de cima e a faixa de baixo livre. */
+.parceira-com-legenda { position: relative; }
+.parceira-legenda {
+  position: absolute;
+  left: 6px; right: 6px; bottom: 7%;
+  text-align: center;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: clamp(.72rem, .95vw, .84rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--azul);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.parceiras-faixa-item.parceira-com-legenda .parceira-legenda { font-size: .8rem; bottom: 5%; }
+@media (max-width: 640px) {
+  .parceira-legenda { font-size: .72rem; }
+  .parceiras-faixa-item.parceira-com-legenda .parceira-legenda { font-size: .72rem; }
 }

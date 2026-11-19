@@ -335,6 +335,8 @@ const ESCOLAS_PARCEIRAS = [
   { slug: 'cesc', nome: 'CESC – Centro Educacional Sonho de Criança' },
   { slug: 'escola-crista-batista', nome: 'Escola Cristã Batista' },
   { slug: 'espaco-natural', nome: 'Escola Espaço Natural' },
+  // Só o símbolo (sem logotipo completo): o nome entra como legenda no cartão. Ver .parceira-legenda.
+  { slug: 'estrelinha-magica', nome: 'E.E.I Estrelinha Mágica', legenda: true },
   { slug: 'jesus-eucaristico', nome: 'Educandário Jesus Eucarístico' },
   { slug: 'maria-das-dores', nome: 'Maria das Dores – Escola de Educação Infantil' },
   { slug: 'moppe', nome: 'Moppe' },
@@ -348,11 +350,17 @@ function renderEscolasFaixa() {
   const mount = document.getElementById('escolas-faixa-mount');
   if (!mount) return;
 
-  const img = (e, decorativa) => `<img src="assets/escolas-parceiras/${e.slug}.webp" alt="${decorativa ? '' : 'Logomarca ' + e.nome.replace(/&/g, '&amp;')}" width="600" height="400" loading="lazy" decoding="async" />`;
+  const nomeHtml = (e) => e.nome.replace(/&/g, '&amp;');
+  const img = (e, decorativa) => {
+    const alt = decorativa ? '' : (e.legenda ? 'Símbolo da ' : 'Logomarca ') + nomeHtml(e);
+    return `<img src="assets/escolas-parceiras/${e.slug}.webp" alt="${alt}" width="600" height="400" loading="lazy" decoding="async" />`;
+  };
+  // Legenda só para quem não tem logotipo completo; aria-hidden porque o alt do símbolo já traz o nome
+  const item = (e, decorativa) => `<li class="parceiras-faixa-item${e.legenda ? ' parceira-com-legenda' : ''}">${img(e, decorativa)}${e.legenda ? `<span class="parceira-legenda" aria-hidden="true">${nomeHtml(e)}</span>` : ''}</li>`;
   // A segunda cópia existe só para o loop visual; fica oculta para tecnologias assistivas.
   const lista = (decorativa) => `
     <ul class="parceiras-faixa-set" role="list"${decorativa ? ' aria-hidden="true"' : ''}>
-      ${ESCOLAS_PARCEIRAS.map(e => `<li class="parceiras-faixa-item">${img(e, decorativa)}</li>`).join('')}
+      ${ESCOLAS_PARCEIRAS.map(e => item(e, decorativa)).join('')}
     </ul>`;
 
   mount.innerHTML = `
