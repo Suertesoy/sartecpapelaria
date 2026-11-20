@@ -4674,7 +4674,7 @@ body.le-modal-aberto { overflow: hidden; }
 .esc-hero-top .btn-ed { margin-top: 4px; }
 
 .esc-hero-wall { max-width: var(--container); margin: 0 auto; padding: 0 24px 64px; scroll-margin-top: calc(var(--header-h) + 12px); }
-.esc-hero .parceiras-grid { --cols: 5; --gap: 20px; }
+.esc-hero .parceiras-grid { --cols: 4; --gap: 24px; }
 .esc-hero .parceira-card { border-radius: 18px; box-shadow: 0 2px 10px rgba(30, 58, 138, 0.06); }
 /* cada logo vem numa tela 600×400 com margens diferentes: --s/--tx/--ty (medidos por logo) compensam
    a área útil e centralizam, sem distorcer nem cortar (o arquivo oficial não é alterado) */
@@ -4886,7 +4886,7 @@ body.le-modal-aberto { overflow: hidden; }
   text-align: center;
   font-family: 'Archivo', sans-serif;
   font-weight: 700;
-  font-size: clamp(.72rem, .95vw, .84rem);
+  font-size: clamp(.72rem, 1.1vw, .95rem);
   line-height: 1.1;
   letter-spacing: -0.01em;
   color: var(--azul);
