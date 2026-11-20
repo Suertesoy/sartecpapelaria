@@ -4438,7 +4438,7 @@ body.le-modal-aberto { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .parceira-card { transition: none; } .parceira-card:hover { transform: none; } }
 
 /* Faixa da Home: carrossel contínuo de logos */
-.parceiras-faixa { --item-w: 180px; --item-gap: 16px; --faixa-n: 15; --faixa-dur: calc(var(--faixa-n) * 2.8s); background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 32px 0 26px; scroll-margin-top: calc(var(--header-h) + 8px); }
+.parceiras-faixa { --item-w: 180px; --item-gap: 16px; --faixa-n: 16; --faixa-dur: calc(var(--faixa-n) * 2.8s); background: #FFFFFF; border-bottom: 1px solid #E2E8F0; padding: 32px 0 26px; scroll-margin-top: calc(var(--header-h) + 8px); }
 .parceiras-faixa-head { max-width: var(--container); margin: 0 auto 10px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
 .parceiras-faixa-copy { min-width: 0; }
 .parceiras-faixa-head h2 { font-family: Archivo, sans-serif; font-weight: 800; font-size: clamp(1.3rem, 2.6vw, 1.85rem); line-height: 1.15; margin: 0; color: var(--texto); letter-spacing: -0.02em; }

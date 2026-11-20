@@ -333,6 +333,7 @@ const ESCOLAS_PARCEIRAS = [
   { slug: 'castelinho-novo', nome: 'Escola Castelinho Novo' },
   { slug: 'catavento', nome: 'Colégio Catavento' },
   { slug: 'cesc', nome: 'CESC – Centro Educacional Sonho de Criança' },
+  { slug: 'colegio-evoluti', nome: 'Colégio Evoluti' },
   { slug: 'escola-crista-batista', nome: 'Escola Cristã Batista' },
   { slug: 'espaco-natural', nome: 'Escola Espaço Natural' },
   // Só o símbolo (sem logotipo completo): o nome entra como legenda no cartão. Ver .parceira-legenda.

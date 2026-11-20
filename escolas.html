@@ -47,7 +47,7 @@
     <!-- Hero — vitrine das escolas parceiras: as logomarcas são o elemento principal -->
 <section class="esc-hero" aria-labelledby="esc-hero-title">
   <div class="esc-hero-top">
-    <h1 id="esc-hero-title"><span class="num">15</span> escolas parceiras. <em>Desconto diferenciado</em> na lista escolar.</h1>
+    <h1 id="esc-hero-title"><span class="num" id="esc-total">16</span> escolas parceiras. <em>Desconto diferenciado</em> na lista escolar.</h1>
     <p class="esc-hero-sub">Se a sua escola está entre elas, a lista escolar já conta com condições especiais na Sartec.</p>
     <a href="lista-escolar.html" class="btn-ed btn-ed-primary">Enviar lista escolar</a>
   </div>
@@ -59,6 +59,7 @@
           <li class="parceira-card" style="--s:1.077;--tx:0.17%;--ty:-0.13%"><img src="assets/escolas-parceiras/castelinho-novo.webp" alt="Logomarca Escola Castelinho Novo" width="600" height="400" loading="lazy" decoding="async" /></li>
           <li class="parceira-card" style="--s:1.091;--tx:0.08%;--ty:0.13%"><img src="assets/escolas-parceiras/catavento.webp" alt="Logomarca Colégio Catavento" width="600" height="400" loading="lazy" decoding="async" /></li>
           <li class="parceira-card" style="--s:1.176;--tx:0.08%;--ty:0.13%"><img src="assets/escolas-parceiras/cesc.webp" alt="Logomarca CESC – Centro Educacional Sonho de Criança" width="600" height="400" loading="lazy" decoding="async" /></li>
+      <li class="parceira-card" style="--s:1.082;--tx:0.08%;--ty:0.00%"><img src="assets/escolas-parceiras/colegio-evoluti.webp" alt="Logomarca Colégio Evoluti" width="600" height="400" loading="lazy" decoding="async" /></li>
           <li class="parceira-card" style="--s:1.085;--tx:0.17%;--ty:0.13%"><img src="assets/escolas-parceiras/escola-crista-batista.webp" alt="Logomarca Escola Cristã Batista" width="600" height="400" loading="lazy" decoding="async" /></li>
           <li class="parceira-card" style="--s:1.077;--tx:0.17%;--ty:0.13%"><img src="assets/escolas-parceiras/espaco-natural.webp" alt="Logomarca Escola Espaço Natural" width="600" height="400" loading="lazy" decoding="async" /></li>
       <li class="parceira-card parceira-com-legenda"><img src="assets/escolas-parceiras/estrelinha-magica.webp" alt="Símbolo da E.E.I Estrelinha Mágica" width="600" height="400" loading="lazy" decoding="async" /><span class="parceira-legenda" aria-hidden="true">E.E.I Estrelinha Mágica</span></li>
@@ -121,6 +122,14 @@
   <script src="assets/app.js"></script>
   <script>
     SartecInit({ active: 'escolas', fab: 'principal' });
+  </script>
+  <script>
+    // o total exibido no título acompanha a lista de logos (evita divergência ao incluir novas escolas)
+    (function () {
+      var n = document.querySelectorAll('.parceiras-grid .parceira-card').length;
+      var el = document.getElementById('esc-total');
+      if (el && n) el.textContent = String(n);
+    })();
   </script>
 </body>
 </html>
