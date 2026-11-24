@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { normalizarItens } from '../api/analisar-lista.js';
+import sharp from 'sharp';
+import { normalizarItens, recortarPagina } from '../api/analisar-lista.js';
 
 test('preserva quantidades explícitas, inclusive acima de 99', () => {
   const itens = normalizarItens([
@@ -62,4 +63,22 @@ test('preserva variantes, itens repetidos em seções distintas e listas com mai
     [8, 'material de entrega'],
     [2, 'estojo'],
   ]);
+});
+
+test('recorta páginas grandes com sobreposição e mantém fotos pequenas na análise integral', async () => {
+  const gerarImagem = (width, height) => sharp({
+    create: { width, height, channels: 3, background: '#ffffff' },
+  }).jpeg().toBuffer();
+
+  assert.deepEqual(await recortarPagina(await gerarImagem(800, 1100)), []);
+
+  const recortes = await recortarPagina(await gerarImagem(1200, 1600));
+  assert.deepEqual(recortes.map(({ nome }) => nome), [
+    'superior esquerdo', 'superior direito', 'inferior esquerdo', 'inferior direito',
+  ]);
+  for (const recorte of recortes) {
+    const { width, height } = await sharp(recorte.imagem).metadata();
+    assert.equal(width, 696);
+    assert.equal(height, 928);
+  }
 });

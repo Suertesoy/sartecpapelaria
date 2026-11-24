@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import formidable from 'formidable';
 import Anthropic from '@anthropic-ai/sdk';
+import sharp from 'sharp';
 
 export const config = { api: { bodyParser: false } };
 
@@ -52,13 +53,15 @@ Não retorne nada que seja:
 
 ━━━ REGRAS DE EXTRAÇÃO ━━━
 - Leia todas as páginas, colunas e seções em ordem. Use as divisões visuais e os títulos para entender a qual grupo cada material pertence.
+- Quando houver recortes de uma foto, compare os recortes com a foto integral. São partes da mesma página, inclusive para validacaoConjunto. Use os recortes para ler palavras e números pequenos e a foto inteira para conferir a posição dos itens. Não duplique linhas visíveis em mais de uma imagem.
+- Antes de responder, confira a quantidade no início de cada linha, inclusive quando vier após símbolos como # ou ◊. Zero à esquerda não muda o valor: "#03 Cadernos ... sendo 1 para inglês" pede 3 cadernos, com 1 dos 3 reservado para inglês.
 - Transcreva a identidade do produto e preserve os termos da escola quando distinguirem materiais. Sulfitão branco e sulfite A4 são produtos distintos. Não troque um pelo outro nem deduza dimensões, gramatura ou finalidade. Sacos plásticos A4 com furos são sacos plásticos, não clipes nem parte da pasta da linha anterior. Cola bastão escolar não é refil de cola quente.
 - Gere um item por produto ou variante com quantidade própria, inclusive quando há mais de um na mesma linha. "1 pincel macio nº 08 e 1 pincel duro nº 08 (cabo amarelo)" são dois itens de 1, cada um com suas especificações. "1 lápis 4B 1 tinta acrílica fosca, 37 ml" também são dois itens. Não coloque um produto em obs de outro.
 - Se um título pedir um recipiente com materiais enumerados ("1 estojo com", "1 nécessaire com"), registre o recipiente e cada material listado como itens separados. Preserve as quantidades e não consolide pedidos do mesmo produto em seções diferentes. Quando a escola pede um produto vendido como conjunto ("1 estojo de canetinhas com 12 unidades", "1 caixa de lápis de cor com 24 unidades"), registre um item com quantidade 1 e o conteúdo da embalagem separado.
 - qty é a quantidade pedida na unidade do documento. "500 folhas de sulfite A4" tem qty 500 e unidade folha. "200 copos descartáveis" tem qty 200 e unidade un. "1 resma de sulfite A4 com 500 folhas" tem qty 1, unidade resma e conteudoEmbalagem "500 folhas". Não converta folhas ou copos em embalagens quando o documento só pede unidades avulsas.
-- Inclua no nome a unidade quando ela for necessária para entender a linha: "Folhas de sulfite A4", "Resma de sulfite A4", "Caixa de lápis de cor". Use conteudoEmbalagem apenas para o que vem dentro de uma embalagem explícita. Não repita seu conteúdo em obs nem no nome.
+- Inclua no nome a unidade quando ela for necessária para entender a linha: "Folhas de sulfite A4", "Resma de sulfite A4", "Caixa de lápis de cor". Use conteudoEmbalagem apenas para a contagem de itens dentro de uma embalagem explícita. Não repita seu conteúdo em obs nem no nome. Use obs para especificações como "48 folhas" de um caderno ou "37 ml" de uma tinta.
 - Preserve em obs as especificações ligadas a cada produto, como páginas de um caderno, tamanho, cor, medida e gramatura. Quando houver uma distribuição explícita por variantes, separe cada variante em sua própria linha. Exemplo: "4 folhas dupla face (2 pretas e 2 rosas)" vira duas linhas com qty 2 e as respectivas cores. Se o total divergir da distribuição ou houver cor possivelmente repetida por erro do documento, preserve os dados do original e sinalize a dúvida; não corrija por conta própria.
-- Use qty null quando a quantidade estiver ausente, ambígua ou ilegível. Para qualquer dúvida de leitura, use confianca "baixa" e preencha trechoDuvidoso com o trecho legível do documento relacionado ao item, sem completar palavras por conta própria. Quando a leitura for clara, deixe trechoDuvidoso vazio.
+- Use qty null quando a quantidade estiver ausente, ambígua ou ilegível. Para qualquer dúvida de leitura, use confianca "baixa" e preencha trechoDuvidoso com o trecho legível do documento relacionado ao item, sem completar palavras por conta própria. Se a identidade do material estiver ilegível e houver risco de trocar o produto, use no nome somente o que for legível, por exemplo "Papel branco (tipo a confirmar)". Quando a leitura for clara, deixe trechoDuvidoso vazio.
 - Retorne apenas JSON válido, sem markdown, sem texto antes ou depois.
 
 ━━━ VALIDAÇÃO DO CONJUNTO (obrigatório sempre) ━━━
@@ -175,6 +178,36 @@ function normalizarValidacaoConjunto(vc) {
   };
 }
 
+function blocoImagem(data, mimetype) {
+  return { type: 'image', source: { type: 'base64', media_type: mimetype, data: data.toString('base64') } };
+}
+
+// Zooms sobrepostos ajudam em páginas grandes cujo texto fica pequeno na imagem inteira.
+export async function recortarPagina(data) {
+  const imagem = sharp(data);
+  const { autoOrient: { width, height } } = await imagem.metadata();
+  if (width < 1100 || height < 1300) return [];
+
+  const orientada = await imagem.autoOrient().jpeg({ quality: 94 }).toBuffer();
+  const largura = Math.ceil(width * 0.58);
+  const altura = Math.ceil(height * 0.58);
+  const recortes = [
+    { nome: 'superior esquerdo', left: 0, top: 0 },
+    { nome: 'superior direito', left: width - largura, top: 0 },
+    { nome: 'inferior esquerdo', left: 0, top: height - altura },
+    { nome: 'inferior direito', left: width - largura, top: height - altura },
+  ];
+
+  return Promise.all(recortes.map(async ({ nome, left, top }) => ({
+    nome,
+    imagem: await sharp(orientada)
+      .extract({ left, top, width: largura, height: altura })
+      .resize({ width: 1150, height: 1150, fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: 90 })
+      .toBuffer(),
+  })));
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método não permitido.' });
@@ -222,15 +255,27 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: `O conjunto ultrapassou ${Math.round(LIMITE_TOTAL_BYTES / (1024 * 1024))}MB. Reduza o tamanho ou envie menos arquivos.` });
   }
 
-  // Montar blocos de conteúdo para Claude
   const contentBlocks = [];
-  for (const arq of arquivos) {
-    const base64 = readFileSync(arq.filepath).toString('base64');
-    contentBlocks.push(
-      arq.mimetype === 'application/pdf'
-        ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
-        : { type: 'image',    source: { type: 'base64', media_type: arq.mimetype,        data: base64 } }
-    );
+  for (const [index, arq] of arquivos.entries()) {
+    const data = readFileSync(arq.filepath);
+    const numero = index + 1;
+    if (arq.mimetype === 'application/pdf') {
+      contentBlocks.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: data.toString('base64') } });
+      continue;
+    }
+
+    contentBlocks.push({ type: 'text', text: `Imagem integral do arquivo ${numero}.` }, blocoImagem(data, arq.mimetype));
+    try {
+      const recortes = await recortarPagina(data);
+      for (const recorte of recortes) {
+        contentBlocks.push(
+          { type: 'text', text: `Zoom do canto ${recorte.nome} do arquivo ${numero}. É parte da mesma imagem integral.` },
+          blocoImagem(recorte.imagem, 'image/jpeg'),
+        );
+      }
+    } catch {
+      console.warn('[analisar-lista] Não foi possível ampliar a imagem. A análise usará a imagem integral.');
+    }
   }
   const qtd = arquivos.length;
   contentBlocks.push({
