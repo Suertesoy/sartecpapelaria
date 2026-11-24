@@ -51,10 +51,14 @@ Não retorne nada que seja:
 - Trate a marca como sugestão da escola, nunca como obrigação.
 
 ━━━ REGRAS DE EXTRAÇÃO ━━━
-- Não invente itens.
-- Preserve em obs: número de folhas, capa dura/brochura, cor, tamanho, gramatura, formato, quantidade por embalagem, obrigatório/opcional (exceto marca, que vai em marcaSugerida).
-- Quando não houver quantidade clara, use 1.
-- Se um item puder ser comprado mas houver dúvida, inclua com confianca "baixa".
+- Leia todas as páginas, colunas e seções em ordem. Use as divisões visuais e os títulos para entender a qual grupo cada material pertence.
+- Transcreva a identidade do produto e preserve os termos da escola quando distinguirem materiais. Sulfitão branco e sulfite A4 são produtos distintos. Não troque um pelo outro nem deduza dimensões, gramatura ou finalidade. Sacos plásticos A4 com furos são sacos plásticos, não clipes nem parte da pasta da linha anterior. Cola bastão escolar não é refil de cola quente.
+- Gere um item por produto ou variante com quantidade própria, inclusive quando há mais de um na mesma linha. "1 pincel macio nº 08 e 1 pincel duro nº 08 (cabo amarelo)" são dois itens de 1, cada um com suas especificações. "1 lápis 4B 1 tinta acrílica fosca, 37 ml" também são dois itens. Não coloque um produto em obs de outro.
+- Se um título pedir um recipiente com materiais enumerados ("1 estojo com", "1 nécessaire com"), registre o recipiente e cada material listado como itens separados. Preserve as quantidades e não consolide pedidos do mesmo produto em seções diferentes. Quando a escola pede um produto vendido como conjunto ("1 estojo de canetinhas com 12 unidades", "1 caixa de lápis de cor com 24 unidades"), registre um item com quantidade 1 e o conteúdo da embalagem separado.
+- qty é a quantidade pedida na unidade do documento. "500 folhas de sulfite A4" tem qty 500 e unidade folha. "200 copos descartáveis" tem qty 200 e unidade un. "1 resma de sulfite A4 com 500 folhas" tem qty 1, unidade resma e conteudoEmbalagem "500 folhas". Não converta folhas ou copos em embalagens quando o documento só pede unidades avulsas.
+- Inclua no nome a unidade quando ela for necessária para entender a linha: "Folhas de sulfite A4", "Resma de sulfite A4", "Caixa de lápis de cor". Use conteudoEmbalagem apenas para o que vem dentro de uma embalagem explícita. Não repita seu conteúdo em obs nem no nome.
+- Preserve em obs as especificações ligadas a cada produto, como páginas de um caderno, tamanho, cor, medida e gramatura. Quando houver uma distribuição explícita por variantes, separe cada variante em sua própria linha. Exemplo: "4 folhas dupla face (2 pretas e 2 rosas)" vira duas linhas com qty 2 e as respectivas cores. Se o total divergir da distribuição ou houver cor possivelmente repetida por erro do documento, preserve os dados do original e sinalize a dúvida; não corrija por conta própria.
+- Use qty null quando a quantidade estiver ausente, ambígua ou ilegível. Para qualquer dúvida de leitura, use confianca "baixa" e preencha trechoDuvidoso com o trecho legível do documento relacionado ao item, sem completar palavras por conta própria. Quando a leitura for clara, deixe trechoDuvidoso vazio.
 - Retorne apenas JSON válido, sem markdown, sem texto antes ou depois.
 
 ━━━ VALIDAÇÃO DO CONJUNTO (obrigatório sempre) ━━━
@@ -86,11 +90,13 @@ Se houver apenas 1 arquivo: mesmaCriancaProvavel: true, confianca: "alta", motiv
     {
       "nome": "string",
       "qty": 1,
-      "unidade": "un|caixa|conjunto|pacote|rolo|outro",
+      "unidade": "un|folha|resma|caixa|conjunto|pacote|rolo|outro",
+      "conteudoEmbalagem": "string",
       "obs": "string",
       "categoria": "string",
       "marcaSugerida": "string",
-      "confianca": "alta|media|baixa"
+      "confianca": "alta|media|baixa",
+      "trechoDuvidoso": "string"
     }
   ],
   "avisos": ["string"],
@@ -103,7 +109,7 @@ Se houver apenas 1 arquivo: mesmaCriancaProvavel: true, confianca: "alta", motiv
   }
 }`;
 
-const UNIDADES_VALIDAS = ['un', 'caixa', 'conjunto', 'pacote', 'rolo', 'outro'];
+const UNIDADES_VALIDAS = ['un', 'folha', 'resma', 'caixa', 'conjunto', 'pacote', 'rolo', 'outro'];
 
 function gerarId(nome) {
   return nome
@@ -127,21 +133,33 @@ function normalizarMetadados(meta) {
   };
 }
 
-function normalizarItens(itens) {
+export function normalizarItens(itens) {
   if (!Array.isArray(itens)) return [];
   return itens
     .filter(it => it && typeof it.nome === 'string' && it.nome.trim())
-    .slice(0, 80)
-    .map(it => ({
-      id:            gerarId(it.nome.trim()),
-      nome:          it.nome.trim(),
-      qty:           Math.min(Math.max(Math.round(Number(it.qty) || 1), 1), 99),
-      unidade:       UNIDADES_VALIDAS.includes(it.unidade) ? it.unidade : 'un',
-      obs:           typeof it.obs           === 'string' ? it.obs.trim()           : '',
-      categoria:     typeof it.categoria     === 'string' ? it.categoria.trim()     : 'geral',
-      marcaSugerida: typeof it.marcaSugerida === 'string' ? it.marcaSugerida.trim() : '',
-      confianca:     ['alta', 'media', 'baixa'].includes(it.confianca) ? it.confianca : 'media',
-    }));
+    .map((it, index) => {
+      const nome = it.nome.trim();
+      const quantidade = typeof it.qty === 'string' && /^\d+$/.test(it.qty.trim()) ? Number(it.qty) : it.qty;
+      const qty = Number.isSafeInteger(quantidade) && quantidade > 0 ? quantidade : null;
+      const trechoDuvidoso = typeof it.trechoDuvidoso === 'string' ? it.trechoDuvidoso.trim() : '';
+
+      return {
+        id: `${gerarId(nome)}_${index + 1}`,
+        nome,
+        qty,
+        unidade: UNIDADES_VALIDAS.includes(it.unidade) ? it.unidade : 'un',
+        conteudoEmbalagem: typeof it.conteudoEmbalagem === 'string' ? it.conteudoEmbalagem.trim() : '',
+        obs: typeof it.obs === 'string' ? it.obs.trim() : '',
+        categoria: typeof it.categoria === 'string' ? it.categoria.trim() : 'geral',
+        marcaSugerida: typeof it.marcaSugerida === 'string' ? it.marcaSugerida.trim() : '',
+        confianca: qty === null || trechoDuvidoso ? 'baixa' : normalizarConfianca(it.confianca),
+        trechoDuvidoso,
+      };
+    });
+}
+
+function normalizarConfianca(confianca) {
+  return ['alta', 'media', 'baixa'].includes(confianca) ? confianca : 'media';
 }
 
 function normalizarValidacaoConjunto(vc) {
@@ -227,10 +245,16 @@ export default async function handler(req, res) {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const msg = await client.messages.create({
       model: MODELO,
-      max_tokens: 4096,
+      max_tokens: 8192,
       system: PROMPT_SISTEMA,
       messages: [{ role: 'user', content: contentBlocks }],
     });
+    if (msg.stop_reason === 'max_tokens') {
+      return res.status(422).json({
+        ok: false,
+        error: 'A lista ficou longa demais para conferir por inteiro. Tente analisar menos páginas por vez.',
+      });
+    }
     respostaTexto = msg.content?.[0]?.text ?? '';
   } catch (err) {
     console.error('[analisar-lista] Erro Anthropic:', err.message);
@@ -242,7 +266,7 @@ export default async function handler(req, res) {
     const match = respostaTexto.match(/\{[\s\S]*\}/);
     dados = JSON.parse(match ? match[0] : respostaTexto);
   } catch {
-    console.error('[analisar-lista] Resposta não-JSON da IA:', respostaTexto.slice(0, 300));
+    console.error('[analisar-lista] Resposta não-JSON da IA');
     return res.status(502).json({ ok: false, error: 'A IA retornou um formato inesperado. Tente novamente.' });
   }
 

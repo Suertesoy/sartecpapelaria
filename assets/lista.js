@@ -563,7 +563,7 @@ function aplicarDadosAnalisados(dados) {
     estado.rascunho.id  = 'lista_' + estado.rascunho.num + '_' + Date.now();
   }
   estado.rascunho.metadados = dados.metadados || { escola: '', anoSerie: '', segmento: '', anoLetivo: '' };
-  estado.rascunho.itens     = dados.itens.map(it => ({ ...it, incluso: true, preferenciaCliente: '' }));
+  estado.rascunho.itens     = dados.itens.map(it => ({ ...it, qtyLida: it.qty, incluso: true, preferenciaCliente: '' }));
   renderizarFaixas();
   renderizarResultado();
   trocarEstado('estado-resultado');
@@ -1120,14 +1120,16 @@ function renderizarResultado() {
   renderizarResumoPedido();
 
   grid.innerHTML = estado.rascunho.itens.map(it => {
-    const busca = encodeURIComponent('material escolar ' + it.nome + (it.obs ? ' ' + it.obs : ''));
+    const detalhes = detalhesItem(it);
+    const busca = encodeURIComponent(['material escolar', it.nome, detalhes].filter(Boolean).join(' '));
     const marcaSugerida = (it.marcaSugerida || '').trim();
     const temPref = (it.preferenciaCliente || '').trim() !== '';
     return `
     <div class="item-card ${it.incluso ? '' : 'excluido'}" data-id="${it.id}">
       <div class="item-info">
         <h4>${esc(it.nome)}</h4>
-        ${it.obs ? `<div class="obs">${esc(it.obs)}</div>` : ''}
+        ${detalhes ? `<div class="obs">${esc(detalhes)}</div>` : ''}
+        ${it.confianca === 'baixa' ? `<div class="obs"><strong>Confira a leitura.</strong>${it.trechoDuvidoso ? ' ' + esc(it.trechoDuvidoso) : ''}</div>` : ''}
       </div>
       ${marcaSugerida ? `<p class="marca-sugerida">Sugestão da escola: <strong>${esc(marcaSugerida)}</strong></p>` : ''}
       <div class="item-extras">
@@ -1146,7 +1148,7 @@ function renderizarResultado() {
       <div class="item-controls">
         <div class="qty-control">
           <button class="qty-btn" data-acao="menos" aria-label="Diminuir">−</button>
-          <span class="qty-num">${it.qty}</span>
+          <span class="qty-num">${it.qty ?? 'A confirmar'}</span>
           <button class="qty-btn" data-acao="mais" aria-label="Aumentar">+</button>
         </div>
         <div class="item-choice-toggle">
@@ -1157,9 +1159,8 @@ function renderizarResultado() {
     </div>`;
   }).join('');
 
-  grid.querySelectorAll('.item-card').forEach(card => {
-    const id   = card.dataset.id;
-    const item = estado.rascunho.itens.find(x => x.id === id);
+  grid.querySelectorAll('.item-card').forEach((card, index) => {
+    const item = estado.rascunho.itens[index];
 
     card.querySelectorAll('.item-choice-option').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1171,8 +1172,8 @@ function renderizarResultado() {
 
     card.querySelectorAll('.qty-btn').forEach(b => {
       b.addEventListener('click', () => {
-        if (b.dataset.acao === 'mais') item.qty += 1;
-        else item.qty = Math.max(1, item.qty - 1);
+        if (b.dataset.acao === 'mais') item.qty = (item.qty ?? 0) + 1;
+        else if (item.qty !== null) item.qty = Math.max(1, item.qty - 1);
         atualizarUI();
         trackEvent('school_list_quantity_change', { action: b.dataset.acao, item_id: item.id, quantity: item.qty });
       });
@@ -1210,11 +1211,10 @@ function renderizarResultado() {
 }
 
 function atualizarUI() {
-  grid.querySelectorAll('.item-card').forEach(card => {
-    const id   = card.dataset.id;
-    const item = estado.rascunho.itens.find(x => x.id === id);
+  grid.querySelectorAll('.item-card').forEach((card, index) => {
+    const item = estado.rascunho.itens[index];
     card.classList.toggle('excluido', !item.incluso);
-    card.querySelector('.qty-num').textContent = item.qty;
+    card.querySelector('.qty-num').textContent = item.qty ?? 'A confirmar';
     card.querySelectorAll('.item-choice-option').forEach(btn => {
       btn.classList.toggle('ativo', item.incluso ? btn.dataset.acao === 'incluir' : btn.dataset.acao === 'excluir');
     });
@@ -1237,11 +1237,23 @@ function atualizarContadores() {
 
 // =============== GERAÇÃO DA MENSAGEM ===============
 
+function detalhesItem(item) {
+  return [item.conteudoEmbalagem, item.obs].filter(Boolean).join(', ');
+}
+
 function linhaItem(x) {
-  const base = `✅ ${x.qty}x ${x.nome}${x.obs ? ' (' + x.obs + ')' : ''}`;
+  const detalhes = detalhesItem(x);
+  const quantidade = x.qty === null ? 'Quantidade a confirmar:' : `${x.qty}x`;
+  const base = `• ${quantidade} ${x.nome}${detalhes ? ' (' + detalhes + ')' : ''}`;
   const sugestao    = x.marcaSugerida ? `   Sugestão da escola: ${x.marcaSugerida}` : null;
   const prefCliente = (x.preferenciaCliente || '').trim() ? `   Preferência: ${x.preferenciaCliente.trim()}` : null;
-  return [base, sugestao, prefCliente].filter(Boolean).join('\n');
+  const quantidadeAlterada = x.qtyLida !== undefined && x.qtyLida !== x.qty
+    ? `   Quantidade ajustada no site. Leitura inicial: ${x.qtyLida ?? 'a confirmar'}.`
+    : null;
+  const conferir = x.confianca === 'baixa'
+    ? `   Conferir na lista escolar.${x.trechoDuvidoso ? ' Trecho lido: ' + x.trechoDuvidoso : ''}`
+    : null;
+  return [base, sugestao, prefCliente, quantidadeAlterada, conferir].filter(Boolean).join('\n');
 }
 
 function gerarBlocoLista(lista, numero) {
