@@ -19,15 +19,18 @@ test('preserva quantidades explícitas, inclusive acima de 99', () => {
 });
 
 test('mantém o conteúdo da embalagem separado da quantidade pedida', () => {
-  const [resma, canetinhas] = normalizarItens([
+  const [resma, canetinhas, estojo] = normalizarItens([
     { nome: 'Resma de sulfite A4', qty: 1, unidade: 'resma', conteudoEmbalagem: ' 500 folhas ', obs: '75 g/m²' },
     { nome: 'Estojo de canetinhas', qty: 1, unidade: 'caixa', conteudoEmbalagem: '12 unidades' },
+    { nome: 'Estojo escolar', qty: 1, recipienteSeparado: true, conteudoEmbalagem: '2 lápis e 1 régua', obs: 'com zíper' },
   ]);
   assert.equal(resma.qty, 1);
   assert.equal(resma.conteudoEmbalagem, '500 folhas');
   assert.equal(resma.obs, '75 g/m²');
   assert.equal(canetinhas.qty, 1);
   assert.equal(canetinhas.conteudoEmbalagem, '12 unidades');
+  assert.equal(estojo.conteudoEmbalagem, '');
+  assert.equal(estojo.obs, 'com zíper');
 });
 
 test('sinaliza quantidades inválidas em vez de trocar por 1', () => {

@@ -57,7 +57,7 @@ Não retorne nada que seja:
 - Antes de responder, confira a quantidade no início de cada linha, inclusive quando vier após símbolos como # ou ◊. Zero à esquerda não muda o valor: "#03 Cadernos ... sendo 1 para inglês" pede 3 cadernos, com 1 dos 3 reservado para inglês.
 - Transcreva a identidade do produto e preserve os termos da escola quando distinguirem materiais. Sulfitão branco e sulfite A4 são produtos distintos. Não troque um pelo outro nem deduza dimensões, gramatura ou finalidade. Sacos plásticos A4 com furos são sacos plásticos, não clipes nem parte da pasta da linha anterior. Cola bastão escolar não é refil de cola quente.
 - Gere um item por produto ou variante com quantidade própria, inclusive quando há mais de um na mesma linha. "1 pincel macio nº 08 e 1 pincel duro nº 08 (cabo amarelo)" são dois itens de 1, cada um com suas especificações. "1 lápis 4B 1 tinta acrílica fosca, 37 ml" também são dois itens. Não coloque um produto em obs de outro.
-- Se um título pedir um recipiente com materiais enumerados ("1 estojo com", "1 nécessaire com"), registre o recipiente e cada material listado como itens separados. Preserve as quantidades e não consolide pedidos do mesmo produto em seções diferentes. Quando a escola pede um produto vendido como conjunto ("1 estojo de canetinhas com 12 unidades", "1 caixa de lápis de cor com 24 unidades"), registre um item com quantidade 1 e o conteúdo da embalagem separado.
+- Se a lista pedir um recipiente que a família deve montar ("1 estojo com", "1 nécessaire com"), marque o recipiente com recipienteSeparado true e registre cada material listado como item próprio. A linha do recipiente leva só suas próprias características, como tamanho ou cor. Deixe conteudoEmbalagem vazio e não repita os materiais em obs. Preserve as quantidades e não consolide pedidos do mesmo produto em seções diferentes. Quando a escola pede um produto vendido como conjunto ("1 estojo de canetinhas com 12 unidades", "1 caixa de lápis de cor com 24 unidades"), use recipienteSeparado false e registre um item com quantidade 1 e o conteúdo da embalagem separado.
 - qty é a quantidade pedida na unidade do documento. "500 folhas de sulfite A4" tem qty 500 e unidade folha. "200 copos descartáveis" tem qty 200 e unidade un. "1 resma de sulfite A4 com 500 folhas" tem qty 1, unidade resma e conteudoEmbalagem "500 folhas". Não converta folhas ou copos em embalagens quando o documento só pede unidades avulsas.
 - Inclua no nome a unidade quando ela for necessária para entender a linha: "Folhas de sulfite A4", "Resma de sulfite A4", "Caixa de lápis de cor". Use conteudoEmbalagem apenas para a contagem de itens dentro de uma embalagem explícita. Não repita seu conteúdo em obs nem no nome. Use obs para especificações como "48 folhas" de um caderno ou "37 ml" de uma tinta.
 - Preserve em obs as especificações ligadas a cada produto, como páginas de um caderno, tamanho, cor, medida e gramatura. Quando houver uma distribuição explícita por variantes, separe cada variante em sua própria linha. Exemplo: "4 folhas dupla face (2 pretas e 2 rosas)" vira duas linhas com qty 2 e as respectivas cores. Se o total divergir da distribuição ou houver cor possivelmente repetida por erro do documento, preserve os dados do original e sinalize a dúvida; não corrija por conta própria.
@@ -94,6 +94,7 @@ Se houver apenas 1 arquivo: mesmaCriancaProvavel: true, confianca: "alta", motiv
       "nome": "string",
       "qty": 1,
       "unidade": "un|folha|resma|caixa|conjunto|pacote|rolo|outro",
+      "recipienteSeparado": false,
       "conteudoEmbalagem": "string",
       "obs": "string",
       "categoria": "string",
@@ -151,7 +152,9 @@ export function normalizarItens(itens) {
         nome,
         qty,
         unidade: UNIDADES_VALIDAS.includes(it.unidade) ? it.unidade : 'un',
-        conteudoEmbalagem: typeof it.conteudoEmbalagem === 'string' ? it.conteudoEmbalagem.trim() : '',
+        conteudoEmbalagem: it.recipienteSeparado !== true && typeof it.conteudoEmbalagem === 'string'
+          ? it.conteudoEmbalagem.trim()
+          : '',
         obs: typeof it.obs === 'string' ? it.obs.trim() : '',
         categoria: typeof it.categoria === 'string' ? it.categoria.trim() : 'geral',
         marcaSugerida: typeof it.marcaSugerida === 'string' ? it.marcaSugerida.trim() : '',
