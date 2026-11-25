@@ -4898,3 +4898,59 @@ body.le-modal-aberto { overflow: hidden; }
   .parceira-legenda { font-size: .72rem; }
   .parceiras-faixa-item.parceira-com-legenda .parceira-legenda { font-size: .72rem; }
 }
+
+/* =========================================================
+   CONSENTIMENTO (assets/consent.js) — banner e link do rodapé
+   Aceitar e Recusar têm o mesmo peso visual (mesma facilidade de escolha).
+   ========================================================= */
+.footer-privacy-link {
+  background: none; border: 0; padding: 0; font: inherit; cursor: pointer;
+  color: rgba(255,255,255,0.78); font-weight: 600; text-decoration: underline; text-underline-offset: 2px;
+}
+.footer-privacy-link:hover { color: #FFFFFF; }
+.footer-privacy-link:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; border-radius: 2px; }
+
+.consent-banner {
+  position: fixed; left: 16px; bottom: 16px; z-index: 9500;
+  width: min(440px, calc(100vw - 32px));
+}
+.consent-banner[hidden] { display: none; }
+.consent-card {
+  background: var(--branco); color: var(--texto);
+  border: 1px solid var(--cinza-borda); border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); padding: 18px 18px 16px;
+}
+.consent-titulo { font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--texto); margin: 0 0 6px; }
+.consent-texto { font-size: .88rem; line-height: 1.45; margin: 0 0 12px; }
+.consent-opcoes { display: grid; gap: 10px; margin: 0 0 14px; }
+.consent-opcoes[hidden] { display: none; }
+.consent-opcao { display: flex; gap: 10px; align-items: flex-start; font-size: .86rem; line-height: 1.4; color: var(--texto-suave); cursor: pointer; }
+.consent-opcao input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--azul); }
+.consent-opcao strong { color: var(--texto); }
+.consent-opcao-fixa { cursor: default; }
+.consent-acoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.consent-btn {
+  flex: 1 1 0; min-width: 120px; min-height: 44px; padding: 10px 14px;
+  font: inherit; font-weight: 700; font-size: .95rem; cursor: pointer;
+  background: var(--azul); color: #FFFFFF; border: 2px solid var(--azul); border-radius: var(--radius-sm);
+}
+.consent-btn:hover { background: #172F70; border-color: #172F70; }
+.consent-btn[hidden], .consent-link[hidden] { display: none; }
+.consent-btn:focus-visible, .consent-link:focus-visible { outline: 3px solid var(--azul-claro); outline-offset: 2px; }
+.consent-link {
+  flex-basis: 100%; min-height: 40px; background: none; border: 0; padding: 4px 0; cursor: pointer;
+  font: inherit; font-size: .9rem; font-weight: 600; color: var(--azul); text-decoration: underline; text-underline-offset: 2px;
+}
+.consent-btn-salvar { flex-basis: 100%; }
+
+@media (max-width: 640px) {
+  .consent-banner { left: 0; right: 0; bottom: 0; width: auto; }
+  .consent-card {
+    border-radius: var(--radius) var(--radius) 0 0; border-bottom: 0;
+    padding: 16px 16px calc(14px + env(safe-area-inset-bottom));
+    max-height: 85vh; overflow-y: auto;
+  }
+  .consent-texto { font-size: .85rem; }
+  /* O FAB do WhatsApp fica atrás do banner até a escolha, sem disputar toque com os botões */
+  body.consent-aberto .fab-wpp { visibility: hidden; }
+}

@@ -688,10 +688,13 @@ function renderCategory(container, categoryId, subcategoryId) {
 function renderSearchResults(container, query) {
   const { results, synonymTermUsed } = searchCatalog(query);
 
-  window.trackEvent?.('catalog_search', { search_term: query });
+  // Privacidade: o termo digitado (texto livre) nunca vai para o analytics — só tamanho e nº de
+  // resultados. chaveBusca fica em memória (consent.js) para mandar ao PostHog só a busca final.
+  const medidaBusca = { search_term_length: query.trim().length, result_count: results.length };
+  window.trackEvent?.('catalog_search', medidaBusca, { chaveBusca: query });
 
   if (results.length === 0) {
-    window.trackEvent?.('catalog_search_no_result', { search_term: query });
+    window.trackEvent?.('catalog_search_no_result', { search_term_length: medidaBusca.search_term_length });
     container.innerHTML = `
       <div class="cat-empty-state cat-search-empty">
         <p>Não encontramos esse produto nas categorias. Deseja adicionar “${esc(query)}” manualmente?</p>
@@ -794,7 +797,10 @@ function onBreadcrumbClick(e) {
 function stateFromLocation() {
   const params = new URLSearchParams(window.location.search);
   const categoria = params.get('categoria');
-  const query = params.get('q');
+  // A busca não fica na URL (o GA4 lê o endereço): vem do histórico do navegador. ?q= de links
+  // antigos é retirado da URL por consent.js antes de qualquer tag e guardado em buscaInicial.
+  const hist = window.history.state;
+  const query = params.get('q') || hist?.buscaInicial || (hist?.type === 'search' ? hist.query : null);
   if (categoria && getCategoryById(categoria)) {
     return { type: 'category', categoryId: categoria, subcategoryId: params.get('subcategoria') || null };
   }
@@ -802,14 +808,21 @@ function stateFromLocation() {
   return { type: 'home' };
 }
 
+// Parâmetros de campanha (Google Ads, UTMs) precisam sobreviver às trocas de URL do catálogo:
+// sem isso, o replaceState da inicialização apagava utm_*/gclid antes de o GA4 (carregado só após
+// o consentimento) ler a página de entrada, e a visita perdia a origem da campanha.
+const CAMPAIGN_PARAM = /^(utm_(source|medium|campaign|term|content|id)|gclid|gbraid|wbraid|gad_source|gad_campaignid|fbclid)$/;
+
 function buildUrl(next) {
   const params = new URLSearchParams();
+  new URLSearchParams(window.location.search).forEach((v, k) => {
+    if (CAMPAIGN_PARAM.test(k)) params.set(k, v);
+  });
   if (next.type === 'category') {
     params.set('categoria', next.categoryId);
     if (next.subcategoryId) params.set('subcategoria', next.subcategoryId);
-  } else if (next.type === 'search') {
-    params.set('q', next.query);
   }
+  // Busca (texto livre) não entra na URL: fica só em history.state (ver stateFromLocation).
   const qs = params.toString();
   return window.location.pathname + (qs ? `?${qs}` : '');
 }
@@ -900,7 +913,7 @@ function initSearch() {
       const input = form.querySelector('.cat-search-input');
       const termo = (input?.value || '').trim();
       if (termo) {
-        window.trackEvent?.('catalog_search_submit', { search_term: termo });
+        window.trackEvent?.('catalog_search_submit', { search_term_length: termo.length });
         goSearch(termo);
       }
     });

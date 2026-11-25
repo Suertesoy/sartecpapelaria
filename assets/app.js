@@ -33,7 +33,7 @@ function montarWpp(numero, mensagem) {
  * Sempre inclui page_path e page_title; o restante vem de `params`.
  * Nunca lança erro, mesmo sem GA4/Clarity/Vercel Analytics instalados.
  */
-function trackEvent(nome, params = {}) {
+function trackEvent(nome, params = {}, opcoes = {}) {
   const payload = Object.assign(
     {
       page_path: window.location.pathname,
@@ -43,11 +43,20 @@ function trackEvent(nome, params = {}) {
     params
   );
 
+  // Consentimento (assets/consent.js): sem autorização de medição, nada vai para GA4 nem PostHog
+  // — nem fica na fila do dataLayer para ser enviado depois.
+  const medicaoPermitida = !!(window.SartecConsent && window.SartecConsent.analyticsPermitido());
+
   try {
-    if (typeof window.gtag === 'function') {
+    if (medicaoPermitida && typeof window.gtag === 'function') {
       window.gtag('event', nome, payload);
     }
   } catch (_) { /* GA4 ausente ou com erro — ignorar silenciosamente */ }
+
+  try {
+    // PostHog recebe só eventos e propriedades de uma lista fechada (ver EVENTOS em consent.js).
+    if (medicaoPermitida) window.SartecConsent.capturar(nome, params, opcoes);
+  } catch (_) { /* PostHog ausente ou com erro — ignorar silenciosamente */ }
 
   try {
     if (typeof window.va === 'function') {
@@ -64,13 +73,13 @@ function trackEvent(nome, params = {}) {
   } catch (_) { /* console indisponível — ignorar */ }
 }
 
-function trackWhatsappClick(origem, tipo, url) {
+function trackWhatsappClick(origem, tipo, url, opcoes) {
   trackEvent('whatsapp_click', {
     origin_page: origem,
     event_category: 'whatsapp',
     event_label: tipo,
     target_url: url,
-  });
+  }, opcoes);
 }
 
 function trackCtaClick(origem, label, url) {
@@ -134,7 +143,9 @@ function initAutoTracking() {
       // lista escolar, a mensagem pode conter nome/WhatsApp digitados pelo usuário, e o valor
       // também pode passar do limite de 255 caracteres aceito pela Vercel Analytics.
       const targetUrl = href.split('?')[0];
-      trackWhatsappClick(origem, tipo, targetUrl);
+      // defaultPrevented: a validação da página impediu a abertura do WhatsApp (ex.: lista escolar
+      // sem nome da criança). O GA4 segue recebendo como antes; o PostHog descarta esse clique.
+      trackWhatsappClick(origem, tipo, targetUrl, { bloqueado: e.defaultPrevented });
       return;
     }
     if (href.includes('google.com/maps') || href.includes('goo.gl/maps')) {
@@ -421,6 +432,7 @@ function renderFooter() {
         <div class="container footer-bottom-inner">
           <span>© 2026 Sartec Papelaria e Informática &nbsp;·&nbsp; CNPJ: ${SARTEC.CNPJ}</span>
           <span>Implementado pela <a href="https://lacabral.vercel.app/" target="_blank" rel="noopener" class="footer-partner-link">L A Cabral</a></span>
+          <span><button type="button" class="footer-privacy-link" data-abrir-privacidade>Preferências de privacidade</button></span>
           <span class="footer-ai-note">Algumas imagens deste site foram geradas ou editadas com inteligência artificial para fins ilustrativos.</span>
         </div>
       </div>

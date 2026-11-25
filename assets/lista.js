@@ -460,6 +460,7 @@ formUpload.addEventListener('submit', async (e) => {
   }
   if (arquivos.length > MAX_ARQUIVOS) {
     mostrarErro(`Você pode enviar até ${MAX_ARQUIVOS} arquivos por lista. Selecione os mais completos da mesma criança.`);
+    trackEvent('school_list_form_error', { reason: 'arquivos_demais' });
     return;
   }
   estado.rascunho.arquivoNome = arquivos.map(f => f.name).join(', ');
@@ -656,6 +657,8 @@ async function iniciarAnalise(arquivos) {
   }, 2200);
 
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  // Só o tipo da falha (categoria fixa) e a contagem de arquivos: nunca mensagens, nomes ou conteúdo.
+  const registrarFalha = (tipo) => trackEvent('school_list_analysis_failed', { error_type: tipo, file_count: arquivos.length });
 
   try {
     let paraEnviar;
@@ -666,6 +669,7 @@ async function iniciarAnalise(arquivos) {
       reativarBtn();
       trocarEstado('estado-upload');
       mostrarErro(errPreparo instanceof ErroPreparo ? errPreparo.message : 'Não foi possível preparar os arquivos. Tente novamente.');
+      registrarFalha('preparo_arquivo');
       return;
     }
 
@@ -679,6 +683,7 @@ async function iniciarAnalise(arquivos) {
       reativarBtn();
       trocarEstado('estado-upload');
       mostrarErro('Os arquivos ficaram grandes demais para enviar juntos. Envie menos páginas por vez.');
+      registrarFalha('arquivo_grande_demais');
       return;
     }
     const dados = await resposta.json();
@@ -693,10 +698,11 @@ async function iniciarAnalise(arquivos) {
         reativarBtn();
         trocarEstado('estado-upload');
         mostrarErroMultiArquivo();
+        registrarFalha('criancas_diferentes');
         return;
       }
 
-      // Incerto — pedir confirmação antes de continuar
+      // Incerto — pedir confirmação antes de continuar (não é falha: a pessoa pode confirmar)
       if (vc && !vc.mesmaCriancaProvavel) {
         pendingDados = dados;
         reativarBtn();
@@ -719,6 +725,7 @@ async function iniciarAnalise(arquivos) {
     reativarBtn();
     trocarEstado('estado-upload');
     mostrarErro(dados.error || 'Não consegui identificar itens na lista. Tente enviar uma foto mais nítida ou um PDF.');
+    registrarFalha(resposta.ok ? 'nenhum_item' : 'erro_servidor');
   } catch (err) {
     clearInterval(interval);
     console.error('[lista] Erro na análise:', err);
@@ -732,6 +739,7 @@ async function iniciarAnalise(arquivos) {
     reativarBtn();
     trocarEstado('estado-upload');
     mostrarErro('Erro de conexão. Verifique sua internet e tente novamente.');
+    registrarFalha(err instanceof SyntaxError ? 'resposta_invalida' : 'conexao');
   }
 }
 
@@ -890,11 +898,13 @@ function validarEEnviar(e) {
     if (!(lista.aluno.nome || '').trim()) {
       e.preventDefault();
       abrirListaComErro(lista.id, 'aluno-nome', 'Informe o nome da criança/aluno para identificar esta lista.');
+      trackEvent('school_list_send_blocked', { reason: 'nome_crianca_ausente' });
       return;
     }
     if (!(lista.aluno.preferenciaCor || '').trim()) {
       e.preventDefault();
       abrirListaComErro(lista.id, 'aluno-cor', 'Informe uma preferência de cor, personagem ou estilo. Se não tiver preferência, escreva "qualquer cor".');
+      trackEvent('school_list_send_blocked', { reason: 'preferencia_ausente' });
       return;
     }
   }

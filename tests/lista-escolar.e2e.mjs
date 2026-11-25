@@ -83,7 +83,17 @@ async function abrir(browser, base, { viewport, mobile = false, resposta = RESPO
   const ctx = await browser.newContext(device ? { ...devices[device] } : { viewport: viewport || { width: 1440, height: 900 }, isMobile: mobile, hasTouch: mobile, deviceScaleFactor: mobile ? 2 : 1 });
   const page = await ctx.newPage();
   const sessao = { page, ctx, envios: [], corpos: [], eventos: [], resposta, erros: [] };
-  await page.addInitScript(() => { window.SARTEC_DEBUG_ANALYTICS = true; });
+  await page.addInitScript(() => {
+    window.SARTEC_DEBUG_ANALYTICS = true;
+    // Estes testes cobrem a UX da lista, não o consentimento: simula visitante que já escolheu
+    // (só essenciais), para o banner de primeira visita não cobrir a tela. O banner e a primeira
+    // visita no mobile são cobertos em tests/analytics-consent.e2e.mjs.
+    try {
+      if (!localStorage.getItem('sartec_consent')) {
+        localStorage.setItem('sartec_consent', JSON.stringify({ v: 1, analytics: false, marketing: false, ts: Date.now() }));
+      }
+    } catch (_) {}
+  });
   // O Chromium não entrega ao Playwright os bytes de partes File/Blob; então medimos dentro da página:
   // tamanho exato do multipart (new Response(formData).blob()) e o conteúdo de cada arquivo enviado.
   await page.exposeFunction('__capturarEnvio', (dados) => {
