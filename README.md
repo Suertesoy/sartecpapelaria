@@ -29,8 +29,11 @@ Primeiro script de todas as páginas, síncrono. Google **Consent Mode v2, modo 
 
 - **Google Analytics 4 (GA4)** `G-S5M2P2DX7L` — mesma instalação de antes (um único `config`), agora
   carregada por `consent.js` só após o aceite. Referência para aquisição e atribuição.
-- **PostHog** — funis, usabilidade e erros. Desligado enquanto `POSTHOG_KEY` (em `consent.js`) estiver
-  vazio, e só ativo nos domínios de produção (`PROD_HOSTS`): dados de teste nunca vão para produção.
+- **PostHog** — funis, usabilidade e erros. Projeto "Sartec | Site e Conversão" (ID 772946, US Cloud,
+  organização L A Cabral), dashboard "Sartec | UX e Conversão". Carrega só após o aceite da categoria
+  "Medição" e só nos domínios de produção (`PROD_HOSTS`): dados de teste nunca vão para o projeto.
+  `POSTHOG_KEY: ''` desliga tudo. No projeto: IPs anonimizados e autocapture, replay, heatmaps,
+  console e performance desligados também no servidor.
   Sem autocapture, rage/dead clicks, heatmaps, exceções automáticas ou gravação de sessão
   (`REPLAY_ENABLED: false` até o mascaramento ser validado). Lista fechada de eventos/propriedades
   (`EVENTOS` em `consent.js`); `before_send` descarta o resto e remove query strings das URLs
