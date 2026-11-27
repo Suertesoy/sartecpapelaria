@@ -23,8 +23,9 @@
 
   var CONFIG = {
     GA4_ID: 'G-S5M2P2DX7L',
-    // Token PÚBLICO do projeto PostHog da Sartec (phc_...). Vazio = PostHog desligado.
-    POSTHOG_KEY: '',
+    // Token PÚBLICO (só escrita) do projeto PostHog "Sartec | Site e Conversão" (ID 772946, US Cloud).
+    // Feito para ficar no código do site. Vazio = PostHog desligado (chave de emergência).
+    POSTHOG_KEY: 'phc_yVZgktfxBtXZyMEsvBW6XBvJTtQQbSShE8TRmmsRmxeq',
     POSTHOG_HOST: 'https://us.i.posthog.com',
     PROD_HOSTS: ['sartecpapelaria.com.br', 'www.sartecpapelaria.com.br'],
     // Gravação de sessão fica DESLIGADA até o mascaramento ser validado em staging.
