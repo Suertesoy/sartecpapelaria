@@ -76,6 +76,17 @@ function conferirPH(s, esperados) {
 async function abrir(browser, { device = null, consent = null } = {}) {
   const ctx = await browser.newContext(device ? { ...devices[device] } : { viewport: { width: 1366, height: 900 }, userAgent: UA_CHROME });
   const s = { ctx, ga: [], gaBruto: [], ph: [], phBruto: [], phReq: [], wa: [], anuncios: [], gtag: 0, erros: [], api: 0 };
+  // Em HTTPS o navegador headless se identifica como "HeadlessChrome" em navigator.userAgentData, e o
+  // filtro de robôs do PostHog descarta os eventos (correto para robôs reais). Só no teste, apresenta
+  // as marcas de um Chrome comum; o código do site não muda.
+  if (!device) {
+    await ctx.addInitScript(() => {
+      try {
+        const brands = [{ brand: 'Chromium', version: '140' }, { brand: 'Google Chrome', version: '140' }, { brand: 'Not=A?Brand', version: '24' }];
+        Object.defineProperty(Navigator.prototype, 'userAgentData', { configurable: true, get: () => ({ brands, mobile: false, platform: 'Windows', getHighEntropyValues: async () => ({ brands, mobile: false, platform: 'Windows' }), toJSON: () => ({ brands, mobile: false, platform: 'Windows' }) }) });
+      } catch (_) {}
+    });
+  }
   if (consent) {
     await ctx.addInitScript((c) => {
       try { if (!sessionStorage.getItem('__p')) { sessionStorage.setItem('__p', '1'); localStorage.setItem('sartec_consent', JSON.stringify({ v: 1, ...c, ts: Date.now() })); } } catch (_) {}
